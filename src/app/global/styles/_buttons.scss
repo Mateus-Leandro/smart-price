@@ -1,0 +1,15 @@
+@use '../colors' as *;
+@use '@angular/material' as mat;
+
+@include mat.button-overrides(
+  (
+    filled-container-color: $primary,
+    filled-label-text-color: $font-primary,
+    filled-container-height: 36px,
+    filled-container-shape: 8px,
+  )
+);
+
+.button:hover {
+  opacity: 0.6;
+}

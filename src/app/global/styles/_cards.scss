@@ -1,0 +1,12 @@
+@use '../colors' as *;
+@use '@angular/material' as mat;
+
+@include mat.card-overrides(
+  (
+    title-text-size: 16px,
+    title-text-weight: 500,
+    subtitle-text-size: 13px,
+    subtitle-text-color: $medium-gray,
+    subtitle-text-line-height: normal,
+  )
+);

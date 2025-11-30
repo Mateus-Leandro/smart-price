@@ -1,0 +1,18 @@
+@use '../../../../global/colors.scss' as *;
+
+.mat-card {
+  margin: 20px;
+  background: #fff;
+  color: $font-secondary;
+}
+
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.table-container {
+  margin: 10px;
+}

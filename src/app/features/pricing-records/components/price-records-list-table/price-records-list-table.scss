@@ -1,0 +1,11 @@
+@use '../../../../global/colors.scss' as *;
+@use '../../../../global/styles/tables' as *;
+
+.mat-card {
+  margin: 20px;
+  background: $secondary;
+}
+
+.table-container {
+  margin: 10px;
+}

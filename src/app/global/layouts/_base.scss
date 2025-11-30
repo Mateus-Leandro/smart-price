@@ -1,0 +1,22 @@
+@use '../colors' as *;
+@use '@angular/material' as mat;
+
+body {
+  color-scheme: light;
+  background-color: $light-gray;
+  margin: 0;
+  font-family: Roboto, sans-serif;
+}
+
+html {
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$azure-palette,
+        tertiary: mat.$blue-palette,
+      ),
+      typography: Roboto,
+      density: 0,
+    )
+  );
+}

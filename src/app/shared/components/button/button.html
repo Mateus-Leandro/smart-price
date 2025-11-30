@@ -1,0 +1,6 @@
+<button mat-flat-button class="button" [style.--bg-color]="bgColor" [style.--text-color]="textColor">
+    @if (icon) {
+    <mat-icon class="icon-left">{{ icon }}</mat-icon>
+    }
+    {{ text }}
+</button>

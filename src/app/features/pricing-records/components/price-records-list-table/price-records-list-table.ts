@@ -1,26 +1,16 @@
 import { Component, ViewChild } from '@angular/core';
-import { MatCardModule } from '@angular/material/card';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatSort, MatSortModule } from '@angular/material/sort';
-
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatIconModule } from '@angular/material/icon';
+import { IconButton } from "../../../../shared/components/icon-button/icon-button";
 
 @Component({
-  selector: 'app-lista-precificacao',
-  imports: [
-    MatToolbarModule,
-    MatCardModule,
-    MatButtonModule,
-    MatIconModule,
-    MatTableModule,
-    MatSortModule,
-  ],
-  templateUrl: './lista-precificacao.html',
-  styleUrl: './lista-precificacao.scss',
+  selector: 'app-price-records-list-table',
+  imports: [MatTableModule, MatSortModule, MatIconModule, IconButton],
+  templateUrl: './price-records-list-table.html',
+  styleUrl: './price-records-list-table.scss',
 })
-export class ListaPrecificacao {
+export class PriceRecordsListTable {
   @ViewChild(MatSort) sort!: MatSort;
   ngAfterViewInit() {
     this.dataSource.sort = this.sort;
@@ -40,7 +30,13 @@ export class ListaPrecificacao {
   }
 
   dataSource = new MatTableDataSource([
-    { nome: 'Encarte Semanal - 04/11/2025', data: '03/11/2025', status: 'Concluído', produtos: '45 produtos', acoes: '' },
+    {
+      nome: 'Encarte Semanal - 04/11/2025',
+      data: '03/11/2025',
+      status: 'Concluído',
+      produtos: '45 produtos',
+      acoes: '',
+    },
     {
       nome: 'Promoção Quinzenal - 28/10/2025',
       data: '27/10/2025',

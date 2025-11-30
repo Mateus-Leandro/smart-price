@@ -1,8 +1,8 @@
 import { Component, signal } from '@angular/core';
-import { ListaPrecificacao } from "./lista-precificacao/lista-precificacao";
+import { PriceRecordsList } from "./features/pricing-records/pages/price-records-list/price-records-list";
 @Component({
   selector: 'app-root',
-  imports: [ListaPrecificacao],
+  imports: [PriceRecordsList],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
