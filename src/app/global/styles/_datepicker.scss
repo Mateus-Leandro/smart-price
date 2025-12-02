@@ -1,0 +1,11 @@
+@use '../colors' as *;
+@use '@angular/material' as mat;
+
+@include mat.datepicker-overrides(
+  (
+    calendar-body-label-text-color: $primary,
+    calendar-period-button-text-color: $primary,
+    calendar-navigation-button-icon-color: $primary,
+    calendar-header-text-color: $font-primary,
+  )
+);

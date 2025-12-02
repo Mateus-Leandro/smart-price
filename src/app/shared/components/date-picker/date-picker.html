@@ -1,0 +1,16 @@
+<div [formGroup]="dpFormGroup">
+    <mat-form-field appearance="outline">
+        <mat-label>{{ label }}</mat-label>
+
+        <input matInput [matDatepicker]="dp" formControlName="selectionDate" [min]="minDate" [max]="maxDate"
+            [required]="required" readonly (click)="dp.open()" />
+
+        <mat-datepicker-toggle matIconSuffix [for]="dp"></mat-datepicker-toggle>
+        <mat-datepicker #dp></mat-datepicker>
+
+        @if (dpFormGroup.get('selectionDate')?.hasError('required')) {
+        <mat-error>Campo obrigatório</mat-error>
+        }
+
+    </mat-form-field>
+</div>
