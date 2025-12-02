@@ -1,0 +1,9 @@
+@use '../colors' as *;
+@use '@angular/material' as mat;
+
+@include mat.dialog-overrides(
+  (
+    subhead-color: $font-secondary,
+    container-shape: 10px,
+  )
+);
