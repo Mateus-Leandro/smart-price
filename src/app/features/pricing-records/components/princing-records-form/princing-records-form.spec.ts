@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { PriceRecordsListTable } from './price-records-list-table';
+import { PrincingRecordsForm } from './princing-records-form';
 
-describe('PriceRecordsListTable', () => {
-  let component: PriceRecordsListTable;
-  let fixture: ComponentFixture<PriceRecordsListTable>;
+describe('PrincingRecordsForm', () => {
+  let component: PrincingRecordsForm;
+  let fixture: ComponentFixture<PrincingRecordsForm>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [PriceRecordsListTable]
+      imports: [PrincingRecordsForm]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(PriceRecordsListTable);
+    fixture = TestBed.createComponent(PrincingRecordsForm);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

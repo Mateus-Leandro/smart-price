@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, inject, model, signal, ViewChild } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
@@ -7,7 +7,16 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { Button } from '../../../../shared/components/button/button';
 import { ToolBar } from '../../../../core/layout/tool-bar/tool-bar';
-import { PriceRecordsListTable } from '../../components/price-records-list-table/price-records-list-table';
+import { PricingRecordsListTable } from '../../components/pricing-records-list-table/pricing-records-list-table';
+import { MatDialog } from '@angular/material/dialog';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { provideNativeDateAdapter } from '@angular/material/core';
+import {
+  PrincingRecordsForm,
+  PrincingRecordsFormData,
+} from '../../components/princing-records-form/princing-records-form';
 
 @Component({
   selector: 'app-price-records-list',
@@ -20,13 +29,20 @@ import { PriceRecordsListTable } from '../../components/price-records-list-table
     MatSortModule,
     Button,
     ToolBar,
-    PriceRecordsListTable,
+    PricingRecordsListTable,
+    MatFormFieldModule,
+    MatInputModule,
+    MatDatepickerModule,
   ],
-  templateUrl: './price-records-list.html',
-  styleUrl: './price-records-list.scss',
+  templateUrl: './pricing-records-list.html',
+  providers: [provideNativeDateAdapter()],
+  styleUrl: './pricing-records-list.scss',
 })
-export class PriceRecordsList {
+export class PricingRecordsList {
   @ViewChild(MatSort) sort!: MatSort;
+  private readonly dialog = inject(MatDialog);
+  formData = signal<PrincingRecordsFormData>({ name: '', creationDate: '' });
+
   ngAfterViewInit() {
     this.dataSource.sort = this.sort;
 
@@ -67,4 +83,20 @@ export class PriceRecordsList {
       acoes: '',
     },
   ]);
+
+  openDialog(): void {
+    const dialogRef = this.dialog.open(PrincingRecordsForm, {
+      data: {
+        name: this.formData().name,
+        creationDate: this.formData().creationDate,
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((result: PrincingRecordsFormData | undefined) => {
+      if (result) {
+        this.formData.set(result);
+        console.log(JSON.stringify(result));
+      }
+    });
+  }
 }

@@ -2,16 +2,18 @@ import { Component, ViewChild } from '@angular/core';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
-import { IconButton } from "../../../../shared/components/icon-button/icon-button";
+import { IconButton } from '../../../../shared/components/icon-button/icon-button';
+import { PrincingRecordsForm } from '../princing-records-form/princing-records-form';
 
 @Component({
   selector: 'app-price-records-list-table',
   imports: [MatTableModule, MatSortModule, MatIconModule, IconButton],
-  templateUrl: './price-records-list-table.html',
-  styleUrl: './price-records-list-table.scss',
+  templateUrl: './pricing-records-list-table.html',
+  styleUrl: './pricing-records-list-table.scss',
 })
-export class PriceRecordsListTable {
+export class PricingRecordsListTable {
   @ViewChild(MatSort) sort!: MatSort;
+
   ngAfterViewInit() {
     this.dataSource.sort = this.sort;
 
