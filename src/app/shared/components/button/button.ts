@@ -3,10 +3,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { Spinner } from '../spinner/spinner';
 
 @Component({
   selector: 'app-button',
-  imports: [MatButtonModule, MatIcon, CommonModule, MatProgressSpinnerModule],
+  imports: [MatButtonModule, MatIcon, CommonModule, MatProgressSpinnerModule, Spinner],
   templateUrl: './button.html',
   styleUrl: '../../../global/styles/_buttons.scss',
 })
