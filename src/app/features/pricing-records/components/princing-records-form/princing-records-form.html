@@ -1,36 +1,28 @@
 <h2 mat-dialog-title>Novo Registro de Precificação</h2>
 
 <form [formGroup]="form" (ngSubmit)="salvar()">
+  <mat-dialog-content>
+    <p>Crie um novo registro para gerenciar a precificação de produtos</p>
 
-    <mat-dialog-content>
+    <div fxLayout="column" fxLayoutGap="16px">
+      <mat-form-field appearance="outline">
+        <mat-label>Nome do registro</mat-label>
 
-        <p>Crie um novo registro para gerenciar a precificação de produtos</p>
+        <input matInput formControlName="name" />
 
-        <div fxLayout="column" fxLayoutGap="16px">
+        @if (form.get('name')?.invalid && form.get('name')?.touched) {
+          <mat-error>Campo obrigatório</mat-error>
+        }
+      </mat-form-field>
 
-            <mat-form-field appearance="outline">
-                <mat-label>Nome do registro</mat-label>
+      <app-date-picker formControlName="creationDate" label="Data de criação" [required]="true">
+      </app-date-picker>
+    </div>
+  </mat-dialog-content>
 
-                <input matInput formControlName="name" />
+  <mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close type="button">Cancelar</button>
 
-                @if (form.get('name')?.invalid && form.get('name')?.touched) {
-                <mat-error>Campo obrigatório</mat-error>
-                }
-            </mat-form-field>
-
-            <app-date-picker formControlName="creationDate" label="Data de criação" [required]="true">
-            </app-date-picker>
-
-        </div>
-
-    </mat-dialog-content>
-
-    <mat-dialog-actions align="end">
-        <button mat-button mat-dialog-close type="button">Cancelar</button>
-
-        <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">
-            Salvar
-        </button>
-    </mat-dialog-actions>
-
+    <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">Salvar</button>
+  </mat-dialog-actions>
 </form>

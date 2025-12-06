@@ -13,9 +13,9 @@ export const routes: Routes = [
     path: 'home',
     canActivate: [authGuard],
     loadComponent: () =>
-      import(
-        '../app/features/pricing-records/pages/pricing-records-list/pricing-records-list'
-      ).then((m) => m.PricingRecordsList),
+      import('../app/features/pricing-records/pages/pricing-records-list/pricing-records-list').then(
+        (m) => m.PricingRecordsList,
+      ),
   },
 
   { path: '', redirectTo: 'home', pathMatch: 'full' },
