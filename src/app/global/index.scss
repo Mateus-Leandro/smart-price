@@ -1,7 +1,7 @@
 @use './colors';
 
-@use './layouts/base';
-@use './layouts/helpers';
+@use './styles/base';
+@use './styles/helpers';
 
 @use './styles/buttons';
 @use './styles/tables';
@@ -9,3 +9,4 @@
 @use './styles/cards';
 @use './styles/dialogs';
 @use './styles/datepicker';
+@use './styles/spinner';

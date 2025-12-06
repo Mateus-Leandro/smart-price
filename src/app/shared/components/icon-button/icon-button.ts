@@ -5,7 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
   selector: 'app-icon-button',
   imports: [MatIconModule],
   templateUrl: './icon-button.html',
-  styleUrl: './icon-button.scss',
+  styleUrl: '../../../global/styles/_buttons.scss',
 })
 export class IconButton {
   @Input() icon: string = '';
