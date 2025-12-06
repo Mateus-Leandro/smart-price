@@ -14,4 +14,9 @@ export class Button {
   @Input() icon: string = '';
   @Input() bgColor: string = '#000';
   @Input() textColor: string = 'white';
+  @Input() height: string = '40px';
+  @Input() width: string = 'auto';
+  @Input() fontSize: string = '16px';
+  @Input() padding: string = '0 24px';
+  @Input() type: 'button' | 'submit' = 'button';
 }
