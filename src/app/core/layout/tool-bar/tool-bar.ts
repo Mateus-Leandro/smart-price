@@ -12,8 +12,10 @@ import { Button } from 'src/app/shared/components/button/button';
 })
 export class ToolBar {
   constructor(private authService: AuthService) {}
+  loading = false;
 
   logout() {
+    this.loading = true;
     this.authService.logout();
   }
 }
