@@ -47,7 +47,7 @@ export class PrincingRecordsForm {
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<PrincingRecordsForm>,
-    @Inject(MAT_DIALOG_DATA) public data: PrincingRecordsFormData
+    @Inject(MAT_DIALOG_DATA) public data: PrincingRecordsFormData,
   ) {
     this.form = this.fb.group({
       name: [data.name || '', Validators.required],

@@ -17,6 +17,8 @@ import {
   PrincingRecordsForm,
   PrincingRecordsFormData,
 } from '../../components/princing-records-form/princing-records-form';
+import { SupabaseService } from 'src/app/shared/services/supabase.service';
+import { AuthService } from 'src/app/features/auth/services/auth.service';
 
 @Component({
   selector: 'app-price-records-list',
@@ -42,6 +44,8 @@ export class PricingRecordsList {
   @ViewChild(MatSort) sort!: MatSort;
   private readonly dialog = inject(MatDialog);
   formData = signal<PrincingRecordsFormData>({ name: '', creationDate: '' });
+
+  constructor(private authService: AuthService) {}
 
   ngAfterViewInit() {
     this.dataSource.sort = this.sort;

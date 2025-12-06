@@ -6,7 +6,10 @@ import { Router } from '@angular/router';
   providedIn: 'root',
 })
 export class AuthService {
-  constructor(private supabaseService: SupabaseService, private router: Router) {}
+  constructor(
+    private supabaseService: SupabaseService,
+    private router: Router,
+  ) {}
 
   async login(email: string, password: string) {
     const { data, error } = await this.supabaseService.supabase.auth.signInWithPassword({

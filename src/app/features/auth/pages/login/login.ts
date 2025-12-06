@@ -4,8 +4,9 @@ import { MatInputModule } from '@angular/material/input';
 import { FormsModule, NgForm } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { Button } from 'src/app/shared/components/button/button';
-import { CommonModule, } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
   selector: 'app-login',
@@ -17,20 +18,30 @@ import { Router } from '@angular/router';
 export class Login {
   email = '';
   password = '';
+  loading = false;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private cdr: ChangeDetectorRef,
+  ) {}
 
   async login(form: NgForm) {
+    this.loading = true;
+
     if (form.invalid) {
       form.control.markAllAsTouched();
+      this.loading = false;
       return;
     }
 
     try {
       await this.authService.login(this.email, this.password);
       this.router.navigate(['/home']);
-    } catch (error: any) {
-      alert(error.message);
+    } catch (error) {
+    } finally {
+      this.loading = false;
+      this.cdr.detectChanges();
     }
   }
 }
