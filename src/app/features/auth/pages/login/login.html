@@ -1,53 +1,49 @@
-<div fxLayout="row" style="width: 100vw; height: 100vh;">
-    <div fxFlex="100" fxLayout="row" class="box-right">
-        <div fxLayout="row" fxFlex="460px" class="box-left">
+<div fxLayout="row" style="width: 100%; height: 100vh;">
+    <div fxFlex fxLayout="row" class="box-right">
+
+        <div fxLayout="column" class="box-left" fxFlex="30%" fxFlex.lt-md="100%">
+
             <div fxLayout="column" fxFlexAlign="center">
 
-                <div fxLayout="row" fxLayoutAlign="center">
-                    <img src="assets/images/logo_smart_price.png" alt="Smart Price" width="440"
-                        style="padding-bottom: 80px;">
+                <div fxLayout="row" fxLayoutAlign="center" class="pad-t-10">
+                    <img src="assets/images/logo_smart_price.png" alt="Smart Price" class="logo">
                 </div>
 
                 <form (ngSubmit)="login(form)" #form="ngForm" fxLayout="column" fxLayoutGap="16px">
 
-                    <div fxLayout="row" class="pad-l-10">
-                        <div fxLayout="column" fxFlex="430px">
-                            <mat-form-field appearance="outline">
+                    <div fxLayout="row" fxLayoutAlign="start">
+                        <div fxFlex="100%" class="full-width">
+                            <mat-form-field appearance="outline" class="full-width">
                                 <mat-label>Email</mat-label>
-                                <input matInput type="email" placeholder="Informe seu email" [(ngModel)]="email"
-                                    name="email" #user="ngModel" required />
-                                @if(user.invalid && user.touched){
-                                <mat-error>
-                                    Campo obrigatório
-                                </mat-error>
+                                <input matInput type="email" [(ngModel)]="email" name="email" #user="ngModel"
+                                    required />
+                                @if(user.invalid){
+                                <mat-error>Campo obrigatório</mat-error>
                                 }
                             </mat-form-field>
                         </div>
                     </div>
 
-                    <div fxLayout="row" class="pad-l-10">
-                        <div fxLayout="column" fxFlex="430px">
-                            <mat-form-field appearance="outline">
+                    <div fxLayout="row" fxLayoutAlign="start">
+                        <div fxFlex="100%" class="full-width">
+                            <mat-form-field appearance="outline" class="full-width">
                                 <mat-label>Senha</mat-label>
-                                <input matInput type="password" placeholder="Digite sua senha" [(ngModel)]="password"
-                                    name="password" #pass="ngModel" required />
-                                @if(pass.invalid && pass.touched){
-                                <mat-error>
-                                    Campo obrigatório
-                                </mat-error>
+                                <input matInput type="password" [(ngModel)]="password" name="password" #pass="ngModel" required />
+                                @if(pass.invalid){
+                                <mat-error>Campo obrigatório</mat-error>
                                 }
                             </mat-form-field>
                         </div>
                     </div>
 
-                    <div fxLayout="row" fxLayoutAlign="center" class="pad-l-10">
-                        <app-button text="Entrar" width="430px" height="52px" fontSize="18px" padding="0 32px">
+                    <div fxLayout="row" fxLayoutAlign="center">
+                        <app-button text="Entrar" width="250px" height="52px" fontSize="18px" [disabled]="!!form.invalid" type="submit" >
                         </app-button>
                     </div>
 
                 </form>
-
             </div>
+
         </div>
     </div>
 </div>
