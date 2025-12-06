@@ -1,0 +1,23 @@
+.button {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  padding: 0;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  border-radius: 50%;
+  border: none;
+
+  mat-icon {
+    color: #ff0000;
+    font-size: 22px;
+  }
+}
+
+.button:hover {
+  cursor: pointer;
+  opacity: 0.6;
+}

@@ -23,4 +23,5 @@ export class Button {
   @Input() type: 'button' | 'submit' = 'button';
   @Input() disabled: boolean = false;
   @Input() loading: boolean = false;
+  @Input() spinnerDiameter = 70;
 }
