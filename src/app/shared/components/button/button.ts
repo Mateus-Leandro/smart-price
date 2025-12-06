@@ -19,4 +19,6 @@ export class Button {
   @Input() fontSize: string = '16px';
   @Input() padding: string = '0 24px';
   @Input() type: 'button' | 'submit' = 'button';
+  @Input() disabled: boolean = false;
+
 }
