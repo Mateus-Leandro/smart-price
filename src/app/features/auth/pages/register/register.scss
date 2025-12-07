@@ -1,0 +1,10 @@
+@use '@angular/material' as mat;
+
+mat-card {
+  border-radius: 0 !important;
+}
+
+.logo {
+  width: 50%;
+  max-width: 400px;
+}

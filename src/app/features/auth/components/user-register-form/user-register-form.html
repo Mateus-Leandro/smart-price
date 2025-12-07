@@ -1,0 +1,25 @@
+<form #userForm="ngForm">
+  <div fxLayout="column" fxLayoutGap="10px">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Nome</mat-label>
+      <input type="text" matInput placeholder="Digite seu nome" required />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Email</mat-label>
+      <input type="email" matInput placeholder="Digite seu email" required />
+    </mat-form-field>
+
+    <div fxLayout="row" fxLayoutGap="20px">
+      <mat-form-field appearance="outline" fxFlex>
+        <mat-label>Senha</mat-label>
+        <input type="password" matInput placeholder="Digite sua senha" required />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" fxFlex>
+        <mat-label>Confirmar senha</mat-label>
+        <input type="password" matInput placeholder="Confirme a senha" required />
+      </mat-form-field>
+    </div>
+  </div>
+</form>

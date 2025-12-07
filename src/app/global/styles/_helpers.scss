@@ -1,9 +1,27 @@
+@use '../colors' as *;
+
 .pad-t-10 {
-  padding-top: 20px;
+  padding-top: 10px;
+}
+
+.pad-b-10 {
+  padding-bottom: 20px;
 }
 
 .pad-l-10 {
   padding-left: 10px;
+}
+
+.pad-r-7 {
+  padding-right: 7px;
+}
+
+.mg-t-20 {
+  margin-top: 20px;
+}
+
+.mg-t-60 {
+  margin-top: 60px;
 }
 
 .full-width {
@@ -12,4 +30,13 @@
 
 .spacer {
   flex: 1 1 auto;
+}
+
+.full-page {
+  min-height: 100vh;
+}
+
+.full-color-page {
+  min-height: 100vh;
+  background-color: $primary;
 }
