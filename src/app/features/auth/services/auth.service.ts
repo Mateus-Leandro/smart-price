@@ -29,6 +29,13 @@ export class AuthService {
     this.router.navigate(['/login']);
   }
 
+  async register(email: string, password: string) {
+    const { error } = await this.supabaseService.supabase.auth.signUp({
+      email: email,
+      password: password,
+    });
+  }
+
   async passworldReset(email: string) {
     const { error } = await this.supabaseService.supabase.auth.resetPasswordForEmail(email);
     if (error) throw `Erro ao resetar senha: ${error}`;

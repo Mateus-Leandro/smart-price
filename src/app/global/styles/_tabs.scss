@@ -1,0 +1,13 @@
+@use '../colors' as *;
+@use '@angular/material' as mat;
+
+@include mat.tabs-overrides(
+  (
+    active-label-text-color: $font-primary,
+    active-focus-label-text-color: $font-primary,
+    active-hover-label-text-color: $font-primary,
+    inactive-hover-label-text-color: $font-primary,
+    inactive-focus-label-text-color: $font-primary,
+    inactive-label-text-color: $gray,
+  )
+);
