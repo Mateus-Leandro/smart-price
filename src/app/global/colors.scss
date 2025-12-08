@@ -8,4 +8,18 @@ $light-gray: #f5f2f2;
 $medium-gray: #6b7280;
 $gray: #bebebe;
 
-$error: #b00020;
+$cancel-color: #b00020;
+
+:root {
+  --primary: #{$primary};
+  --secondary: #{$secondary};
+
+  --font-primary: #{$font-primary};
+  --font-secondary: #{$font-secondary};
+
+  --light-gray: #{$light-gray};
+  --medium-gray: #{$medium-gray};
+  --gray: #{$gray};
+
+  --cancel-color: #{$cancel-color};
+}

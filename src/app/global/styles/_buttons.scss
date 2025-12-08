@@ -14,3 +14,9 @@
   opacity: 0.6;
   cursor: pointer;
 }
+
+.button[disabled] {
+  background-color: $gray !important;
+  color: $medium-gray !important;
+  opacity: 0.6 !important;
+}
