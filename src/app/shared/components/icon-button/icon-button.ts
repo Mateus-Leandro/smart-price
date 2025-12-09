@@ -5,8 +5,11 @@ import { MatIconModule } from '@angular/material/icon';
   selector: 'app-icon-button',
   imports: [MatIconModule],
   templateUrl: './icon-button.html',
-  styleUrl: './icon-button.scss',
 })
 export class IconButton {
   @Input() icon: string = '';
+  @Input() iconColor: string = 'var(--font-secondary)';
+  @Input() height: string = '36px';
+  @Input() width: string = '36px';
+  @Input() disabled?: boolean = false;
 }

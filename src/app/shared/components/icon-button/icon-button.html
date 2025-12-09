@@ -1,3 +1,11 @@
-<button mat-icon-button class="button">
+<button
+  class="button"
+  mat-icon-button
+  [style.height]="height"
+  [style.width]="width"
+  [style.color]="iconColor"
+  [disabled]="disabled"
+  style="border: none; background-color: transparent"
+>
   <mat-icon>{{ icon }}</mat-icon>
 </button>
