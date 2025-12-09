@@ -99,7 +99,6 @@ export class PricingRecordsList {
     dialogRef.afterClosed().subscribe((result: PrincingRecordsFormData | undefined) => {
       if (result) {
         this.formData.set(result);
-        console.log(JSON.stringify(result));
       }
     });
   }

@@ -2,12 +2,35 @@
   <div fxLayout="column" fxLayoutGap="10px">
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>CNPJ</mat-label>
-      <input type="text" matInput placeholder="Informe o CNPJ da empresa" required />
+      <input
+        type="text"
+        matInput
+        placeholder="00.000.000/0000-00"
+        [(ngModel)]="cnpj"
+        #document="ngModel"
+        name="cnpj"
+        mask="00.000.000/0000-00"
+        required
+      />
+      @if (document.invalid) {
+        <mat-error>Campo obrigatório</mat-error>
+      }
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Razão social</mat-label>
-      <input type="text" matInput placeholder="Digite a razão social" required />
+      <input
+        type="text"
+        matInput
+        placeholder="Digite a razão social"
+        [(ngModel)]="corporateReason"
+        #name="ngModel"
+        name="corporateReason"
+        required
+      />
+      @if (name.invalid) {
+        <mat-error>Campo obrigatório</mat-error>
+      }
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="full-width">

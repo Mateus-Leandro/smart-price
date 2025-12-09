@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { SupabaseService } from '../../../shared/services/supabase.service';
 import { Router } from '@angular/router';
+import { ICreateEnterpriseUser } from 'src/app/shared/interfaces/enterprise-user-interface';
 
 @Injectable({
   providedIn: 'root',
@@ -18,8 +19,7 @@ export class AuthService {
     });
 
     if (error) throw `Erro ao realizar login: ${error}`;
-
-    return data.user;
+    this.router.navigate(['/home']);
   }
 
   async logout() {
@@ -29,11 +29,12 @@ export class AuthService {
     this.router.navigate(['/login']);
   }
 
-  async register(email: string, password: string) {
-    const { error } = await this.supabaseService.supabase.auth.signUp({
-      email: email,
-      password: password,
-    });
+  async register(user: ICreateEnterpriseUser) {
+    try {
+      return await this.callPostEdgeFunction('create-enterprise-user', user);
+    } catch (error) {
+      throw `Erro ao criar usuário: ${error}`;
+    }
   }
 
   async passworldReset(email: string) {
@@ -44,5 +45,18 @@ export class AuthService {
   async isLogged() {
     const { data } = await this.supabaseService.supabase.auth.getSession();
     return !!data.session;
+  }
+
+  private async callPostEdgeFunction(functionName: string, body: any) {
+    const { data, error } = await this.supabaseService.supabase.functions.invoke(functionName, {
+      method: 'POST',
+      body: JSON.stringify(body),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (error) throw error;
+    return data;
   }
 }
