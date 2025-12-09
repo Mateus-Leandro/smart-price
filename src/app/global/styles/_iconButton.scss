@@ -1,0 +1,23 @@
+@use '../colors' as *;
+@use '@angular/material' as mat;
+
+@include mat.icon-button-overrides(
+  (
+    filled-container-color: $transparent,
+    icon-color: $font-primary,
+    icon-size: 22px,
+    container-shape: 8px,
+    disabled-icon-color: $gray,
+  )
+);
+
+.button:hover {
+  opacity: 0.6;
+  cursor: pointer;
+}
+
+.button[disabled] {
+  background-color: $gray !important;
+  color: $medium-gray !important;
+  opacity: 0.6 !important;
+}
