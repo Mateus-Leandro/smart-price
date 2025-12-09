@@ -2,23 +2,67 @@
   <div fxLayout="column" fxLayoutGap="10px">
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Nome</mat-label>
-      <input type="text" matInput placeholder="Digite seu nome" required />
+      <input
+        type="text"
+        matInput
+        placeholder="Digite seu nome"
+        [(ngModel)]="name"
+        #userName="ngModel"
+        name="name"
+        required
+      />
+      @if (userName.invalid) {
+        <mat-error>Campo obrigatório</mat-error>
+      }
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Email</mat-label>
-      <input type="email" matInput placeholder="Digite seu email" required />
+      <input
+        type="email"
+        matInput
+        placeholder="Digite seu email"
+        [(ngModel)]="email"
+        #userEmail="ngModel"
+        name="email"
+        required
+      />
+      @if (userEmail.invalid) {
+        <mat-error>Campo obrigatório</mat-error>
+      }
     </mat-form-field>
 
     <div fxLayout="row" fxLayoutGap="20px">
       <mat-form-field appearance="outline" fxFlex>
         <mat-label>Senha</mat-label>
-        <input type="password" matInput placeholder="Digite sua senha" required />
+        <input
+          type="password"
+          matInput
+          placeholder="Digite sua senha"
+          [(ngModel)]="pass"
+          #userPass="ngModel"
+          name="pass"
+          required
+        />
+        @if (userPass.invalid) {
+          <mat-error>Campo obrigatório</mat-error>
+        }
       </mat-form-field>
 
       <mat-form-field appearance="outline" fxFlex>
         <mat-label>Confirmar senha</mat-label>
-        <input type="password" matInput placeholder="Confirme a senha" required />
+        <input
+          type="password"
+          matInput
+          placeholder="Confirme a senha"
+          [(ngModel)]="confirmationPass"
+          #userConfirmationPass="ngModel"
+          name="confirmationPass"
+          required
+        />
+        @if (userConfirmationPass.invalid) {
+          <mat-error>Campo obrigatório</mat-error>
+        }
       </mat-form-field>
     </div>
   </div>

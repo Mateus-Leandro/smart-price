@@ -37,7 +37,6 @@ export class Login {
 
     try {
       await this.authService.login(this.email, this.password);
-      this.router.navigate(['/home']);
     } catch (error) {
     } finally {
       this.loading = false;

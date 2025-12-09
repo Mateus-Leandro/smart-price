@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 
@@ -9,4 +9,10 @@ import { MatInputModule } from '@angular/material/input';
   imports: [FlexLayoutModule, FormsModule, MatFormFieldModule, MatInputModule],
   templateUrl: './user-register-form.html',
 })
-export class UserRegisterForm {}
+export class UserRegisterForm {
+  name = '';
+  email = '';
+  pass = '';
+  confirmationPass = '';
+  @ViewChild('userForm') form?: NgForm;
+}
