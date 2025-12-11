@@ -1,6 +1,6 @@
 <h2 mat-dialog-title>Novo Registro de Precificação</h2>
 
-<form [formGroup]="form" (ngSubmit)="salvar()">
+<form [formGroup]="form" (ngSubmit)="save()">
   <mat-dialog-content>
     <p>Crie um novo registro para gerenciar a precificação de produtos</p>
 
@@ -21,8 +21,9 @@
   </mat-dialog-content>
 
   <mat-dialog-actions align="end">
-    <button mat-button mat-dialog-close type="button">Cancelar</button>
-
-    <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">Salvar</button>
+    <div fxLayout="row" fxLayoutGap="5px">
+      <app-button text="Cancelar" (click)="cancel()" type="button" bgColor="var(--cancel-color)" />
+      <app-button text="Salvar" type="submit" [disabled]="form.invalid" />
+    </div>
   </mat-dialog-actions>
 </form>
