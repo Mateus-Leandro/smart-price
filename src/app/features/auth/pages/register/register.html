@@ -6,10 +6,13 @@
   style="min-height: 100vh; padding-bottom: 10px"
 >
   <div fxLayout="column" fxFlex="100" fxFlex.gt-sm="70" fxFlex.gt-md="50">
+    <!-- Logo -->
     <div fxLayout="row" fxLayoutAlign="center start">
       <img src="assets/images/logo_smart_price.png" alt="Smart Price" class="logo" />
     </div>
+
     <mat-tab-group #tabs>
+      <!-- ABA EMPRESA -->
       <mat-tab label="Empresa">
         <mat-card>
           <mat-card-header>
@@ -17,7 +20,7 @@
           </mat-card-header>
 
           <mat-card-content>
-            <app-company-register-form #registerFormRef />
+            <app-company-register-form #companyFormRef></app-company-register-form>
           </mat-card-content>
 
           <mat-card-actions align="end">
@@ -28,11 +31,12 @@
                 bgColor="var(--cancel-color)"
                 (click)="returnToLogin()"
               ></app-button>
+
               <app-button
                 mat-flat-button
-                (click)="nextTab(tabs, registerFormRef)"
                 text="Próximo"
-                [disabled]="!!registerFormRef.form?.invalid"
+                (click)="nextTab(tabs, companyFormRef.companyFormGroup)"
+                [disabled]="companyFormRef.companyFormGroup.invalid"
               >
                 <mat-icon>chevron_right</mat-icon>
               </app-button>
@@ -41,14 +45,15 @@
         </mat-card>
       </mat-tab>
 
-      <mat-tab label="Usuário" [disabled]="registerFormRef.form?.invalid">
+      <!-- ABA USUÁRIO -->
+      <mat-tab label="Usuário" [disabled]="companyFormRef.companyFormGroup.invalid">
         <mat-card class="card-space">
           <mat-card-header>
             <mat-card-title>Informações do usuário</mat-card-title>
           </mat-card-header>
 
           <mat-card-content>
-            <app-user-register-form #userFormRef />
+            <app-user-register-form #userFormRef></app-user-register-form>
           </mat-card-content>
 
           <mat-card-actions align="end">
@@ -62,8 +67,12 @@
               <app-button
                 icon="save"
                 text="Salvar"
-                (click)="registerNewUser(userFormRef.form!, registerFormRef.form!)"
-                [disabled]="!!registerFormRef.form?.invalid || !!userFormRef.form?.invalid"
+                (click)="
+                  registerNewUser(userFormRef.userFormGroup, companyFormRef.companyFormGroup)
+                "
+                [disabled]="
+                  companyFormRef.companyFormGroup.invalid || userFormRef.userFormGroup.invalid
+                "
               ></app-button>
             </div>
           </mat-card-actions>

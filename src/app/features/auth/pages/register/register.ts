@@ -3,12 +3,12 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { MatTabGroup, MatTabsModule } from '@angular/material/tabs';
+import { MatTabsModule, MatTabGroup } from '@angular/material/tabs';
 import { CompanyRegisterForm } from '../../components/company-register-form/company-register-form';
 import { UserRegisterForm } from '../../components/user-register-form/user-register-form';
 import { Router } from '@angular/router';
 import { Button } from 'src/app/shared/components/button/button';
-import { NgForm } from '@angular/forms';
+import { FormGroup, NgForm } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { ICreateCompanyUser } from 'src/app/shared/interfaces/company-user-interface';
 
@@ -25,7 +25,7 @@ import { ICreateCompanyUser } from 'src/app/shared/interfaces/company-user-inter
     Button,
   ],
   templateUrl: './register.html',
-  styleUrl: './register.scss',
+  styleUrls: ['./register.scss'],
 })
 export class Register {
   constructor(
@@ -33,57 +33,60 @@ export class Register {
     private authService: AuthService,
   ) {}
 
-  nextTab(tabs: MatTabGroup, companyFormRef: any) {
-    const companyForm = companyFormRef.form;
-
+  nextTab(tabs: MatTabGroup, companyForm: FormGroup) {
     if (companyForm.invalid) {
-      companyForm.control.markAllAsTouched();
+      companyForm.markAllAsTouched();
       return;
     }
-
     tabs.selectedIndex = 1;
   }
-
   returnToLogin() {
     this.router.navigate(['/login']);
   }
 
-  async registerNewUser(userForm: NgForm, companyForm: NgForm) {
+  async registerNewUser(userForm: FormGroup, companyForm: FormGroup) {
     let invalid = false;
-
     if (companyForm.invalid) {
       invalid = true;
-      companyForm.control.markAllAsTouched();
+      companyForm.markAllAsTouched();
     }
 
     if (userForm.invalid) {
-      userForm.control.markAllAsTouched();
+      invalid = true;
+      userForm.markAllAsTouched();
     }
 
     if (invalid) return;
 
-    const companyFormValues = companyForm.value;
-    const userFormValues = userForm.value;
+    if (userForm.invalid || companyForm.invalid) return;
+
+    const invalidCompany = companyForm.invalid;
+    const invalidUser = userForm.invalid;
+
+    if (invalidCompany) companyForm.markAllAsTouched();
+    if (invalidUser) userForm.markAllAsTouched();
+    if (invalidCompany || invalidUser) return;
 
     const newUser: ICreateCompanyUser = {
       company: {
-        cnpj: companyFormValues.cnpj,
-        name: companyFormValues.corporateReason,
+        cnpj: companyForm.value.cnpj,
+        name: companyForm.value.corporateReason,
       },
       user: {
-        name: userFormValues.name,
-        email: userFormValues.email,
-        password: userFormValues.pass,
+        name: userForm.get('name')?.value,
+        email: userForm.get('email')?.value,
+        password: userForm.get('pass')?.value,
       },
     };
 
     try {
       const { user } = await this.authService.register(newUser);
+
       if (user) {
         await this.authService.login(user.email, newUser.user.password);
       }
-      return;
     } catch (error) {
+      console.error(error);
       throw error;
     }
   }
