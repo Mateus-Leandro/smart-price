@@ -4,13 +4,13 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTabGroup, MatTabsModule } from '@angular/material/tabs';
-import { EnterpriseRegisterForm } from '../../components/enterprise-register-form/enterprise-register-form';
+import { CompanyRegisterForm } from '../../components/company-register-form/company-register-form';
 import { UserRegisterForm } from '../../components/user-register-form/user-register-form';
-import { Route, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { Button } from 'src/app/shared/components/button/button';
 import { NgForm } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
-import { ICreateEnterpriseUser } from 'src/app/shared/interfaces/enterprise-user-interface';
+import { ICreateCompanyUser } from 'src/app/shared/interfaces/company-user-interface';
 
 @Component({
   selector: 'app-register',
@@ -20,7 +20,7 @@ import { ICreateEnterpriseUser } from 'src/app/shared/interfaces/enterprise-user
     MatIconModule,
     MatButtonModule,
     MatTabsModule,
-    EnterpriseRegisterForm,
+    CompanyRegisterForm,
     UserRegisterForm,
     Button,
   ],
@@ -33,11 +33,11 @@ export class Register {
     private authService: AuthService,
   ) {}
 
-  nextTab(tabs: MatTabGroup, enterpriseFormRef: any) {
-    const enterpriseForm = enterpriseFormRef.form;
+  nextTab(tabs: MatTabGroup, companyFormRef: any) {
+    const companyForm = companyFormRef.form;
 
-    if (enterpriseForm.invalid) {
-      enterpriseForm.control.markAllAsTouched();
+    if (companyForm.invalid) {
+      companyForm.control.markAllAsTouched();
       return;
     }
 
@@ -48,12 +48,12 @@ export class Register {
     this.router.navigate(['/login']);
   }
 
-  async registerNewUser(userForm: NgForm, enterpriseForm: NgForm) {
+  async registerNewUser(userForm: NgForm, companyForm: NgForm) {
     let invalid = false;
 
-    if (enterpriseForm.invalid) {
+    if (companyForm.invalid) {
       invalid = true;
-      enterpriseForm.control.markAllAsTouched();
+      companyForm.control.markAllAsTouched();
     }
 
     if (userForm.invalid) {
@@ -62,13 +62,13 @@ export class Register {
 
     if (invalid) return;
 
-    const enterpriseFormValues = enterpriseForm.value;
+    const companyFormValues = companyForm.value;
     const userFormValues = userForm.value;
 
-    const newUser: ICreateEnterpriseUser = {
-      enterprise: {
-        cnpj: enterpriseFormValues.cnpj,
-        name: enterpriseFormValues.corporateReason,
+    const newUser: ICreateCompanyUser = {
+      company: {
+        cnpj: companyFormValues.cnpj,
+        name: companyFormValues.corporateReason,
       },
       user: {
         name: userFormValues.name,

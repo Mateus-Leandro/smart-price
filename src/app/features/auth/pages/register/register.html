@@ -1,5 +1,10 @@
-<div fxLayout="row" fxLayoutAlign="start start" fxLayoutAlign.gt-sm="center start" class="full-color-page"
-  style="min-height: 100vh; padding-bottom: 10px">
+<div
+  fxLayout="row"
+  fxLayoutAlign="start start"
+  fxLayoutAlign.gt-sm="center start"
+  class="full-color-page"
+  style="min-height: 100vh; padding-bottom: 10px"
+>
   <div fxLayout="column" fxFlex="100" fxFlex.gt-sm="70" fxFlex.gt-md="50">
     <div fxLayout="row" fxLayoutAlign="center start">
       <img src="assets/images/logo_smart_price.png" alt="Smart Price" class="logo" />
@@ -12,15 +17,23 @@
           </mat-card-header>
 
           <mat-card-content>
-            <app-enterprise-register-form #enterpriseFormRef />
+            <app-company-register-form #registerFormRef />
           </mat-card-content>
 
           <mat-card-actions align="end">
             <div fxLayout="row" fxLayoutGap="5px" class="pad-r-7">
-              <app-button text="Cancelar" icon="backspace" bgColor="var(--cancel-color)"
-                (click)="returnToLogin()"></app-button>
-              <app-button mat-flat-button (click)="nextTab(tabs, enterpriseFormRef)" text="Próximo"
-                [disabled]="!!enterpriseFormRef.form?.invalid">
+              <app-button
+                text="Cancelar"
+                icon="backspace"
+                bgColor="var(--cancel-color)"
+                (click)="returnToLogin()"
+              ></app-button>
+              <app-button
+                mat-flat-button
+                (click)="nextTab(tabs, registerFormRef)"
+                text="Próximo"
+                [disabled]="!!registerFormRef.form?.invalid"
+              >
                 <mat-icon>chevron_right</mat-icon>
               </app-button>
             </div>
@@ -28,7 +41,7 @@
         </mat-card>
       </mat-tab>
 
-      <mat-tab label="Usuário" [disabled]="enterpriseFormRef.form?.invalid">
+      <mat-tab label="Usuário" [disabled]="registerFormRef.form?.invalid">
         <mat-card class="card-space">
           <mat-card-header>
             <mat-card-title>Informações do usuário</mat-card-title>
@@ -40,11 +53,18 @@
 
           <mat-card-actions align="end">
             <div fxLayout="row" fxLayoutGap="5px" class="pad-r-7">
-              <app-button text="Cancelar" icon="backspace" bgColor="var(--cancel-color)"
-                (click)="returnToLogin()"></app-button>
-              <app-button icon="save" text="Salvar"
-                (click)="registerNewUser(userFormRef.form!, enterpriseFormRef.form!)"
-                [disabled]="!!enterpriseFormRef.form?.invalid || !!userFormRef.form?.invalid"></app-button>
+              <app-button
+                text="Cancelar"
+                icon="backspace"
+                bgColor="var(--cancel-color)"
+                (click)="returnToLogin()"
+              ></app-button>
+              <app-button
+                icon="save"
+                text="Salvar"
+                (click)="registerNewUser(userFormRef.form!, registerFormRef.form!)"
+                [disabled]="!!registerFormRef.form?.invalid || !!userFormRef.form?.invalid"
+              ></app-button>
             </div>
           </mat-card-actions>
         </mat-card>
