@@ -1,66 +1,56 @@
-<form #userForm="ngForm">
+<form [formGroup]="userFormGroup" (ngSubmit)="onSubmit()">
   <div fxLayout="column" fxLayoutGap="10px">
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Nome</mat-label>
-      <input
-        type="text"
-        matInput
-        placeholder="Digite seu nome"
-        [(ngModel)]="name"
-        #userName="ngModel"
-        name="name"
-        required
-      />
-      @if (userName.invalid) {
+      <input matInput placeholder="Digite seu nome" formControlName="name" />
+      @if (name.touched && name.hasError('required')) {
         <mat-error>Campo obrigatório</mat-error>
       }
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Email</mat-label>
-      <input
-        type="email"
-        matInput
-        placeholder="Digite seu email"
-        [(ngModel)]="email"
-        #userEmail="ngModel"
-        name="email"
-        required
-      />
-      @if (userEmail.invalid) {
+      <input matInput placeholder="Digite seu email" formControlName="email" />
+
+      @if (email.touched && email.hasError('required')) {
         <mat-error>Campo obrigatório</mat-error>
+      }
+
+      @if (email.touched && email.hasError('email')) {
+        <mat-error>Email inválido</mat-error>
       }
     </mat-form-field>
 
     <div fxLayout="row" fxLayoutGap="20px">
       <mat-form-field appearance="outline" fxFlex>
         <mat-label>Senha</mat-label>
-        <input
-          type="password"
-          matInput
-          placeholder="Digite sua senha"
-          [(ngModel)]="pass"
-          #userPass="ngModel"
-          name="pass"
-          required
-        />
-        @if (userPass.invalid) {
+        <input matInput type="password" placeholder="Digite sua senha" formControlName="pass" />
+        @if (pass.touched && pass.hasError('required')) {
           <mat-error>Campo obrigatório</mat-error>
+        }
+        @if (pass.touched && pass.hasError('minlength')) {
+          <mat-error>A senha deve conter no mínimo 6 dígitos</mat-error>
         }
       </mat-form-field>
 
       <mat-form-field appearance="outline" fxFlex>
         <mat-label>Confirmar senha</mat-label>
         <input
-          type="password"
           matInput
+          type="password"
           placeholder="Confirme a senha"
-          [(ngModel)]="confirmationPass"
-          #userConfirmationPass="ngModel"
-          name="confirmationPass"
-          required
+          formControlName="confirmationPass"
         />
-        @if (userConfirmationPass.invalid) {
+
+        @if (confirmationPass.touched && confirmationPass.hasError('passwordsMismatch')) {
+          <mat-error>As senhas não coincidem</mat-error>
+        }
+
+        @if (confirmationPass.touched && confirmationPass.hasError('minlength')) {
+          <mat-error>A senha deve conter no mínimo 6 dígitos</mat-error>
+        }
+
+        @if (confirmationPass.touched && confirmationPass.hasError('required')) {
           <mat-error>Campo obrigatório</mat-error>
         }
       </mat-form-field>

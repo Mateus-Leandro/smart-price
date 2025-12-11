@@ -1,4 +1,4 @@
-<form #companyForm="ngForm">
+<form [formGroup]="companyFormGroup">
   <div fxLayout="column" fxLayoutGap="10px">
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>CNPJ</mat-label>
@@ -6,14 +6,11 @@
         type="text"
         matInput
         placeholder="00.000.000/0000-00"
-        [(ngModel)]="cnpj"
-        #document="ngModel"
-        name="cnpj"
+        formControlName="cnpj"
         mask="00.000.000/0000-00"
-        required
       />
-      @if (document.invalid) {
-        <mat-error>Campo obrigatório</mat-error>
+      @if (cnpj.invalid && cnpj.touched) {
+        <mat-error> Campo obrigatório </mat-error>
       }
     </mat-form-field>
 
@@ -23,19 +20,21 @@
         type="text"
         matInput
         placeholder="Digite a razão social"
-        [(ngModel)]="corporateReason"
-        #name="ngModel"
-        name="corporateReason"
-        required
+        formControlName="corporateReason"
       />
-      @if (name.invalid) {
-        <mat-error>Campo obrigatório</mat-error>
+      @if (corporateReason.invalid && corporateReason.touched) {
+        <mat-error> Campo obrigatório </mat-error>
       }
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Nome fantasia </mat-label>
-      <input type="text" matInput placeholder="Digite o nome fantasia" />
+      <mat-label>Nome fantasia</mat-label>
+      <input
+        type="text"
+        matInput
+        placeholder="Digite o nome fantasia"
+        formControlName="fantasyName"
+      />
     </mat-form-field>
   </div>
 </form>
