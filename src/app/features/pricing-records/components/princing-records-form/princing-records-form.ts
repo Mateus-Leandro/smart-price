@@ -16,6 +16,7 @@ import {
 } from '@angular/material/dialog';
 
 import { DatePicker } from 'src/app/shared/components/date-picker/date-picker';
+import { Button } from 'src/app/shared/components/button/button';
 
 export interface PrincingRecordsFormData {
   name: string;
@@ -34,9 +35,9 @@ export interface PrincingRecordsFormData {
     MatDialogTitle,
     MatDialogContent,
     MatDialogActions,
-    MatDialogClose,
     FlexLayoutModule,
     DatePicker,
+    Button,
   ],
   templateUrl: './princing-records-form.html',
   styleUrl: './princing-records-form.scss',
@@ -55,12 +56,16 @@ export class PrincingRecordsForm {
     });
   }
 
-  salvar() {
+  save() {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
 
     this.dialogRef.close(this.form.value);
+  }
+
+  cancel() {
+    this.dialogRef.close();
   }
 }
