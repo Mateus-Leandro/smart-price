@@ -8,7 +8,7 @@ import { CommonModule } from '@angular/common';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
 
 @Component({
-  selector: 'app-enterprise-register-form',
+  selector: 'app-company-register-form',
   imports: [
     FlexLayoutModule,
     MatCardModule,
@@ -19,10 +19,10 @@ import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
     NgxMaskDirective,
   ],
   providers: [provideNgxMask()],
-  templateUrl: './enterprise-register-form.html',
+  templateUrl: './company-register-form.html',
 })
-export class EnterpriseRegisterForm {
-  @ViewChild('enterpriseForm') form?: NgForm;
+export class CompanyRegisterForm {
+  @ViewChild('companyForm') form?: NgForm;
   cnpj = '';
   corporateReason = '';
 }

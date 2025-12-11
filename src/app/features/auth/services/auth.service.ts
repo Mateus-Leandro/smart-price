@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { SupabaseService } from '../../../shared/services/supabase.service';
 import { Router } from '@angular/router';
-import { ICreateEnterpriseUser } from 'src/app/shared/interfaces/enterprise-user-interface';
+import { ICreateCompanyUser } from 'src/app/shared/interfaces/company-user-interface';
 
 @Injectable({
   providedIn: 'root',
@@ -29,7 +29,7 @@ export class AuthService {
     this.router.navigate(['/login']);
   }
 
-  async register(user: ICreateEnterpriseUser) {
+  async register(user: ICreateCompanyUser) {
     try {
       return await this.callPostEdgeFunction('create-enterprise-user', user);
     } catch (error) {

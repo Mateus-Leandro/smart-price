@@ -1,10 +1,10 @@
-export interface ICreateEnterpriseUser {
+export interface ICreateCompanyUser {
   user: {
     name: string;
     email: string;
     password: string;
   };
-  enterprise: {
+  company: {
     id?: string;
     name: string;
     cnpj: string;
