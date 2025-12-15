@@ -1,0 +1,48 @@
+@use '../../../global/colors.scss' as *;
+@use '@angular/material' as mat;
+
+.layout-container {
+  height: 100vh;
+}
+
+.layout-content {
+  padding: 16px;
+}
+
+.layout-drawer {
+  padding: 12px;
+}
+
+.nav-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.nav-item {
+  border-radius: 12px;
+}
+
+.nav-text {
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  color: #fff;
+}
+
+.icon-nav {
+  color: #fff;
+}
+
+.active-link {
+  background-color: #fff;
+
+  .nav-text {
+    font-weight: 600;
+    color: #000;
+  }
+
+  .icon-nav {
+    color: #000;
+  }
+}

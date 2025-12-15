@@ -1,0 +1,9 @@
+@use '../colors' as *;
+@use '@angular/material' as mat;
+
+@include mat.sidenav-overrides(
+  (
+    container-background-color: $primary,
+    container-shape: 30px,
+  )
+);

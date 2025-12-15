@@ -6,7 +6,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { Button } from '../../../../shared/components/button/button';
-import { ToolBar } from '../../../../core/layout/tool-bar/tool-bar';
 import { PricingRecordsListTable } from '../../components/pricing-records-list-table/pricing-records-list-table';
 import { MatDialog } from '@angular/material/dialog';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -17,9 +16,6 @@ import {
   PrincingRecordsForm,
   PrincingRecordsFormData,
 } from '../../components/princing-records-form/princing-records-form';
-import { SupabaseService } from 'src/app/shared/services/supabase.service';
-import { AuthService } from 'src/app/features/auth/services/auth.service';
-
 @Component({
   selector: 'app-price-records-list',
   imports: [
@@ -30,7 +26,6 @@ import { AuthService } from 'src/app/features/auth/services/auth.service';
     MatTableModule,
     MatSortModule,
     Button,
-    ToolBar,
     PricingRecordsListTable,
     MatFormFieldModule,
     MatInputModule,
@@ -45,7 +40,7 @@ export class PricingRecordsList {
   private readonly dialog = inject(MatDialog);
   formData = signal<PrincingRecordsFormData>({ name: '', creationDate: '' });
 
-  constructor(private authService: AuthService) {}
+  constructor() {}
 
   ngAfterViewInit() {
     this.dataSource.sort = this.sort;

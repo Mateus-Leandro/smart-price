@@ -1,19 +1,12 @@
 <mat-toolbar style="padding: 20px">
   <mat-toolbar-row>
+    <app-icon-button icon="menu" (click)="menuClick.emit()"></app-icon-button>
     <span class="title">Sistema de Gestão Varejista</span>
-
-    <span class="spacer"></span>
-
-    <app-button
-      text="Sair"
-      (click)="logout()"
-      [loading]="loading"
-      [spinnerDiameter]="40"
-      bgColor="var(--cancel-color)"
-    ></app-button>
   </mat-toolbar-row>
 
   <mat-toolbar-row>
-    <span class="subtitle"> Módulo de Precificação de Produtos Promocionais </span>
+    <span class="subtitle" style="padding-left: 40px"
+      >Módulo de Precificação de Produtos Promocionais</span
+    >
   </mat-toolbar-row>
 </mat-toolbar>

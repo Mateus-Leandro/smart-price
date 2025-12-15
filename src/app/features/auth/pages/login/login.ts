@@ -5,7 +5,6 @@ import { FormsModule, NgForm } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { Button } from 'src/app/shared/components/button/button';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
 import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
@@ -22,7 +21,6 @@ export class Login {
 
   constructor(
     private authService: AuthService,
-    private router: Router,
     private cdr: ChangeDetectorRef,
   ) {}
 
