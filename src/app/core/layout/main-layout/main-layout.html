@@ -1,0 +1,50 @@
+<mat-drawer-container class="layout-container" hasBackdrop="true">
+  <mat-drawer #drawer mode="side" class="layout-drawer">
+    <div fxLayout="column" fxFlex="100%">
+      <div fxLayout="row" fxLayoutAlign="center start">
+        <img
+          src="assets/images/logo_smart_price.png"
+          alt="Smart Price"
+          class="logo"
+          height="250px"
+          width="290px"
+        />
+      </div>
+      <mat-nav-list class="nav-list">
+        @for (item of navItemsMenuDrawer; track item.router) {
+          <a
+            mat-list-item
+            [routerLink]="item.router"
+            routerLinkActive="active-link"
+            [routerLinkActiveOptions]="{ exact: true }"
+            class="nav-item"
+          >
+            <div fxLayout="row" fxFlex="100%" fxLayoutGap="6px">
+              <mat-icon class="icon-nav">
+                {{ item.icon }}
+              </mat-icon>
+
+              <span class="nav-text">
+                {{ item.textNav }}
+              </span>
+            </div>
+          </a>
+        }
+        <a mat-list-item class="nav-item" (click)="logout()">
+          <div fxLayout="row" fxFlex="100%" fxLayoutGap="6px">
+            <mat-icon class="icon-nav"> logout </mat-icon>
+            <span class="nav-text"> Sair </span>
+          </div>
+        </a>
+      </mat-nav-list>
+    </div>
+  </mat-drawer>
+
+  <mat-drawer-content>
+    <app-tool-bar (menuClick)="drawer.toggle()"></app-tool-bar>
+
+    <main class="layout-content">
+      <router-outlet></router-outlet>
+    </main>
+  </mat-drawer-content>
+</mat-drawer-container>

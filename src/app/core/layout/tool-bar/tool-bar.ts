@@ -1,21 +1,15 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { AuthService } from 'src/app/features/auth/services/auth.service';
-import { Button } from 'src/app/shared/components/button/button';
+import { IconButton } from 'src/app/shared/components/icon-button/icon-button';
 
 @Component({
   selector: 'app-tool-bar',
-  imports: [MatToolbarModule, MatIconModule, Button],
+  imports: [MatToolbarModule, MatIconModule, IconButton],
   templateUrl: './tool-bar.html',
   styleUrl: '../../../global/styles/_toolbar.scss',
 })
 export class ToolBar {
-  constructor(private authService: AuthService) {}
-  loading = false;
-
-  logout() {
-    this.loading = true;
-    this.authService.logout();
-  }
+  constructor() {}
+  @Output() menuClick = new EventEmitter<void>();
 }
