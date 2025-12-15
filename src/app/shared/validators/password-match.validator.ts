@@ -9,7 +9,7 @@ export class PasswordMatchValidator {
       if (!pass || !confirmation) return null;
 
       if (!confirmation.value) {
-        confirmation.setErrors(null);
+        confirmation.setErrors({ required: true });
         return null;
       }
 
