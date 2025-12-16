@@ -6,20 +6,22 @@
           <img src="assets/images/logo_smart_price.png" alt="Smart Price" class="logo" />
         </div>
 
-        <form (ngSubmit)="login(form)" #form="ngForm" fxLayout="column" fxLayoutGap="16px">
+        <form
+          [formGroup]="loginFormGroup"
+          (ngSubmit)="onSubmit()"
+          fxLayout="column"
+          fxLayoutGap="16px"
+        >
           <div fxLayout="row" fxLayoutAlign="start">
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Email</mat-label>
-              <input
-                matInput
-                type="email"
-                [(ngModel)]="email"
-                name="email"
-                #user="ngModel"
-                required
-              />
-              @if (user.invalid) {
+              <input matInput type="email" formControlName="email" [errorStateMatcher]="matcher" />
+              @if (email.hasError('required')) {
                 <mat-error>Campo obrigatório</mat-error>
+              }
+
+              @if (email.hasError('email')) {
+                <mat-error>Email inválido</mat-error>
               }
             </mat-form-field>
           </div>
@@ -30,13 +32,15 @@
               <input
                 matInput
                 type="password"
-                [(ngModel)]="password"
-                name="password"
-                #pass="ngModel"
-                required
+                formControlName="password"
+                [errorStateMatcher]="matcher"
               />
-              @if (pass.invalid) {
+              @if (password.hasError('required')) {
                 <mat-error>Campo obrigatório</mat-error>
+              }
+
+              @if (loginFormGroup.hasError('invalidCredential')) {
+                <mat-error>Email ou senha incorreta</mat-error>
               }
             </mat-form-field>
           </div>
@@ -47,7 +51,7 @@
               width="250px"
               height="52px"
               fontSize="18px"
-              [disabled]="!!form.invalid"
+              [disabled]="!!loginFormGroup.invalid"
               [loading]="loading"
               type="submit"
             >
