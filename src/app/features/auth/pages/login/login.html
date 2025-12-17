@@ -45,7 +45,13 @@
             </mat-form-field>
           </div>
 
-          <div fxLayout="row" fxLayoutAlign="center" fFlex="100%" style="padding-bottom: 20px">
+          <div
+            fxLayout="column"
+            fxLayoutAlign="center center"
+            fFlex="100%"
+            style="padding-bottom: 20px"
+            fxLayoutGap="18px"
+          >
             <app-button
               text="Entrar"
               width="250px"
@@ -56,10 +62,7 @@
               type="submit"
             >
             </app-button>
-          </div>
-
-          <div fxLayout="row" fxLayoutAlign="center">
-            <a matButton href="/register">Ainda não tem conta? clique aqui faça seu cadastro</a>
+            <a matButton href="/register">Criar conta</a>
           </div>
         </form>
       </div>
