@@ -13,8 +13,8 @@ export const routes: Routes = [
         path: 'home',
         canActivate: [authGuard],
         loadComponent: () =>
-          import('../app/features/pricing-records/pages/pricing-records-list/pricing-records-list').then(
-            (m) => m.PricingRecordsList,
+          import('./features/promotional_flyer/pages/promotional_flyer/promotional-flyer').then(
+            (m) => m.PromotionalFlyer,
           ),
       },
     ],
