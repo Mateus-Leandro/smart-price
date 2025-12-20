@@ -37,7 +37,7 @@ export class AuthService {
     }
   }
 
-  async passworldReset(email: string) {
+  async passwordReset(email: string) {
     const { error } = await this.supabaseService.supabase.auth.resetPasswordForEmail(email);
     if (error) throw `Erro ao resetar senha: ${error}`;
   }

@@ -11,7 +11,6 @@ import {
   MatDialogTitle,
   MatDialogContent,
   MatDialogActions,
-  MatDialogClose,
   MAT_DIALOG_DATA,
 } from '@angular/material/dialog';
 
