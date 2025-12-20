@@ -30,7 +30,7 @@ export class MainLayout {
 
   navItemsMenuDrawer = [
     {
-      router: '/home',
+      router: '/promotional_flyer',
       textNav: 'Precificação',
       icon: 'attach_money',
     },

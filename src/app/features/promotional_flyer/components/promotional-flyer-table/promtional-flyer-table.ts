@@ -6,6 +6,7 @@ import { IconButton } from '../../../../shared/components/icon-button/icon-butto
 import { Spinner } from 'src/app/shared/components/spinner/spinner';
 import { Promotionalflyer } from '../../interfaces/promotional-flyer.interface';
 import { PromotionalFlyerService } from '../../services/promotional-flyer.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-promotional-flyer-table',
@@ -21,6 +22,7 @@ export class PromotionalFlyerTable {
   constructor(
     private pricingRecordsService: PromotionalFlyerService,
     private cdr: ChangeDetectorRef,
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -55,5 +57,9 @@ export class PromotionalFlyerTable {
       this.loading = false;
       this.cdr.detectChanges();
     }
+  }
+
+  navigateToPromotionalFlyerProduct(row: any) {
+    this.router.navigate(['/registros', row.id]);
   }
 }
