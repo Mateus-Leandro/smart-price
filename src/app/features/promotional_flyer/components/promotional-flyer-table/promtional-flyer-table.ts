@@ -49,7 +49,7 @@ export class PromotionalFlyerTable {
   async loadPrincingRecords() {
     try {
       this.loading = true;
-      const records = await this.pricingRecordsService.loadRecords();
+      const records = await this.pricingRecordsService.loadFlyers();
       this.dataSource.data = records ?? [];
     } catch (err) {
       console.error('Erro ao carregar registros', err);
@@ -60,6 +60,6 @@ export class PromotionalFlyerTable {
   }
 
   navigateToPromotionalFlyerProduct(row: any) {
-    this.router.navigate(['/registros', row.id]);
+    this.router.navigate(['/promotional_flyer', row.id]);
   }
 }

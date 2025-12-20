@@ -6,7 +6,7 @@ import { SupabaseService } from 'src/app/shared/services/supabase.service';
 })
 export class PromotionalFlyerService {
   constructor(private supabaseService: SupabaseService) {}
-  async loadRecords() {
+  async loadFlyers() {
     try {
       const { data, error } = await this.supabaseService.supabase
         .from('promotional_flyers')
