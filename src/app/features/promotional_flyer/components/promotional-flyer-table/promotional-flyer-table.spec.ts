@@ -1,17 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { PromotionalFlyerTable } from './promtional-flyer-table';
 
-import { PrincingRecordsForm } from './princing-records-form';
-
-describe('PrincingRecordsForm', () => {
-  let component: PrincingRecordsForm;
-  let fixture: ComponentFixture<PrincingRecordsForm>;
+describe('PromotionalFlyerTable', () => {
+  let component: PromotionalFlyerTable;
+  let fixture: ComponentFixture<PromotionalFlyerTable>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [PrincingRecordsForm],
+      imports: [PromotionalFlyerTable],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(PrincingRecordsForm);
+    fixture = TestBed.createComponent(PromotionalFlyerTable);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });
