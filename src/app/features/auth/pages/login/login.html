@@ -26,15 +26,23 @@
             </mat-form-field>
           </div>
 
-          <div fxLayout="row" fxLayoutAlign="start">
+          <div fxLayout=" column" fxLayoutAlign="start">
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Senha</mat-label>
               <input
                 matInput
-                type="password"
+                [type]="passwordVisible() ? 'text' : 'password'"
                 formControlName="password"
                 [errorStateMatcher]="matcher"
               />
+              <app-icon-button
+                [icon]="passwordVisible() ? 'visibility' : 'visibility_off'"
+                aria-label="Mostrar ou ocultar senha"
+                matSuffix
+                type="button"
+                (click)="togglePasswordVisibility()"
+              >
+              </app-icon-button>
               @if (password.hasError('required')) {
                 <mat-error>Campo obrigatório</mat-error>
               }
