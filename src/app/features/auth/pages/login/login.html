@@ -51,6 +51,15 @@
                 <mat-error>Email ou senha incorreta</mat-error>
               }
             </mat-form-field>
+            <div fxLayout="row" fxFlex="100%" fxLayoutAlign="end">
+              <app-button
+                text="Esqueci a minha senha"
+                height="20px"
+                textColor="var(--cancel-color)"
+                bgColor="transparent"
+                (click)="openForgotPasswordDialog()"
+              />
+            </div>
           </div>
 
           <div
@@ -70,7 +79,13 @@
               type="submit"
             >
             </app-button>
-            <a matButton href="/register">Criar conta</a>
+            <app-button
+              text="Cadastrar-se"
+              height="20px"
+              textColor="var(--primary)"
+              bgColor="transparent"
+              (click)="navigateToRegister()"
+            />
           </div>
         </form>
       </div>

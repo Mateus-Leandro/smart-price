@@ -14,6 +14,9 @@ import { CommonModule } from '@angular/common';
 import { LoginErrorStateMatcher } from 'src/app/shared/matchers/login-error-state-matcher';
 import { MatIconModule } from '@angular/material/icon';
 import { IconButton } from 'src/app/shared/components/icon-button/icon-button';
+import { MatDialog } from '@angular/material/dialog';
+import { ForgotPasswordDialog } from '../../components/forgot-password-dialog/forgot-password-dialog';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -41,6 +44,8 @@ export class Login {
     private authService: AuthService,
     private cdr: ChangeDetectorRef,
     private fb: FormBuilder,
+    private dialog: MatDialog,
+    private router: Router,
   ) {
     this.loginFormGroup = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -80,5 +85,17 @@ export class Login {
 
   togglePasswordVisibility(): void {
     this.passwordVisible.update((v) => !v);
+  }
+
+  openForgotPasswordDialog(): void {
+    this.dialog.open(ForgotPasswordDialog, {
+      width: '400px',
+      disableClose: false,
+      autoFocus: true,
+    });
+  }
+
+  navigateToRegister() {
+    this.router.navigate(['/register']);
   }
 }
