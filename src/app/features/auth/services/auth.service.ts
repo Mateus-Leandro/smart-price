@@ -19,7 +19,7 @@ export class AuthService {
     });
 
     if (error) throw `Erro ao realizar login: ${error}`;
-    this.router.navigate(['/home']);
+    this.router.navigate(['/promotional_flyer']);
   }
 
   async logout() {

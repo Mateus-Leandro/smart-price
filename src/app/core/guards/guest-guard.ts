@@ -7,7 +7,7 @@ export const guestGuard: CanActivateFn = async () => {
   const authService = inject(AuthService);
 
   if (await authService.isLogged()) {
-    router.navigate(['/home']);
+    router.navigate(['/promotional_flyer']);
     return false;
   }
 

@@ -8,13 +8,21 @@ export const routes: Routes = [
     path: '',
     component: MainLayout,
     children: [
-      { path: '', redirectTo: 'home', pathMatch: 'full' },
+      { path: '', redirectTo: 'promotional_flyer', pathMatch: 'full' },
       {
-        path: 'home',
+        path: 'promotional_flyer',
         canActivate: [authGuard],
         loadComponent: () =>
-          import('./features/promotional_flyer/pages/promotional_flyer/promotional-flyer').then(
+          import('./features/promotional_flyer/pages/promotional-flyer/promotional-flyer').then(
             (m) => m.PromotionalFlyer,
+          ),
+      },
+      {
+        path: 'promotional_flyer/:id',
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./features/promotional_flyer/pages/promotional-flyer-products/promotional-flyer-products').then(
+            (m) => m.PromotionalFlyerProducts,
           ),
       },
     ],
