@@ -2,16 +2,16 @@
   <div fxFlex fxLayout="row" class="box-right">
     <div fxLayout="column" class="box-left" fxFlex="30%" fxFlex.lt-md="100%">
       <div fxLayout="column" fxFlex="100%" fxLayoutAlign="space-between" class="mg-b-20">
-        <div fxLayout="row" fxLayoutAlign="center" class="mg-t-60">
-          <img src="assets/images/logo_smart_price.png" alt="Smart Price" class="logo" />
-        </div>
-
         <form
           [formGroup]="loginFormGroup"
           (ngSubmit)="onSubmit()"
           fxLayout="column"
           fxLayoutGap="16px"
         >
+          <div fxLayout="row" fxLayoutAlign="center">
+            <img src="assets/images/logo_smart_price.png" alt="Smart Price" class="logo" />
+          </div>
+
           <div fxLayout="row" fxLayoutAlign="start">
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Email</mat-label>
