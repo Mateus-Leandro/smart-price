@@ -12,4 +12,5 @@ export class IconButton {
   @Input() height: string = '36px';
   @Input() width: string = '36px';
   @Input() disabled?: boolean = false;
+  @Input() type: 'button' | 'submit' = 'button';
 }

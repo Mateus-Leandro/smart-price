@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectorRef, Component, signal } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { MatInputModule } from '@angular/material/input';
 import {
@@ -12,6 +12,8 @@ import { AuthService } from '../../services/auth.service';
 import { Button } from 'src/app/shared/components/button/button';
 import { CommonModule } from '@angular/common';
 import { LoginErrorStateMatcher } from 'src/app/shared/matchers/login-error-state-matcher';
+import { MatIconModule } from '@angular/material/icon';
+import { IconButton } from 'src/app/shared/components/icon-button/icon-button';
 
 @Component({
   selector: 'app-login',
@@ -23,6 +25,8 @@ import { LoginErrorStateMatcher } from 'src/app/shared/matchers/login-error-stat
     Button,
     CommonModule,
     ReactiveFormsModule,
+    MatIconModule,
+    IconButton,
   ],
   templateUrl: './login.html',
   styleUrl: './login.scss',
@@ -31,6 +35,7 @@ export class Login {
   loading = false;
   loginFormGroup: FormGroup;
   matcher = new LoginErrorStateMatcher();
+  passwordVisible = signal(false);
 
   constructor(
     private authService: AuthService,
@@ -71,5 +76,9 @@ export class Login {
   }
   get password() {
     return this.loginFormGroup.get('password')!;
+  }
+
+  togglePasswordVisibility(): void {
+    this.passwordVisible.update((v) => !v);
   }
 }
