@@ -57,7 +57,7 @@ export class PromotionalFlyerService {
         { count: 'exact' },
       )
       .eq('promotional_flyer_id', flyerId)
-      .order('id', { ascending: false })
+      .order('products(name)', { ascending: true })
       .range(from, to);
 
     if (error) {
