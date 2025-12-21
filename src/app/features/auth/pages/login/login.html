@@ -1,84 +1,75 @@
 <div fxLayout="row" style="width: 100%; height: 100vh">
   <div fxFlex fxLayout="row" class="box-right">
-    <div fxLayout="column" class="box-left" fxFlex="30%" fxFlex.lt-md="100%">
-      <div fxLayout="column" fxFlex="100%" fxLayoutAlign="space-between" class="mg-b-20">
+    <div fxLayout="column" class="box-left" fxFlex="30%" fxFlex.lt-lg="100%">
+      <div fxLayout="column" fxFlex="100%" fxLayoutAlign="space-between" style="padding: 32px 24px">
+        <div fxLayout="row" fxLayoutAlign="center" fxFlex="50%">
+          <img src="assets/images/logo_smart_price.png" alt="Smart Price" class="logo" />
+        </div>
+
         <form
           [formGroup]="loginFormGroup"
           (ngSubmit)="onSubmit()"
           fxLayout="column"
           fxLayoutGap="16px"
         >
-          <div fxLayout="row" fxLayoutAlign="center">
-            <img src="assets/images/logo_smart_price.png" alt="Smart Price" class="logo" />
-          </div>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Email</mat-label>
+            <input matInput type="email" formControlName="email" [errorStateMatcher]="matcher" />
+            @if (email.hasError('required')) {
+              <mat-error>Campo obrigatório</mat-error>
+            }
+            @if (email.hasError('email')) {
+              <mat-error>Email inválido</mat-error>
+            }
+          </mat-form-field>
 
-          <div fxLayout="row" fxLayoutAlign="start">
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Email</mat-label>
-              <input matInput type="email" formControlName="email" [errorStateMatcher]="matcher" />
-              @if (email.hasError('required')) {
-                <mat-error>Campo obrigatório</mat-error>
-              }
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Senha</mat-label>
+            <input
+              matInput
+              [type]="passwordVisible() ? 'text' : 'password'"
+              formControlName="password"
+              [errorStateMatcher]="matcher"
+            />
+            <app-icon-button
+              matSuffix
+              [icon]="passwordVisible() ? 'visibility' : 'visibility_off'"
+              type="button"
+              (click)="togglePasswordVisibility()"
+            />
+            @if (password.hasError('required')) {
+              <mat-error>Campo obrigatório</mat-error>
+            }
+            @if (loginFormGroup.hasError('invalidCredential')) {
+              <mat-error>Email ou senha incorreta</mat-error>
+            }
+          </mat-form-field>
 
-              @if (email.hasError('email')) {
-                <mat-error>Email inválido</mat-error>
-              }
-            </mat-form-field>
-          </div>
-
-          <div fxLayout=" column" fxLayoutAlign="start">
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Senha</mat-label>
-              <input
-                matInput
-                [type]="passwordVisible() ? 'text' : 'password'"
-                formControlName="password"
-                [errorStateMatcher]="matcher"
-              />
-              <app-icon-button
-                [icon]="passwordVisible() ? 'visibility' : 'visibility_off'"
-                aria-label="Mostrar ou ocultar senha"
-                matSuffix
-                type="button"
-                (click)="togglePasswordVisibility()"
-              >
-              </app-icon-button>
-              @if (password.hasError('required')) {
-                <mat-error>Campo obrigatório</mat-error>
-              }
-
-              @if (loginFormGroup.hasError('invalidCredential')) {
-                <mat-error>Email ou senha incorreta</mat-error>
-              }
-            </mat-form-field>
-            <div fxLayout="row" fxFlex="100%" fxLayoutAlign="end">
-              <app-button
-                text="Esqueci a minha senha"
-                height="20px"
-                textColor="var(--cancel-color)"
-                bgColor="transparent"
-                (click)="openForgotPasswordDialog()"
-              />
-            </div>
+          <div fxLayout="row" fxLayoutAlign="end">
+            <app-button
+              text="Esqueci a minha senha"
+              height="20px"
+              textColor="var(--cancel-color)"
+              bgColor="transparent"
+              (click)="openForgotPasswordDialog()"
+            />
           </div>
 
           <div
             fxLayout="column"
             fxLayoutAlign="center center"
-            fFlex="100%"
-            style="padding-bottom: 20px"
             fxLayoutGap="18px"
+            style="margin-top: 24px"
           >
             <app-button
               text="Entrar"
               width="250px"
               height="52px"
               fontSize="18px"
-              [disabled]="!!loginFormGroup.invalid"
+              [disabled]="loginFormGroup.invalid"
               [loading]="loading"
               type="submit"
-            >
-            </app-button>
+            />
             <app-button
               text="Cadastrar-se"
               height="20px"
