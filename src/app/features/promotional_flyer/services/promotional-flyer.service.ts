@@ -36,33 +36,41 @@ export class PromotionalFlyerService {
     }
   }
 
-  async loadProducts(flyerId: number): Promise<PromotionalFlyerProducts[]> {
-    try {
-      const { data, error } = await this.supabaseService.supabase
-        .from('promotional_flyer_products')
-        .select(
-          `
-          id,
-          products (
-            id,
-            name
-          )
-        `,
-        )
-        .eq('promotional_flyer_id', flyerId)
-        .order('id', { ascending: false });
+  async loadProducts(
+    flyerId: number,
+    pageIndex: number,
+    pageSize: number,
+  ): Promise<{ data: PromotionalFlyerProducts[]; count: number }> {
+    const from = pageIndex * pageSize;
+    const to = from + pageSize - 1;
 
-      if (error) {
-        throw error;
-      }
+    const { data, count, error } = await this.supabaseService.supabase
+      .from('promotional_flyer_products')
+      .select(
+        `
+      id,
+      products (
+        id,
+        name
+      )
+      `,
+        { count: 'exact' },
+      )
+      .eq('promotional_flyer_id', flyerId)
+      .order('id', { ascending: false })
+      .range(from, to);
 
-      return (data ?? []).map((item: any) => ({
+    if (error) {
+      throw error;
+    }
+
+    return {
+      data: (data ?? []).map((item: any) => ({
         id: item.products.id,
         name: item.products.name,
-      }));
-    } catch (err) {
-      throw err;
-    }
+      })),
+      count: count ?? 0,
+    };
   }
 
   private formatDate(date: string): string {
