@@ -4,3 +4,8 @@ export interface Promotionalflyer {
   createdDate: string;
   status: string;
 }
+
+export interface PromotionalFlyerProducts {
+  id: string;
+  name: string;
+}
