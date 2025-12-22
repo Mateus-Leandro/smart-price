@@ -4,7 +4,7 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
 import { IconButton } from '../../../../shared/components/icon-button/icon-button';
 import { Spinner } from 'src/app/shared/components/spinner/spinner';
-import { Promotionalflyer } from '../../interfaces/promotional-flyer.interface';
+import { Promotionalflyer } from '../../../../shared/interfaces/promotional-flyer.interface';
 import { PromotionalFlyerService } from '../../services/promotional-flyer.service';
 import { Router } from '@angular/router';
 

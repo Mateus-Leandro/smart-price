@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { SupabaseService } from 'src/app/shared/services/supabase.service';
-import { PromotionalFlyerProducts } from '../interfaces/promotional-flyer.interface';
+import { PromotionalFlyerProducts } from '../../../shared/interfaces/promotional-flyer.interface';
 
 @Injectable({
   providedIn: 'root',
