@@ -3,7 +3,7 @@ import { PromotionalFlyerService } from '../../services/promotional-flyer.servic
 import { ActivatedRoute } from '@angular/router';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatSort, MatSortModule } from '@angular/material/sort';
-import { PromotionalFlyerProducts } from '../../../../shared/interfaces/promotional-flyer.interface';
+import { IPromotionalFlyerProducts } from '../../../../shared/interfaces/promotional-flyer.interface';
 import { Spinner } from 'src/app/shared/components/spinner/spinner';
 import { IconButton } from 'src/app/shared/components/icon-button/icon-button';
 import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
@@ -19,12 +19,12 @@ export class PromotionalFlyerProductTable {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   loading = false;
-  dataSource = new MatTableDataSource<PromotionalFlyerProducts>([]);
+  dataSource = new MatTableDataSource<IPromotionalFlyerProducts>([]);
   flyerId: number = 0;
   pageSize = 10;
   pageIndex = 0;
   records!: {
-    data: PromotionalFlyerProducts[];
+    data: IPromotionalFlyerProducts[];
     count: number;
   };
 

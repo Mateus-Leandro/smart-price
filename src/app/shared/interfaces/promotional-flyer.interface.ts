@@ -1,11 +1,11 @@
-export interface Promotionalflyer {
+export interface IPromotionalflyer {
   id: number;
   name: string;
   createdDate: string;
   status: string;
 }
 
-export interface PromotionalFlyerProducts {
+export interface IPromotionalFlyerProducts {
   id: string;
   name: string;
 }

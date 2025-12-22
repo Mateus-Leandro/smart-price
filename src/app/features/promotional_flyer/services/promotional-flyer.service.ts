@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { SupabaseService } from 'src/app/shared/services/supabase.service';
-import { PromotionalFlyerProducts } from '../../../shared/interfaces/promotional-flyer.interface';
+import { IPromotionalFlyerProducts } from '../../../shared/interfaces/promotional-flyer.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -40,7 +40,7 @@ export class PromotionalFlyerService {
     flyerId: number,
     pageIndex: number,
     pageSize: number,
-  ): Promise<{ data: PromotionalFlyerProducts[]; count: number }> {
+  ): Promise<{ data: IPromotionalFlyerProducts[]; count: number }> {
     const from = pageIndex * pageSize;
     const to = from + pageSize - 1;
 
