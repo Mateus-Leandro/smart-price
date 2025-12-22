@@ -40,16 +40,17 @@ export class PromotionalFlyerService {
   async loadProducts(
     flyerId: number,
     paginatorDataSource: IDefaultPaginatorDataSource<IPromotionalFlyerProducts>,
+    search?: string,
   ): Promise<{ data: IPromotionalFlyerProducts[]; count: number }> {
     const from = paginatorDataSource.pageIndex * paginatorDataSource.pageSize;
     const to = from + paginatorDataSource.pageSize - 1;
 
-    const { data, count, error } = await this.supabaseService.supabase
+    let query = this.supabaseService.supabase
       .from('promotional_flyer_products')
       .select(
         `
       id,
-      products (
+      products!inner (
         id,
         name
       )
@@ -57,8 +58,13 @@ export class PromotionalFlyerService {
         { count: 'exact' },
       )
       .eq('promotional_flyer_id', flyerId)
-      .order('products(name)', { ascending: true })
-      .range(from, to);
+      .order('products(name)', { ascending: true });
+
+    if (search) {
+      query.ilike('products.name', `%${search}%`);
+    }
+
+    const { data, count, error } = await query.range(from, to);
 
     if (error) {
       throw error;
