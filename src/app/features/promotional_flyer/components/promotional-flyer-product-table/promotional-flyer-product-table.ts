@@ -2,11 +2,12 @@ import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
 import { PromotionalFlyerService } from '../../services/promotional-flyer.service';
 import { ActivatedRoute } from '@angular/router';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { MatSort, MatSortModule } from '@angular/material/sort';
+import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
 import { IPromotionalFlyerProducts } from '../../../../shared/interfaces/promotional-flyer.interface';
 import { Spinner } from 'src/app/shared/components/spinner/spinner';
 import { IconButton } from 'src/app/shared/components/icon-button/icon-button';
 import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { IDefaultPaginatorDataSource } from 'src/app/shared/interfaces/query-interface';
 
 @Component({
   selector: 'app-promotional-flyer-product-table',
@@ -16,16 +17,18 @@ import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/p
 })
 export class PromotionalFlyerProductTable {
   @ViewChild(MatSort) sort!: MatSort;
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   loading = false;
-  dataSource = new MatTableDataSource<IPromotionalFlyerProducts>([]);
   flyerId: number = 0;
-  pageSize = 10;
-  pageIndex = 0;
-  records!: {
-    data: IPromotionalFlyerProducts[];
-    count: number;
+  sortEvent!: Sort;
+  dataSource = new MatTableDataSource<IPromotionalFlyerProducts>([]);
+  paginatorDataSource: IDefaultPaginatorDataSource<IPromotionalFlyerProducts> = {
+    pageIndex: 0,
+    pageSize: 10,
+    records: {
+      data: [],
+      count: 0,
+    },
   };
 
   constructor(
@@ -36,26 +39,25 @@ export class PromotionalFlyerProductTable {
 
   ngOnInit(): void {
     this.flyerId = Number(this?.route?.snapshot?.paramMap?.get('id'));
-    console.log(this.flyerId);
-    this.loadProductsFromPromotionalFlyer(this.flyerId);
+    this.loadProductsFromPromotionalFlyer(this.flyerId, this.paginatorDataSource);
   }
 
   ngAfterViewInit() {
     this.dataSource.sort = this.sort;
-    this.dataSource.paginator = this.paginator;
   }
 
   async loadProductsFromPromotionalFlyer(
     flyerId: number,
-    pageIndex = this.pageIndex,
-    pageSize = this.pageSize,
+    paginatorDataSource: IDefaultPaginatorDataSource<IPromotionalFlyerProducts>,
   ) {
     this.loading = true;
 
     try {
-      this.records = await this.promotionalFlyerService.loadProducts(flyerId, pageIndex, pageSize);
-      this.dataSource.data = this.records.data;
-      this.paginator.length = this.records.count;
+      this.paginatorDataSource.records = await this.promotionalFlyerService.loadProducts(
+        flyerId,
+        paginatorDataSource,
+      );
+      this.dataSource.data = this.paginatorDataSource.records.data;
     } catch (err) {
       console.error(`Erro ao buscar produtos do encarte ${flyerId}`, err);
     } finally {
@@ -65,8 +67,8 @@ export class PromotionalFlyerProductTable {
   }
 
   onPageChange(event: PageEvent) {
-    this.pageSize = event.pageSize;
-    this.pageIndex = event.pageIndex;
-    this.loadProductsFromPromotionalFlyer(this.flyerId, event.pageIndex, event.pageSize);
+    this.paginatorDataSource.pageSize = event.pageSize;
+    this.paginatorDataSource.pageIndex = event.pageIndex;
+    this.loadProductsFromPromotionalFlyer(this.flyerId, this.paginatorDataSource);
   }
 }
