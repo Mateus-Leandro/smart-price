@@ -1,9 +1,15 @@
-<div class="table-container">
+<div class="table-container" fxLayout="column">
   @if (loading) {
     <div fxLayout="row" fxFlex="100%" class="spinner-container">
       <app-spinner />
     </div>
   }
+  <mat-form-field appearance="outline" class="search-input">
+    <mat-label>Pesquisar item pela descrição</mat-label>
+    <input matInput type="search" (input)="onSearch($event)" />
+    <mat-icon matSuffix>search</mat-icon>
+  </mat-form-field>
+
   <table mat-table class="default-table" [dataSource]="dataSource" matSort>
     <ng-container matColumnDef="id">
       <th mat-header-cell *matHeaderCellDef mat-sort-header="id">ID</th>
@@ -11,7 +17,7 @@
     </ng-container>
 
     <ng-container matColumnDef="name">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header="name">Nome do Registro</th>
+      <th mat-header-cell *matHeaderCellDef mat-sort-header="name">Descrição</th>
       <td mat-cell *matCellDef="let element">{{ element.name }}</td>
     </ng-container>
 
