@@ -9,6 +9,7 @@ $medium-gray: #6b7280;
 $gray: #bebebe;
 
 $cancel-color: #b00020;
+$no-background-color: #00000000;
 
 :root {
   --primary: #{$primary};
@@ -22,4 +23,5 @@ $cancel-color: #b00020;
   --gray: #{$gray};
 
   --cancel-color: #{$cancel-color};
+  --no-background-color: #{$no-background-color};
 }

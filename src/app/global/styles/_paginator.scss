@@ -1,0 +1,8 @@
+@use '../colors' as *;
+@use '@angular/material' as mat;
+
+@include mat.paginator-overrides(
+  (
+    container-background-color: $no-background-color,
+  )
+);
