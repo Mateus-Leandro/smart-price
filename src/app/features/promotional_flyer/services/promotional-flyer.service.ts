@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { SupabaseService } from 'src/app/shared/services/supabase.service';
 import { IPromotionalFlyerProducts } from '../../../shared/interfaces/promotional-flyer.interface';
+import { IDefaultPaginatorDataSource } from 'src/app/shared/interfaces/query-interface';
 
 @Injectable({
   providedIn: 'root',
@@ -38,11 +39,10 @@ export class PromotionalFlyerService {
 
   async loadProducts(
     flyerId: number,
-    pageIndex: number,
-    pageSize: number,
+    paginatorDataSource: IDefaultPaginatorDataSource<IPromotionalFlyerProducts>,
   ): Promise<{ data: IPromotionalFlyerProducts[]; count: number }> {
-    const from = pageIndex * pageSize;
-    const to = from + pageSize - 1;
+    const from = paginatorDataSource.pageIndex * paginatorDataSource.pageSize;
+    const to = from + paginatorDataSource.pageSize - 1;
 
     const { data, count, error } = await this.supabaseService.supabase
       .from('promotional_flyer_products')
