@@ -8,4 +8,5 @@ export interface IPromotionalflyer {
 export interface IPromotionalFlyerProducts {
   id: string;
   name: string;
+  salePrice?: number;
 }

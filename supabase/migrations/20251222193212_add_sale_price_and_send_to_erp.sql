@@ -1,0 +1,3 @@
+ALTER TABLE promotional_flyer_products
+ADD COLUMN IF NOT EXISTS sale_price NUMERIC(10,2),
+ADD COLUMN IF NOT EXISTS send_to_erp BOOLEAN NOT NULL DEFAULT false;

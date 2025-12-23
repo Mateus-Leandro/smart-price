@@ -50,6 +50,7 @@ export class PromotionalFlyerService {
       .select(
         `
       id,
+      sale_price,
       products!inner (
         id,
         name
@@ -74,6 +75,7 @@ export class PromotionalFlyerService {
       data: (data ?? []).map((item: any) => ({
         id: item.products.id,
         name: item.products.name,
+        salePrice: item?.sale_price ?? 0,
       })),
       count: count ?? 0,
     };
