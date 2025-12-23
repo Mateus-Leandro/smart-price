@@ -21,6 +21,11 @@
       <td mat-cell *matCellDef="let element">{{ element.name }}</td>
     </ng-container>
 
+    <ng-container matColumnDef="sale_price">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header="sale_price">Novo Preço de Venda</th>
+      <td mat-cell *matCellDef="let element">{{ element.salePrice }}</td>
+    </ng-container>
+
     <ng-container matColumnDef="acoes">
       <th mat-header-cell *matHeaderCellDef></th>
       <td mat-cell *matCellDef="let element" (click)="$event.stopPropagation()">
@@ -28,8 +33,8 @@
       </td>
     </ng-container>
 
-    <tr mat-header-row *matHeaderRowDef="['id', 'name', 'acoes']"></tr>
-    <tr mat-row *matRowDef="let row; columns: ['id', 'name', 'acoes']"></tr>
+    <tr mat-header-row *matHeaderRowDef="['id', 'name', 'sale_price', 'acoes']"></tr>
+    <tr mat-row *matRowDef="let row; columns: ['id', 'name', 'sale_price', 'acoes']"></tr>
   </table>
   <mat-paginator
     [length]="paginatorDataSource.records.count"
