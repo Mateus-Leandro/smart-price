@@ -1,0 +1,8 @@
+drop trigger if exists trg_set_company_id_promotional_flyer_products
+on public.promotional_flyer_products;
+
+create trigger trg_set_company_id_promotional_flyer_products
+before update or insert
+on public.promotional_flyer_products
+for each row
+execute function public.set_company_id_from_metadata();

@@ -3,15 +3,19 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 serve(async (req) => {
   try {
-    console.log(`Informações envio: ${JSON.stringify(req)}`);
+    let errorMessage;
     if (req.method !== 'POST') {
-      return new Response('A Função espera um método do tipo POST', { status: 405 });
+      errorMessage = 'A Função espera um método do tipo POST';
+      console.error(errorMessage);
+      return new Response(errorMessage, { status: 405 });
     }
 
     const payload = await req.json();
 
     if (!Array.isArray(payload)) {
-      return new Response(JSON.stringify({ error: 'Payload enviado não é um array!' }), {
+      errorMessage = 'Payload enviado não é um array!';
+      console.error(errorMessage);
+      return new Response(JSON.stringify({ error: errorMessage }), {
         status: 400,
       });
     }
@@ -33,12 +37,16 @@ serve(async (req) => {
       error,
     } = await supabase.auth.getUser();
     if (error || !user) {
-      return new Response('Não autenticado', { status: 401 });
+      errorMessage = 'Não autenticado';
+      console.error(errorMessage);
+      return new Response(errorMessage, { status: 401 });
     }
 
     const company_id = user.app_metadata.company_id;
     if (!company_id) {
-      return new Response('Não encontrado empresa vinculada ao usuário!', { status: 400 });
+      errorMessage = 'Não encontrado empresa vinculada ao usuário!';
+      console.error(errorMessage);
+      return new Response(errorMessage, { status: 400 });
     }
 
     const results: any[] = [];
@@ -47,14 +55,13 @@ serve(async (req) => {
       const { promotional_flyer_id, product_id, product_name } = item;
 
       if (!promotional_flyer_id || (!product_id && !product_name)) {
-        return new Response(
-          JSON.stringify({
-            error:
-              "Payload Inválido! Campos esperados: 'promotional_flyer_id', 'product_id' e 'product_name'",
-            item,
-          }),
-          { status: 400 },
-        );
+        errorMessage = JSON.stringify({
+          error:
+            "Payload Inválido! Campos esperados: 'promotional_flyer_id', 'product_id' e 'product_name'",
+          item,
+        });
+        console.error(errorMessage);
+        return new Response(errorMessage, { status: 400 });
       }
 
       // 1️⃣ Verifica se o produto existe
@@ -77,14 +84,12 @@ serve(async (req) => {
           .single();
 
         if (productError) {
-          console.log('Erro de criação do produto:', productError);
-          return new Response(
-            JSON.stringify({
-              error: 'Erro ao criar produto',
-              productError,
-            }),
-            { status: 500 },
-          );
+          errorMessage = JSON.stringify({
+            error: 'Erro ao criar produto',
+            productError,
+          });
+          console.error(errorMessage);
+          return new Response(errorMessage, { status: 500 });
         }
       }
 
@@ -95,6 +100,7 @@ serve(async (req) => {
           {
             promotional_flyer_id,
             product_id,
+            company_id,
           },
           {
             onConflict: 'promotional_flyer_id,product_id',
@@ -104,14 +110,12 @@ serve(async (req) => {
         .single();
 
       if (flyerError) {
-        console.log('Erro de upsert:', flyerError);
-        return new Response(
-          JSON.stringify({
-            error: 'Erro ao vincular produto no encarte',
-            flyerError,
-          }),
-          { status: 500 },
-        );
+        errorMessage = JSON.stringify({
+          error: 'Erro ao vincular produto no encarte',
+          flyerError,
+        });
+        console.error(errorMessage);
+        return new Response(errorMessage, { status: 500 });
       }
 
       results.push({
@@ -121,6 +125,7 @@ serve(async (req) => {
       });
     }
 
+    console.log('Upsert de produtos do encarte realizado com sucesso!');
     return new Response(JSON.stringify({ success: true, results }), {
       headers: { 'Content-Type': 'application/json' },
     });
