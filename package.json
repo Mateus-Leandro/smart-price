@@ -6,7 +6,9 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "supabase:deploy-migrations": "supabase db push",
+    "supabase:deploy-function": "bash -c 'read -p \"Nome da função Supabase: \" FN && supabase functions deploy \"$FN\"'"
   },
   "prettier": {
     "printWidth": 100,
