@@ -25,6 +25,18 @@
       border-bottom-color: $font-primary;
       caret-color: $font-primary;
     }
+
+    .icon-button {
+      ::ng-deep mat-icon {
+        color: $secondary !important;
+      }
+    }
+  }
+
+  .icon-button {
+    ::ng-deep mat-icon {
+      color: $primary !important;
+    }
   }
 
   .mat-sort-header-arrow {

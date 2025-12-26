@@ -36,14 +36,8 @@
         />
       </td>
     </ng-container>
-    <ng-container matColumnDef="acoes">
-      <th mat-header-cell *matHeaderCellDef></th>
-      <td mat-cell *matCellDef="let element" (click)="$event.stopPropagation()">
-        <app-icon-button icon="delete_forever" iconColor="var(--cancel-color)"></app-icon-button>
-      </td>
-    </ng-container>
-    <tr mat-header-row *matHeaderRowDef="['id', 'name', 'sale_price', 'acoes']"></tr>
-    <tr mat-row *matRowDef="let row; columns: ['id', 'name', 'sale_price', 'acoes']"></tr>
+    <tr mat-header-row *matHeaderRowDef="['id', 'name', 'sale_price']"></tr>
+    <tr mat-row *matRowDef="let row; columns: ['id', 'name', 'sale_price']"></tr>
   </table>
   <mat-paginator
     #paginator
