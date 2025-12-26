@@ -81,6 +81,26 @@ export class PromotionalFlyerService {
     };
   }
 
+  async updateSalePrice(flyerId: number, productId: number, salePrice: number): Promise<void> {
+    try {
+      const { error } = await this.supabaseService.supabase
+        .from('promotional_flyer_products')
+        .update({
+          sale_price: salePrice,
+          updated_at: new Date(),
+        })
+        .eq('promotional_flyer_id', flyerId)
+        .eq('product_id', productId);
+      debugger;
+      if (error) {
+        throw error;
+      }
+    } catch (err) {
+      console.error('Erro ao atualizar preço de venda:', err);
+      throw err;
+    }
+  }
+
   private formatDate(date: string): string {
     const d = new Date(date);
     return d.toLocaleDateString('pt-BR');

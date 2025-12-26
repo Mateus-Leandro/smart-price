@@ -40,6 +40,7 @@ import { IconButton } from 'src/app/shared/components/icon-button/icon-button';
 
 type FlyerRowForm = FormGroup<{
   salePrice: FormControl<string | null>;
+  productId: FormControl<number>;
 }>;
 
 @Component({
@@ -163,19 +164,12 @@ export class PromotionalFlyerProductTable {
           salePrice: this.fb.control<string | null>(
             item.salePrice != null ? item.salePrice.toFixed(2).replace('.', ',') : null,
           ),
+          productId: this.fb.control<number>(item.id, { nonNullable: true }),
         }),
       ),
     );
 
     this.form.setControl('rows', rowsArray);
-  }
-
-  onPriceCommit(productId: number, value: string | null): void {
-    if (!value) return;
-
-    const numberValue = Number(value.replace(/\./g, '').replace(',', '.'));
-
-    console.log(productId, numberValue);
   }
 
   onEnter(index: number): void {
@@ -195,25 +189,28 @@ export class PromotionalFlyerProductTable {
     }
   }
 
-  onPriceBlur(index: number): void {
-    const control = this.rows.at(index).controls.salePrice;
-    let value = control.value;
+  async onPriceBlur(index: number): Promise<void> {
+    const control = this.rows.at(index).controls;
+    let value = control.salePrice.value;
+    const productId = control.productId.value;
 
     if (!value) {
-      control.setValue('0,00', { emitEvent: false });
+      control.salePrice.setValue('0,00', { emitEvent: false });
       return;
     }
 
-    // Remove o prefixo se existir e limpa separadores de milhar para converter em número
-    // O valor vindo do ngx-mask com dropSpecialCharacters=false pode vir como "1.250,5"
     let cleanValue = value.replace('R$ ', '').replace(/\./g, '').replace(',', '.');
+    const numericPrice = parseFloat(cleanValue);
 
-    const numeric = parseFloat(cleanValue);
-
-    if (!isNaN(numeric)) {
-      // Força 2 casas decimais e volta para o formato brasileiro
-      const formatted = numeric.toFixed(2).replace('.', ',');
-      control.setValue(formatted, { emitEvent: false });
+    if (!isNaN(numericPrice)) {
+      const formatted = numericPrice.toFixed(2).replace('.', ',');
+      control.salePrice.setValue(formatted, { emitEvent: false });
+    }
+    debugger;
+    try {
+      await this.promotionalFlyerService.updateSalePrice(this.flyerId, productId, numericPrice);
+    } catch (error) {
+      console.error('Falha ao atualizar preço de venda no banco');
     }
   }
 }

@@ -6,7 +6,7 @@ export interface IPromotionalflyer {
 }
 
 export interface IPromotionalFlyerProducts {
-  id: string;
+  id: number;
   name: string;
   salePrice?: number;
 }
