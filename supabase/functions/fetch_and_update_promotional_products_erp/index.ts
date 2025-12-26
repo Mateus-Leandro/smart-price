@@ -14,9 +14,11 @@ serve(async (req) => {
     let promotional_flyer_id: number | null = null;
 
     const body = await req.json();
-    if (body?.promotional_flyer_id) {
-      console.log(`Buscando preços do encarte: ${body.promotional_flyer_id}.`);
-      promotional_flyer_id = Number(body.promotional_flyer_id);
+    const payload = Array.isArray(body) ? body[0] : body;
+
+    if (payload?.promotional_flyer_id) {
+      console.log(`Buscando preços do encarte: ${payload.promotional_flyer_id}.`);
+      promotional_flyer_id = Number(payload.promotional_flyer_id);
     } else {
       console.log(`Buscando preços de todos os encartes.`);
     }
@@ -56,8 +58,9 @@ serve(async (req) => {
 
     if (!data || data.length === 0) {
       console.log('Não encontrado nenhum produto para atualização de preços.');
-      return new Response('Não encontrado nenhum produto para atualização de preços.', {
-        status: 404,
+      return new Response(JSON.stringify([]), {
+        headers: { 'Content-Type': 'application/json' },
+        status: 200,
       });
     }
 
@@ -79,5 +82,6 @@ serve(async (req) => {
     });
   } catch (error) {
     console.error(`Error: ${error}`);
+    return new Response(JSON.stringify({ error: 'Internal Server Error' }), { status: 500 });
   }
 });
