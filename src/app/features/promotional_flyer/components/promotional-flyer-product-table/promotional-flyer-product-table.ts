@@ -36,7 +36,6 @@ import { IPromotionalFlyerProducts } from '../../../../shared/interfaces/promoti
 import { IDefaultPaginatorDataSource } from 'src/app/shared/interfaces/query-interface';
 
 import { Spinner } from 'src/app/shared/components/spinner/spinner';
-import { IconButton } from 'src/app/shared/components/icon-button/icon-button';
 
 type FlyerRowForm = FormGroup<{
   salePrice: FormControl<string | null>;
@@ -47,7 +46,6 @@ type FlyerRowForm = FormGroup<{
   selector: 'app-promotional-flyer-product-table',
   imports: [
     Spinner,
-    IconButton,
     MatTableModule,
     MatSortModule,
     MatPaginator,

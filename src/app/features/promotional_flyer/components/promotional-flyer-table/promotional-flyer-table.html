@@ -33,7 +33,11 @@
       <ng-container matColumnDef="acoes">
         <th mat-header-cell *matHeaderCellDef></th>
         <td mat-cell *matCellDef="let element" (click)="$event.stopPropagation()">
-          <app-icon-button icon="delete_forever" iconColor="var(--cancel-color)"></app-icon-button>
+          <app-icon-button
+            icon="send"
+            class="icon-button"
+            tooltipText="Enviar preços para o ERP"
+          ></app-icon-button>
         </td>
       </ng-container>
 
