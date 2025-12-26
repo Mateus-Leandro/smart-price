@@ -4,11 +4,13 @@ import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { MatPaginatorIntl } from '@angular/material/paginator';
 import { MatPaginatorIntlPtBr } from './shared/helpers/mat-paginator-intl-pt-br';
+import { provideNgxMask } from 'ngx-mask';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
+    provideNgxMask(),
     { provide: MatPaginatorIntl, useClass: MatPaginatorIntlPtBr },
   ],
 };

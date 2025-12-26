@@ -1,20 +1,46 @@
-import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
-import { PromotionalFlyerService } from '../../services/promotional-flyer.service';
+import {
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  QueryList,
+  ViewChild,
+  ViewChildren,
+} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
-import { IPromotionalFlyerProducts } from '../../../../shared/interfaces/promotional-flyer.interface';
-import { Spinner } from 'src/app/shared/components/spinner/spinner';
-import { IconButton } from 'src/app/shared/components/icon-button/icon-button';
 import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
-import { IDefaultPaginatorDataSource } from 'src/app/shared/interfaces/query-interface';
 import { MatInputModule } from '@angular/material/input';
-import { FormsModule } from '@angular/forms';
-import { FlexLayoutModule } from '@angular/flex-layout';
 import { MatIconModule } from '@angular/material/icon';
+
+import {
+  FormArray,
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+} from '@angular/forms';
+
+import { FlexLayoutModule } from '@angular/flex-layout';
+
 import { debounceTime } from 'rxjs/internal/operators/debounceTime';
 import { distinctUntilChanged } from 'rxjs/internal/operators/distinctUntilChanged';
 import { Subject } from 'rxjs';
+
+import { NgxMaskDirective } from 'ngx-mask';
+
+import { PromotionalFlyerService } from '../../services/promotional-flyer.service';
+import { IPromotionalFlyerProducts } from '../../../../shared/interfaces/promotional-flyer.interface';
+import { IDefaultPaginatorDataSource } from 'src/app/shared/interfaces/query-interface';
+
+import { Spinner } from 'src/app/shared/components/spinner/spinner';
+import { IconButton } from 'src/app/shared/components/icon-button/icon-button';
+
+type FlyerRowForm = FormGroup<{
+  salePrice: FormControl<string | null>;
+}>;
 
 @Component({
   selector: 'app-promotional-flyer-product-table',
@@ -29,18 +55,25 @@ import { Subject } from 'rxjs';
     FormsModule,
     FlexLayoutModule,
     MatIconModule,
+    ReactiveFormsModule,
+    NgxMaskDirective,
   ],
   templateUrl: './promotional-flyer-product-table.html',
   styleUrl: './promotional-flyer-product-table.scss',
 })
 export class PromotionalFlyerProductTable {
   @ViewChild(MatSort) sort!: MatSort;
+  @ViewChildren('priceInput')
+  priceInputs!: QueryList<ElementRef<HTMLInputElement>>;
 
   searchTerm = '';
   loading = false;
-  flyerId: number = 0;
+  flyerId = 0;
+
   sortEvent!: Sort;
+
   dataSource = new MatTableDataSource<IPromotionalFlyerProducts>([]);
+
   paginatorDataSource: IDefaultPaginatorDataSource<IPromotionalFlyerProducts> = {
     pageIndex: 0,
     pageSize: 10,
@@ -50,25 +83,33 @@ export class PromotionalFlyerProductTable {
     },
   };
 
+  form!: FormGroup;
+
+  private search$ = new Subject<string>();
+
   constructor(
     private promotionalFlyerService: PromotionalFlyerService,
     private cdr: ChangeDetectorRef,
     private route: ActivatedRoute,
+    private fb: FormBuilder,
   ) {}
 
-  private search$ = new Subject<string>();
-
-  ngOnInit() {
+  ngOnInit(): void {
     this.flyerId = Number(this.route.snapshot.paramMap.get('id'));
     this.reload();
+
     this.search$.pipe(debounceTime(300), distinctUntilChanged()).subscribe((value) => {
       this.searchTerm = value;
       this.paginatorDataSource.pageIndex = 0;
       this.reload();
     });
+
+    this.form = this.fb.group({
+      rows: this.fb.array([]),
+    });
   }
 
-  ngAfterViewInit() {
+  ngAfterViewInit(): void {
     this.dataSource.sort = this.sort;
   }
 
@@ -76,7 +117,7 @@ export class PromotionalFlyerProductTable {
     flyerId: number,
     paginatorDataSource: IDefaultPaginatorDataSource<IPromotionalFlyerProducts>,
     search?: string,
-  ) {
+  ): Promise<void> {
     this.loading = true;
 
     try {
@@ -85,7 +126,9 @@ export class PromotionalFlyerProductTable {
         paginatorDataSource,
         search,
       );
+
       this.dataSource.data = this.paginatorDataSource.records.data;
+      this.buildForm(this.dataSource.data);
     } catch (err) {
       console.error(`Erro ao buscar produtos do encarte ${flyerId}`, err);
     } finally {
@@ -94,18 +137,83 @@ export class PromotionalFlyerProductTable {
     }
   }
 
-  onPageChange(event: PageEvent) {
+  onPageChange(event: PageEvent): void {
     this.paginatorDataSource.pageSize = event.pageSize;
     this.paginatorDataSource.pageIndex = event.pageIndex;
     this.reload();
   }
 
-  onSearch(event: Event) {
+  onSearch(event: Event): void {
     const value = (event.target as HTMLInputElement).value;
     this.search$.next(value);
   }
 
-  private reload() {
+  private reload(): void {
     this.loadProductsFromPromotionalFlyer(this.flyerId, this.paginatorDataSource, this.searchTerm);
+  }
+
+  get rows(): FormArray<FlyerRowForm> {
+    return this.form.get('rows') as FormArray<FlyerRowForm>;
+  }
+
+  private buildForm(data: IPromotionalFlyerProducts[]): void {
+    const rowsArray = this.fb.array<FlyerRowForm>(
+      data.map((item) =>
+        this.fb.group({
+          salePrice: this.fb.control<string | null>(
+            item.salePrice != null ? item.salePrice.toFixed(2).replace('.', ',') : null,
+          ),
+        }),
+      ),
+    );
+
+    this.form.setControl('rows', rowsArray);
+  }
+
+  onPriceCommit(productId: number, value: string | null): void {
+    if (!value) return;
+
+    const numberValue = Number(value.replace(/\./g, '').replace(',', '.'));
+
+    console.log(productId, numberValue);
+  }
+
+  onEnter(index: number): void {
+    const inputs = this.priceInputs.toArray();
+    const current = inputs[index];
+    const next = inputs[index + 1];
+
+    if (current) {
+      current.nativeElement.blur();
+    }
+
+    if (next) {
+      setTimeout(() => {
+        next.nativeElement.focus();
+        next.nativeElement.select();
+      });
+    }
+  }
+
+  onPriceBlur(index: number): void {
+    const control = this.rows.at(index).controls.salePrice;
+    let value = control.value;
+
+    if (!value) {
+      control.setValue('0,00', { emitEvent: false });
+      return;
+    }
+
+    // Remove o prefixo se existir e limpa separadores de milhar para converter em número
+    // O valor vindo do ngx-mask com dropSpecialCharacters=false pode vir como "1.250,5"
+    let cleanValue = value.replace('R$ ', '').replace(/\./g, '').replace(',', '.');
+
+    const numeric = parseFloat(cleanValue);
+
+    if (!isNaN(numeric)) {
+      // Força 2 casas decimais e volta para o formato brasileiro
+      const formatted = numeric.toFixed(2).replace('.', ',');
+      control.setValue(formatted, { emitEvent: false });
+    }
   }
 }
