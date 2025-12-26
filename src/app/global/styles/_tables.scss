@@ -20,10 +20,24 @@
     cursor: pointer;
     background-color: $primary;
     color: $secondary;
+    .only-line {
+      color: $font-primary;
+      border-bottom-color: $font-primary;
+      caret-color: $font-primary;
+    }
   }
 
   .mat-sort-header-arrow {
     color: $secondary;
+  }
+
+  .only-line {
+    border: none;
+    border-bottom: 1px solid $medium-gray;
+    outline: none;
+    padding: 8px 0;
+    background: transparent;
+    width: 100%;
   }
 }
 
