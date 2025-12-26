@@ -46,6 +46,7 @@
     <tr mat-row *matRowDef="let row; columns: ['id', 'name', 'sale_price', 'acoes']"></tr>
   </table>
   <mat-paginator
+    #paginator
     [length]="paginatorDataSource.records.count"
     [pageSize]="paginatorDataSource.pageSize"
     [pageIndex]="paginatorDataSource.pageIndex"

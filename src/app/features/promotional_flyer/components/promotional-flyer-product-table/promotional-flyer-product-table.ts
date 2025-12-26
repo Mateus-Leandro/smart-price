@@ -66,6 +66,7 @@ export class PromotionalFlyerProductTable {
   @ViewChild(MatSort) sort!: MatSort;
   @ViewChildren('priceInput')
   priceInputs!: QueryList<ElementRef<HTMLInputElement>>;
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   searchTerm = '';
   loading = false;
@@ -186,7 +187,25 @@ export class PromotionalFlyerProductTable {
         next.nativeElement.focus();
         next.nativeElement.select();
       });
+    } else if (this.paginator && this.paginator.hasNextPage()) {
+      this.paginator.nextPage();
+      this.focusFirstInputAfterLoad();
     }
+  }
+
+  private focusFirstInputAfterLoad(): void {
+    const interval = setInterval(() => {
+      if (!this.loading) {
+        clearInterval(interval);
+        setTimeout(() => {
+          if (this.priceInputs.first) {
+            this.priceInputs.first.nativeElement.focus();
+            this.priceInputs.first.nativeElement.select();
+          }
+        }, 200);
+      }
+    }, 50);
+    setTimeout(() => clearInterval(interval), 5000);
   }
 
   async onPriceBlur(index: number): Promise<void> {
@@ -205,12 +224,11 @@ export class PromotionalFlyerProductTable {
     if (!isNaN(numericPrice)) {
       const formatted = numericPrice.toFixed(2).replace('.', ',');
       control.salePrice.setValue(formatted, { emitEvent: false });
-    }
-    debugger;
-    try {
-      await this.promotionalFlyerService.updateSalePrice(this.flyerId, productId, numericPrice);
-    } catch (error) {
-      console.error('Falha ao atualizar preço de venda no banco');
+      try {
+        await this.promotionalFlyerService.updateSalePrice(this.flyerId, productId, numericPrice);
+      } catch (error) {
+        console.error('Falha ao atualizar preço de venda no banco');
+      }
     }
   }
 }

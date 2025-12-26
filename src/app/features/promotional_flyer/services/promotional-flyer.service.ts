@@ -91,7 +91,6 @@ export class PromotionalFlyerService {
         })
         .eq('promotional_flyer_id', flyerId)
         .eq('product_id', productId);
-      debugger;
       if (error) {
         throw error;
       }
