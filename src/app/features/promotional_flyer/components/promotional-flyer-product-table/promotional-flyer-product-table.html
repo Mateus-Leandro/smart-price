@@ -26,6 +26,7 @@
           [formControl]="rows.at(i).controls.salePrice"
           (keyup.enter)="onEnter(i)"
           (blur)="onPriceBlur(i)"
+          (focus)="onFocus(i)"
           mask="separator.2"
           thousandSeparator="."
           decimalMarker=","

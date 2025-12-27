@@ -183,7 +183,6 @@ export class PromotionalFlyerProductTable {
     if (next) {
       setTimeout(() => {
         next.nativeElement.focus();
-        next.nativeElement.select();
       });
     } else if (this.paginator && this.paginator.hasNextPage()) {
       this.paginator.nextPage();
@@ -227,6 +226,14 @@ export class PromotionalFlyerProductTable {
       } catch (error) {
         console.error('Falha ao atualizar preço de venda no banco');
       }
+    }
+  }
+
+  onFocus(index: number) {
+    const inputs = this.priceInputs.toArray();
+    const current = inputs[index];
+    if (current) {
+      current.nativeElement.select();
     }
   }
 }
