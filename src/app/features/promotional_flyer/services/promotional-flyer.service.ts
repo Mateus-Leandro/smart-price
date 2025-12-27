@@ -104,4 +104,29 @@ export class PromotionalFlyerService {
     const d = new Date(date);
     return d.toLocaleDateString('pt-BR');
   }
+
+  async sendPricesToErp(flyerId: number, productId?: number) {
+    try {
+      let query = this.supabaseService.supabase
+        .from('promotional_flyer_products')
+        .update({
+          send_to_erp: true,
+          updated_at: new Date(),
+        })
+        .eq('promotional_flyer_id', flyerId)
+        .gt('sale_price', 0);
+
+      if (productId) {
+        query = query.eq('product_id', productId);
+      }
+
+      const { error } = await query;
+      if (error) {
+        throw error;
+      }
+    } catch (error) {
+      console.error('Erro ao enviar preços para o ERP:', error);
+      throw error;
+    }
+  }
 }

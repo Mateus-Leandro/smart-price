@@ -18,6 +18,7 @@ export class PromotionalFlyerTable {
   @ViewChild(MatSort) sort!: MatSort;
   loading = false;
   dataSource = new MatTableDataSource<IPromotionalflyer>([]);
+  sendingFlyerId?: number | null;
 
   constructor(
     private pricingRecordsService: PromotionalFlyerService,
@@ -61,5 +62,17 @@ export class PromotionalFlyerTable {
 
   navigateToPromotionalFlyerProduct(row: any) {
     this.router.navigate(['/promotional_flyer', row.id]);
+  }
+
+  async sendPrices(flyerId: number) {
+    try {
+      this.sendingFlyerId = flyerId;
+      await this.pricingRecordsService.sendPricesToErp(flyerId);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      this.sendingFlyerId = null;
+      this.cdr.detectChanges();
+    }
   }
 }
