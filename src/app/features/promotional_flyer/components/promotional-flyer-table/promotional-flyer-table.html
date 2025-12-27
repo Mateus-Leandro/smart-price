@@ -33,11 +33,16 @@
       <ng-container matColumnDef="acoes">
         <th mat-header-cell *matHeaderCellDef></th>
         <td mat-cell *matCellDef="let element" (click)="$event.stopPropagation()">
-          <app-icon-button
-            icon="send"
-            class="icon-button"
-            tooltipText="Enviar preços para o ERP"
-          ></app-icon-button>
+          @if (sendingFlyerId != element.id) {
+            <app-icon-button
+              icon="send"
+              class="icon-button"
+              tooltipText="Enviar preços para o ERP"
+              (click)="sendPrices(element.id)"
+            ></app-icon-button>
+          } @else {
+            <app-spinner [diameter]="30"></app-spinner>
+          }
         </td>
       </ng-container>
 
