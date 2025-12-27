@@ -32,6 +32,7 @@ export class Register {
     private router: Router,
     private authService: AuthService,
   ) {}
+  loading = false;
 
   nextTab(tabs: MatTabGroup, companyForm: FormGroup) {
     if (companyForm.invalid) {
@@ -80,6 +81,7 @@ export class Register {
     };
 
     try {
+      this.loading = true;
       const { user } = await this.authService.register(newUser);
 
       if (user) {
@@ -88,6 +90,8 @@ export class Register {
     } catch (error) {
       console.error(error);
       throw error;
+    } finally {
+      this.loading = false;
     }
   }
 }

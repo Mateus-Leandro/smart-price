@@ -58,13 +58,16 @@
 
           <mat-card-actions align="end">
             <div fxLayout="row" fxLayoutGap="5px" class="pad-r-7">
+              @if (!loading) {
+                <app-button
+                  text="Cancelar"
+                  icon="backspace"
+                  bgColor="var(--cancel-color)"
+                  (click)="returnToLogin()"
+                ></app-button>
+              }
               <app-button
-                text="Cancelar"
-                icon="backspace"
-                bgColor="var(--cancel-color)"
-                (click)="returnToLogin()"
-              ></app-button>
-              <app-button
+                [loading]="loading"
                 icon="save"
                 text="Salvar"
                 (click)="
