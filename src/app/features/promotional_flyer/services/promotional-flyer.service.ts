@@ -14,23 +14,23 @@ export class PromotionalFlyerService {
         .from('promotional_flyers')
         .select(
           `
-          id,
-          name,
-          finished,
-          created_at
-        `,
+        id,
+        name,
+        finished,
+        created_at,
+        promotional_flyer_products(count)
+      `,
         )
         .order('created_at', { ascending: false });
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
       return (data ?? []).map((item) => ({
         id: item.id,
         name: item.name,
         createdDate: this.formatDate(item.created_at),
         status: item.finished ? 'Encerrada' : 'Em andamento',
+        totalProducts: item.promotional_flyer_products?.[0]?.count ?? 0,
       }));
     } catch (err) {
       throw err;

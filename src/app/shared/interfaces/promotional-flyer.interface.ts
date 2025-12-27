@@ -3,6 +3,7 @@ export interface IPromotionalflyer {
   name: string;
   createdDate: string;
   status: string;
+  totalProducts: number;
 }
 
 export interface IPromotionalFlyerProducts {
