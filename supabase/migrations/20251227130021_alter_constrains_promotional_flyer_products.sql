@@ -1,0 +1,6 @@
+ALTER TABLE public.promotional_flyer_products 
+DROP CONSTRAINT IF EXISTS promotional_flyer_products_flyer_product_unique;
+
+ALTER TABLE public.promotional_flyer_products 
+ADD CONSTRAINT promotional_flyer_products_flyer_product_company_unique 
+UNIQUE (promotional_flyer_id, product_id, company_id);
