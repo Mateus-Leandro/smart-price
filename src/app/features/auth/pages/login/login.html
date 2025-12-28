@@ -44,16 +44,17 @@
               <mat-error>Email ou senha incorreta</mat-error>
             }
           </mat-form-field>
-
-          <div fxLayout="row" fxLayoutAlign="end">
-            <app-button
-              text="Esqueci a minha senha"
-              height="20px"
-              textColor="var(--cancel-color)"
-              bgColor="transparent"
-              (click)="openForgotPasswordDialog()"
-            />
-          </div>
+          @if (!loading) {
+            <div fxLayout="row" fxLayoutAlign="end">
+              <app-button
+                text="Esqueci a minha senha"
+                height="20px"
+                textColor="var(--cancel-color)"
+                bgColor="transparent"
+                (click)="openForgotPasswordDialog()"
+              />
+            </div>
+          }
 
           <div
             fxLayout="column"
@@ -70,13 +71,15 @@
               [loading]="loading"
               type="submit"
             />
-            <app-button
-              text="Cadastrar-se"
-              height="20px"
-              textColor="var(--primary)"
-              bgColor="transparent"
-              (click)="navigateToRegister()"
-            />
+            @if (!loading) {
+              <app-button
+                text="Cadastrar-se"
+                height="20px"
+                textColor="var(--primary)"
+                bgColor="transparent"
+                (click)="navigateToRegister()"
+              />
+            }
           </div>
         </form>
       </div>
