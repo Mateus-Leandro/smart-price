@@ -21,7 +21,7 @@ export class PromotionalFlyerTable {
   sendingFlyerId?: number | null;
 
   constructor(
-    private pricingRecordsService: PromotionalFlyerService,
+    private promotionalFlyerService: PromotionalFlyerService,
     private cdr: ChangeDetectorRef,
     private router: Router,
   ) {}
@@ -50,7 +50,7 @@ export class PromotionalFlyerTable {
   async loadPrincingRecords() {
     try {
       this.loading = true;
-      const records = await this.pricingRecordsService.loadFlyers();
+      const records = await this.promotionalFlyerService.loadFlyers();
       this.dataSource.data = records ?? [];
     } catch (err) {
       console.error('Erro ao carregar registros', err);
@@ -67,7 +67,7 @@ export class PromotionalFlyerTable {
   async sendPrices(flyerId: number) {
     try {
       this.sendingFlyerId = flyerId;
-      await this.pricingRecordsService.sendPricesToErp(flyerId);
+      await this.promotionalFlyerService.sendPricesToErp(flyerId);
     } catch (error) {
       console.error(error);
     } finally {

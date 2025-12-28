@@ -11,13 +11,13 @@
   )
 );
 
-.button:hover {
-  opacity: 0.6;
+.icon-button {
   cursor: pointer;
-}
+  background-color: transparent !important;
+  border: none;
 
-.button[disabled] {
-  background-color: $gray !important;
-  color: $medium-gray !important;
-  opacity: 0.6 !important;
+  .icon-button:hover {
+    opacity: 0.6;
+    cursor: pointer;
+  }
 }

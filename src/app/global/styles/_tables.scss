@@ -26,16 +26,32 @@
       caret-color: $font-primary;
     }
 
-    .icon-button {
+    .icon-button-table {
       ::ng-deep mat-icon {
         color: $secondary !important;
+        cursor: pointer;
+      }
+    }
+
+    .icon-button-table-disabled {
+      ::ng-deep mat-icon {
+        color: $medium-gray !important;
+        cursor: default;
       }
     }
   }
 
-  .icon-button {
+  .icon-button-table {
     ::ng-deep mat-icon {
       color: $primary !important;
+      cursor: pointer;
+    }
+  }
+
+  .icon-button-table-disabled {
+    ::ng-deep mat-icon {
+      color: $medium-gray !important;
+      cursor: default;
     }
   }
 
