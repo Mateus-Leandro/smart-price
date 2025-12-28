@@ -46,6 +46,9 @@ serve(async (req) => {
         current_cost_price,
         quote_cost,
         current_loyalty_price,
+        quote_supplier_id,
+        quote_supplier_name,
+        quote_supplier_cnpj,
       } = item;
 
       if (!promotional_flyer_id || (!product_id && !product_name)) {
@@ -54,7 +57,7 @@ serve(async (req) => {
         });
       }
 
-      // 1️⃣ Verifica se o produto existe NESTA empresa (Chave Composta)
+      // Verifica se o produto existe NESTA empresa (Chave Composta)
       const { data: existingProduct } = await supabase
         .from('products')
         .select('id')
@@ -62,7 +65,7 @@ serve(async (req) => {
         .eq('company_id', company_id)
         .maybeSingle();
 
-      // 2️⃣ Cria produto se não existir para esta empresa
+      // Cria produto se não existir para esta empresa
       if (!existingProduct) {
         const { error: productError } = await supabase.from('products').insert({
           id: product_id,
@@ -78,7 +81,37 @@ serve(async (req) => {
         }
       }
 
-      // 3️⃣ Upsert flyer x product
+      // Verifica se o fornecedpr existe NESTA empresa (Chave Composta)
+      const { data, error } = await supabase
+        .from('suppliers')
+        .upsert(
+          {
+            id: quote_supplier_id,
+            company_id: company_id,
+            name: quote_supplier_name,
+            cnpj: quote_supplier_cnpj,
+          },
+          {
+            onConflict: 'id, company_id',
+          },
+        )
+        .select()
+        .single();
+
+      if (error) {
+        console.error(`Erro ao realizar upsert do fornecedor ${quote_supplier_id}:`, error);
+        return new Response(
+          JSON.stringify({
+            error: `Erro ao realizar upsert do fornecedor ${quote_supplier_id}:`,
+            error,
+          }),
+          {
+            status: 500,
+          },
+        );
+      }
+
+      // Upsert flyer x product
       const { data: flyerProduct, error: flyerError } = await supabase
         .from('promotional_flyer_products')
         .upsert(
