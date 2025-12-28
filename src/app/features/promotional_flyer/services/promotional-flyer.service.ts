@@ -70,6 +70,7 @@ export class PromotionalFlyerService {
         `
       id,
       sale_price,
+      quote_cost,
       current_cost_price,
       current_sale_price,
       products!inner (
@@ -97,6 +98,7 @@ export class PromotionalFlyerService {
         id: item.products.id,
         name: item.products.name,
         salePrice: item?.sale_price ?? 0,
+        quoteCost: item?.quote_cost ?? 0,
         currentCostPrice: item?.current_cost_price ?? 0,
         currentSalePrice: item?.current_sale_price ?? 0,
       })),

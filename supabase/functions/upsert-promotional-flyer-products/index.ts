@@ -44,6 +44,7 @@ serve(async (req) => {
         product_name,
         current_sale_price,
         current_cost_price,
+        quote_cost,
       } = item;
 
       if (!promotional_flyer_id || (!product_id && !product_name)) {
@@ -86,6 +87,7 @@ serve(async (req) => {
             company_id,
             current_sale_price,
             current_cost_price,
+            quote_cost,
           },
           {
             onConflict: 'promotional_flyer_id,product_id,company_id',
