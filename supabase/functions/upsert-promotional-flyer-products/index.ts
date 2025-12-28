@@ -52,14 +52,6 @@ serve(async (req) => {
         });
       }
 
-      if (!current_sale_price) {
-        current_sale_price = 0.0;
-      }
-
-      if (!current_cost_price) {
-        current_cost_price = 0.0;
-      }
-
       // 1️⃣ Verifica se o produto existe NESTA empresa (Chave Composta)
       const { data: existingProduct } = await supabase
         .from('products')
