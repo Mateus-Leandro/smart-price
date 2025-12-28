@@ -7,17 +7,42 @@ import { Spinner } from 'src/app/shared/components/spinner/spinner';
 import { IPromotionalflyer } from '../../../../shared/interfaces/promotional-flyer.interface';
 import { PromotionalFlyerService } from '../../services/promotional-flyer.service';
 import { Router } from '@angular/router';
+import { IDefaultPaginatorDataSource } from 'src/app/shared/interfaces/query-interface';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { MatFormField, MatLabel } from '@angular/material/select';
+import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
+import { MatInputModule } from '@angular/material/input';
 
 @Component({
   selector: 'app-promotional-flyer-table',
-  imports: [MatTableModule, MatSortModule, MatIconModule, IconButton, Spinner],
+  imports: [
+    MatTableModule,
+    MatSortModule,
+    MatIconModule,
+    IconButton,
+    Spinner,
+    MatPaginator,
+    MatFormField,
+    MatLabel,
+    MatInputModule,
+  ],
   templateUrl: './promotional-flyer-table.html',
   styleUrl: './promotional-flyer-table.scss',
 })
 export class PromotionalFlyerTable {
   @ViewChild(MatSort) sort!: MatSort;
   loading = false;
+  searchTerm = '';
   dataSource = new MatTableDataSource<IPromotionalflyer>([]);
+  paginatorDataSource: IDefaultPaginatorDataSource<IPromotionalflyer> = {
+    pageIndex: 0,
+    pageSize: 10,
+    records: {
+      data: [],
+      count: 0,
+    },
+  };
+  private search$ = new Subject<string>();
   sendingFlyerId?: number | null;
 
   constructor(
@@ -27,7 +52,13 @@ export class PromotionalFlyerTable {
   ) {}
 
   ngOnInit(): void {
-    this.loadPrincingRecords();
+    this.reload();
+
+    this.search$.pipe(debounceTime(300), distinctUntilChanged()).subscribe((value) => {
+      this.searchTerm = value;
+      this.paginatorDataSource.pageIndex = 0;
+      this.reload();
+    });
   }
 
   ngAfterViewInit() {
@@ -47,11 +78,17 @@ export class PromotionalFlyerTable {
     };
   }
 
-  async loadPrincingRecords() {
+  async loadPrincingRecords(
+    paginatorDataSource: IDefaultPaginatorDataSource<IPromotionalflyer>,
+    search?: string,
+  ) {
     try {
       this.loading = true;
-      const records = await this.promotionalFlyerService.loadFlyers();
-      this.dataSource.data = records ?? [];
+      this.paginatorDataSource.records = await this.promotionalFlyerService.loadFlyers(
+        paginatorDataSource,
+        search,
+      );
+      this.dataSource.data = this.paginatorDataSource.records.data;
     } catch (err) {
       console.error('Erro ao carregar registros', err);
     } finally {
@@ -74,5 +111,20 @@ export class PromotionalFlyerTable {
       this.sendingFlyerId = null;
       this.cdr.detectChanges();
     }
+  }
+
+  onPageChange(event: PageEvent): void {
+    this.paginatorDataSource.pageSize = event.pageSize;
+    this.paginatorDataSource.pageIndex = event.pageIndex;
+    this.reload();
+  }
+
+  private reload(): void {
+    this.loadPrincingRecords(this.paginatorDataSource, this.searchTerm);
+  }
+
+  onSearch(event: Event): void {
+    const value = (event.target as HTMLInputElement).value;
+    this.search$.next(value);
   }
 }

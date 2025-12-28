@@ -8,9 +8,15 @@ import { IDefaultPaginatorDataSource } from 'src/app/shared/interfaces/query-int
 })
 export class PromotionalFlyerService {
   constructor(private supabaseService: SupabaseService) {}
-  async loadFlyers() {
+  async loadFlyers(
+    paginatorDataSource: IDefaultPaginatorDataSource<IPromotionalFlyerProducts>,
+    search?: string,
+  ) {
     try {
-      const { data, error } = await this.supabaseService.supabase
+      const from = paginatorDataSource.pageIndex * paginatorDataSource.pageSize;
+      const to = from + paginatorDataSource.pageSize - 1;
+
+      let query = this.supabaseService.supabase
         .from('promotional_flyers')
         .select(
           `
@@ -20,18 +26,28 @@ export class PromotionalFlyerService {
         created_at,
         promotional_flyer_products(count)
       `,
+          { count: 'exact' },
         )
         .order('created_at', { ascending: false });
 
+      if (search) {
+        query.ilike('name', `%${search}%`);
+      }
+
+      const { data, count, error } = await query.range(from, to);
+
       if (error) throw error;
 
-      return (data ?? []).map((item) => ({
-        id: item.id,
-        name: item.name,
-        createdDate: this.formatDate(item.created_at),
-        status: item.finished ? 'Encerrada' : 'Em andamento',
-        totalProducts: item.promotional_flyer_products?.[0]?.count ?? 0,
-      }));
+      return {
+        data: (data ?? []).map((item) => ({
+          id: item.id,
+          name: item.name,
+          createdDate: this.formatDate(item.created_at),
+          status: item.finished ? 'Encerrada' : 'Em andamento',
+          totalProducts: item.promotional_flyer_products?.[0]?.count ?? 0,
+        })),
+        count: count ?? 0,
+      };
     } catch (err) {
       throw err;
     }

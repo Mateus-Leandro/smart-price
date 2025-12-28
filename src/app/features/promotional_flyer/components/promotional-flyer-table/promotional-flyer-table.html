@@ -4,29 +4,34 @@
       <app-spinner />
     </div>
   } @else {
+    <mat-form-field appearance="outline" class="search-input">
+      <mat-label>Pesquise pelo nome do registro</mat-label>
+      <input matInput type="search" (input)="onSearch($event)" />
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
     <table mat-table class="default-table" [dataSource]="dataSource" matSort>
       <ng-container matColumnDef="id">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header="id">ID</th>
+        <th mat-header-cell *matHeaderCellDef>ID</th>
         <td mat-cell *matCellDef="let element">{{ element.id }}</td>
       </ng-container>
 
-      <ng-container matColumnDef="nome">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header="nome">Nome do Registro</th>
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Nome do Registro</th>
         <td mat-cell *matCellDef="let element">{{ element.name }}</td>
       </ng-container>
 
-      <ng-container matColumnDef="data">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header="data">Data de Criação</th>
+      <ng-container matColumnDef="createdDate">
+        <th mat-header-cell *matHeaderCellDef>Data de Criação</th>
         <td mat-cell *matCellDef="let element">{{ element.createdDate }}</td>
       </ng-container>
 
       <ng-container matColumnDef="status">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header="status">Status</th>
+        <th mat-header-cell *matHeaderCellDef>Status</th>
         <td mat-cell *matCellDef="let element">{{ element.status }}</td>
       </ng-container>
 
       <ng-container matColumnDef="produtos">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header="produtos">Produtos</th>
+        <th mat-header-cell *matHeaderCellDef>Produtos</th>
         <td mat-cell *matCellDef="let element">{{ element.totalProducts }}</td>
       </ng-container>
 
@@ -48,13 +53,23 @@
 
       <tr
         mat-header-row
-        *matHeaderRowDef="['id', 'nome', 'data', 'status', 'produtos', 'send']"
+        *matHeaderRowDef="['id', 'name', 'createdDate', 'status', 'produtos', 'send']"
       ></tr>
       <tr
         (click)="navigateToPromotionalFlyerProduct(row)"
         mat-row
-        *matRowDef="let row; columns: ['id', 'nome', 'data', 'status', 'produtos', 'send']"
+        *matRowDef="let row; columns: ['id', 'name', 'createdDate', 'status', 'produtos', 'send']"
       ></tr>
     </table>
+    <mat-paginator
+      #paginator
+      [length]="paginatorDataSource.records.count"
+      [pageSize]="paginatorDataSource.pageSize"
+      [pageIndex]="paginatorDataSource.pageIndex"
+      [pageSizeOptions]="[5, 10, 25, 50, 100]"
+      (page)="onPageChange($event)"
+      showFirstLastButtons
+    >
+    </mat-paginator>
   }
 </div>
