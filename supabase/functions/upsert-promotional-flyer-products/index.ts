@@ -38,12 +38,26 @@ serve(async (req) => {
     const results: any[] = [];
 
     for (const item of payload) {
-      const { promotional_flyer_id, product_id, product_name } = item;
+      const {
+        promotional_flyer_id,
+        product_id,
+        product_name,
+        current_sale_price,
+        current_cost_price,
+      } = item;
 
       if (!promotional_flyer_id || (!product_id && !product_name)) {
         return new Response(JSON.stringify({ error: 'Campos obrigatórios ausentes', item }), {
           status: 400,
         });
+      }
+
+      if (!current_sale_price) {
+        current_sale_price = 0.0;
+      }
+
+      if (!current_cost_price) {
+        current_cost_price = 0.0;
       }
 
       // 1️⃣ Verifica se o produto existe NESTA empresa (Chave Composta)
@@ -78,6 +92,8 @@ serve(async (req) => {
             promotional_flyer_id,
             product_id,
             company_id,
+            current_sale_price,
+            current_cost_price,
           },
           {
             onConflict: 'promotional_flyer_id,product_id,company_id',

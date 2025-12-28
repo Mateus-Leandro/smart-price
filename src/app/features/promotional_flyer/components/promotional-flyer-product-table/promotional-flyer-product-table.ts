@@ -37,6 +37,7 @@ import { IDefaultPaginatorDataSource } from 'src/app/shared/interfaces/query-int
 
 import { Spinner } from 'src/app/shared/components/spinner/spinner';
 import { IconButton } from 'src/app/shared/components/icon-button/icon-button';
+import { CurrencyPipe } from '@angular/common';
 
 type FlyerRowForm = FormGroup<{
   salePrice: FormControl<string | null>;
@@ -58,6 +59,7 @@ type FlyerRowForm = FormGroup<{
     ReactiveFormsModule,
     NgxMaskDirective,
     IconButton,
+    CurrencyPipe,
   ],
   templateUrl: './promotional-flyer-product-table.html',
   styleUrl: './promotional-flyer-product-table.scss',
@@ -261,5 +263,13 @@ export class PromotionalFlyerProductTable {
     const numericPrice = parseFloat(cleanValue);
 
     return isNaN(numericPrice) || numericPrice <= 0;
+  }
+
+  showRowDetails(row: any): void {
+    console.log('Linha clicada!', {
+      id: row.id,
+      nome: row.name,
+      precoAtual: row.currentSalePrice,
+    });
   }
 }

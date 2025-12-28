@@ -16,6 +16,18 @@
       <th mat-header-cell *matHeaderCellDef>Descrição</th>
       <td mat-cell *matCellDef="let element">{{ element.name }}</td>
     </ng-container>
+    <ng-container matColumnDef="current_cost_price">
+      <th mat-header-cell *matHeaderCellDef>Custo (Pr. Entrada)</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.currentCostPrice | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="current_sale_price">
+      <th mat-header-cell *matHeaderCellDef>Preço de Venda</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.currentSalePrice | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+      </td>
+    </ng-container>
     <ng-container matColumnDef="sale_price">
       <th mat-header-cell *matHeaderCellDef>Novo Preço de Venda</th>
       <td mat-cell *matCellDef="let element; let i = index">
@@ -53,8 +65,25 @@
         }
       </td>
     </ng-container>
-    <tr mat-header-row *matHeaderRowDef="['id', 'name', 'sale_price', 'send']"></tr>
-    <tr mat-row *matRowDef="let row; columns: ['id', 'name', 'sale_price', 'send']"></tr>
+    <tr
+      mat-header-row
+      *matHeaderRowDef="[
+        'id',
+        'name',
+        'current_cost_price',
+        'current_sale_price',
+        'sale_price',
+        'send',
+      ]"
+    ></tr>
+    <tr
+      mat-row
+      *matRowDef="
+        let row;
+        columns: ['id', 'name', 'current_cost_price', 'current_sale_price', 'sale_price', 'send']
+      "
+      (click)="showRowDetails(row)"
+    ></tr>
   </table>
   <mat-paginator
     #paginator

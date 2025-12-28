@@ -10,4 +10,6 @@ export interface IPromotionalFlyerProducts {
   id: number;
   name: string;
   salePrice?: number;
+  currentCostPrice: number;
+  currentSalePrice: number;
 }
