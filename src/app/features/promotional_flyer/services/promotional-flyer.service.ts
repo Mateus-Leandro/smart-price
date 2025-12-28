@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core';
 import { SupabaseService } from 'src/app/shared/services/supabase.service';
-import { IPromotionalFlyerProducts } from '../../../shared/interfaces/promotional-flyer.interface';
+import {
+  IPromotionalflyer,
+  IPromotionalFlyerProducts,
+} from '../../../shared/interfaces/promotional-flyer.interface';
 import { IDefaultPaginatorDataSource } from 'src/app/shared/interfaces/query-interface';
 
 @Injectable({
@@ -9,7 +12,7 @@ import { IDefaultPaginatorDataSource } from 'src/app/shared/interfaces/query-int
 export class PromotionalFlyerService {
   constructor(private supabaseService: SupabaseService) {}
   async loadFlyers(
-    paginatorDataSource: IDefaultPaginatorDataSource<IPromotionalFlyerProducts>,
+    paginatorDataSource: IDefaultPaginatorDataSource<IPromotionalflyer>,
     search?: string,
   ) {
     try {
@@ -67,6 +70,8 @@ export class PromotionalFlyerService {
         `
       id,
       sale_price,
+      current_cost_price,
+      current_sale_price,
       products!inner (
         id,
         name
@@ -92,6 +97,8 @@ export class PromotionalFlyerService {
         id: item.products.id,
         name: item.products.name,
         salePrice: item?.sale_price ?? 0,
+        currentCostPrice: item?.current_cost_price ?? 0,
+        currentSalePrice: item?.current_sale_price ?? 0,
       })),
       count: count ?? 0,
     };
