@@ -1,9 +1,16 @@
 <div>
   <mat-card class="mat-card">
     <mat-card-header>
-      <div fxLayout="column">
-        <mat-card-title>Produtos do Encarte {{ id }}</mat-card-title>
-        <mat-card-subtitle> Realize a manutenção dos preços de vendas do itens </mat-card-subtitle>
+      <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+        <app-icon-button
+          icon="arrow_back"
+          tooltipText="Voltar para a lista de encartes"
+          (click)="goBack()"
+        ></app-icon-button>
+        <div fxLayout="column">
+          <mat-card-title>Produtos do Encarte {{ id }}</mat-card-title>
+          <mat-card-subtitle>Realize a manutenção dos preços de vendas dos itens</mat-card-subtitle>
+        </div>
       </div>
     </mat-card-header>
     <app-promotional-flyer-product-table />
