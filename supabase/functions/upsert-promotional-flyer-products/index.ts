@@ -81,8 +81,8 @@ serve(async (req) => {
         }
       }
 
-      // Verifica se o fornecedpr existe NESTA empresa (Chave Composta)
-      const { data, error } = await supabase
+      // Upsert do fornecedor
+      const { data, upsertSupplierError } = await supabase
         .from('suppliers')
         .upsert(
           {
@@ -98,12 +98,15 @@ serve(async (req) => {
         .select()
         .single();
 
-      if (error) {
-        console.error(`Erro ao realizar upsert do fornecedor ${quote_supplier_id}:`, error);
+      if (upsertSupplierError) {
+        console.error(
+          `Erro ao realizar upsert do fornecedor ${quote_supplier_id}:`,
+          upsertSupplierError,
+        );
         return new Response(
           JSON.stringify({
             error: `Erro ao realizar upsert do fornecedor ${quote_supplier_id}:`,
-            error,
+            upsertSupplierError,
           }),
           {
             status: 500,
@@ -123,6 +126,7 @@ serve(async (req) => {
             current_cost_price,
             quote_cost,
             current_loyalty_price,
+            quote_supplier_id,
           },
           {
             onConflict: 'promotional_flyer_id,product_id,company_id',

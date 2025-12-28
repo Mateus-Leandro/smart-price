@@ -10,7 +10,10 @@ export interface IPromotionalFlyerProducts {
   id: number;
   name: string;
   salePrice?: number;
+  quoteCost: number;
   currentCostPrice: number;
   currentSalePrice: number;
-  quoteCost: number;
+  currentLoyaltyPrice: number;
+  supplierId: number;
+  supplierName: string;
 }

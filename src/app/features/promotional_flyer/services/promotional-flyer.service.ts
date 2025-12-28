@@ -68,17 +68,21 @@ export class PromotionalFlyerService {
       .from('promotional_flyer_products')
       .select(
         `
+    id,
+    sale_price,
+    quote_cost,
+    current_cost_price,
+    current_sale_price,
+    current_loyalty_price,
+    products!inner (
       id,
-      sale_price,
-      quote_cost,
-      current_cost_price,
-      current_sale_price,
-      current_loyalty_price,
-      products!inner (
-        id,
-        name
-      )
-      `,
+      name
+    ),
+    supplier:suppliers!inner(
+      id, 
+      name
+    )
+    `,
         { count: 'exact' },
       )
       .eq('promotional_flyer_id', flyerId)
@@ -90,6 +94,7 @@ export class PromotionalFlyerService {
 
     const { data, count, error } = await query.range(from, to);
 
+    debugger;
     if (error) {
       throw error;
     }
@@ -103,6 +108,8 @@ export class PromotionalFlyerService {
         currentCostPrice: item?.current_cost_price ?? 0,
         currentSalePrice: item?.current_sale_price ?? 0,
         currentLoyaltyPrice: item?.current_loyalty_price ?? 0,
+        supplierId: item?.supplier.id,
+        supplierName: item?.supplier.name,
       })),
       count: count ?? 0,
     };
