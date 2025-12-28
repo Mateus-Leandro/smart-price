@@ -36,6 +36,7 @@ import { IPromotionalFlyerProducts } from '../../../../shared/interfaces/promoti
 import { IDefaultPaginatorDataSource } from 'src/app/shared/interfaces/query-interface';
 
 import { Spinner } from 'src/app/shared/components/spinner/spinner';
+import { IconButton } from 'src/app/shared/components/icon-button/icon-button';
 
 type FlyerRowForm = FormGroup<{
   salePrice: FormControl<string | null>;
@@ -56,6 +57,7 @@ type FlyerRowForm = FormGroup<{
     MatIconModule,
     ReactiveFormsModule,
     NgxMaskDirective,
+    IconButton,
   ],
   templateUrl: './promotional-flyer-product-table.html',
   styleUrl: './promotional-flyer-product-table.scss',
@@ -69,6 +71,7 @@ export class PromotionalFlyerProductTable {
   searchTerm = '';
   loading = false;
   flyerId = 0;
+  sendingProductId?: number | null;
 
   sortEvent!: Sort;
 
@@ -235,5 +238,28 @@ export class PromotionalFlyerProductTable {
     if (current) {
       current.nativeElement.select();
     }
+  }
+
+  async sendPrices(productId: number) {
+    try {
+      this.sendingProductId = productId;
+      await this.promotionalFlyerService.sendPricesToErp(this.flyerId, productId);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      this.sendingProductId = null;
+      this.cdr.detectChanges();
+    }
+  }
+
+  isPriceInvalid(index: number): boolean {
+    const value = this.rows.at(index).controls.salePrice.value;
+
+    if (!value) return true;
+
+    const cleanValue = value.replace('R$ ', '').replace(/\./g, '').replace(',', '.');
+    const numericPrice = parseFloat(cleanValue);
+
+    return isNaN(numericPrice) || numericPrice <= 0;
   }
 }

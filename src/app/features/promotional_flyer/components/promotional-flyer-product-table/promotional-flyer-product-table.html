@@ -37,8 +37,24 @@
         />
       </td>
     </ng-container>
-    <tr mat-header-row *matHeaderRowDef="['id', 'name', 'sale_price']"></tr>
-    <tr mat-row *matRowDef="let row; columns: ['id', 'name', 'sale_price']"></tr>
+    <ng-container matColumnDef="send">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let element; let i = index" (click)="$event.stopPropagation()">
+        @if (sendingProductId != element.id) {
+          <app-icon-button
+            icon="send"
+            [class]="isPriceInvalid(i) ? 'icon-button-table-disabled' : 'icon-button-table'"
+            [tooltipText]="isPriceInvalid(i) ? '' : 'Enviar preços para o ERP'"
+            (click)="sendPrices(element.id)"
+            [disabled]="isPriceInvalid(i)"
+          ></app-icon-button>
+        } @else {
+          <app-spinner [diameter]="30"></app-spinner>
+        }
+      </td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="['id', 'name', 'sale_price', 'send']"></tr>
+    <tr mat-row *matRowDef="let row; columns: ['id', 'name', 'sale_price', 'send']"></tr>
   </table>
   <mat-paginator
     #paginator

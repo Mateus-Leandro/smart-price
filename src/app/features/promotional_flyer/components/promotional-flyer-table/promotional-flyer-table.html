@@ -30,13 +30,13 @@
         <td mat-cell *matCellDef="let element">{{ element.totalProducts }}</td>
       </ng-container>
 
-      <ng-container matColumnDef="acoes">
+      <ng-container matColumnDef="send">
         <th mat-header-cell *matHeaderCellDef></th>
         <td mat-cell *matCellDef="let element" (click)="$event.stopPropagation()">
           @if (sendingFlyerId != element.id) {
             <app-icon-button
               icon="send"
-              class="icon-button"
+              class="icon-button-table"
               tooltipText="Enviar preços para o ERP"
               (click)="sendPrices(element.id)"
             ></app-icon-button>
@@ -48,12 +48,12 @@
 
       <tr
         mat-header-row
-        *matHeaderRowDef="['id', 'nome', 'data', 'status', 'produtos', 'acoes']"
+        *matHeaderRowDef="['id', 'nome', 'data', 'status', 'produtos', 'send']"
       ></tr>
       <tr
         (click)="navigateToPromotionalFlyerProduct(row)"
         mat-row
-        *matRowDef="let row; columns: ['id', 'nome', 'data', 'status', 'produtos', 'acoes']"
+        *matRowDef="let row; columns: ['id', 'nome', 'data', 'status', 'produtos', 'send']"
       ></tr>
     </table>
   }
