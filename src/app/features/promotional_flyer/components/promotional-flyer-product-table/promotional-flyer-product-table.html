@@ -22,6 +22,12 @@
         {{ element.currentCostPrice | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
       </td>
     </ng-container>
+    <ng-container matColumnDef="quote_cost">
+      <th mat-header-cell *matHeaderCellDef>Custo Cotação (Pr. Ganhador)</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.quoteCost | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+      </td>
+    </ng-container>
     <ng-container matColumnDef="current_sale_price">
       <th mat-header-cell *matHeaderCellDef>Preço de Venda</th>
       <td mat-cell *matCellDef="let element">
@@ -70,6 +76,7 @@
       *matHeaderRowDef="[
         'id',
         'name',
+        'quote_cost',
         'current_cost_price',
         'current_sale_price',
         'sale_price',
@@ -80,7 +87,15 @@
       mat-row
       *matRowDef="
         let row;
-        columns: ['id', 'name', 'current_cost_price', 'current_sale_price', 'sale_price', 'send']
+        columns: [
+          'id',
+          'name',
+          'quote_cost',
+          'current_cost_price',
+          'current_sale_price',
+          'sale_price',
+          'send',
+        ]
       "
       (click)="showRowDetails(row)"
     ></tr>

@@ -12,4 +12,5 @@ export interface IPromotionalFlyerProducts {
   salePrice?: number;
   currentCostPrice: number;
   currentSalePrice: number;
+  quoteCost: number;
 }
