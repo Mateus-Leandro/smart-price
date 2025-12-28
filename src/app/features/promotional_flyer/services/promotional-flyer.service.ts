@@ -73,6 +73,7 @@ export class PromotionalFlyerService {
       quote_cost,
       current_cost_price,
       current_sale_price,
+      current_loyalty_price,
       products!inner (
         id,
         name
@@ -101,6 +102,7 @@ export class PromotionalFlyerService {
         quoteCost: item?.quote_cost ?? 0,
         currentCostPrice: item?.current_cost_price ?? 0,
         currentSalePrice: item?.current_sale_price ?? 0,
+        currentLoyaltyPrice: item?.current_loyalty_price ?? 0,
       })),
       count: count ?? 0,
     };
