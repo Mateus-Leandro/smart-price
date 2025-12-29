@@ -6,7 +6,7 @@ import { MatPaginatorIntl } from '@angular/material/paginator';
 import { MatPaginatorIntlPtBr } from './shared/helpers/mat-paginator-intl-pt-br';
 import { provideNgxMask } from 'ngx-mask';
 import localePt from '@angular/common/locales/pt';
-import { registerLocaleData } from '@angular/common';
+import { DatePipe, registerLocaleData } from '@angular/common';
 
 registerLocaleData(localePt);
 
@@ -17,5 +17,6 @@ export const appConfig: ApplicationConfig = {
     provideNgxMask(),
     { provide: MatPaginatorIntl, useClass: MatPaginatorIntlPtBr },
     { provide: LOCALE_ID, useValue: 'pt-BR' },
+    DatePipe,
   ],
 };
