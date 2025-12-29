@@ -5,12 +5,16 @@ import {
   IPromotionalFlyerProducts,
 } from '../../../shared/interfaces/promotional-flyer.interface';
 import { IDefaultPaginatorDataSource } from 'src/app/shared/interfaces/query-interface';
+import { DatePipe } from '@angular/common';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PromotionalFlyerService {
-  constructor(private supabaseService: SupabaseService) {}
+  constructor(
+    private supabaseService: SupabaseService,
+    private datePipe: DatePipe,
+  ) {}
   async loadFlyers(
     paginatorDataSource: IDefaultPaginatorDataSource<IPromotionalflyer>,
     search?: string,
@@ -45,7 +49,7 @@ export class PromotionalFlyerService {
         data: (data ?? []).map((item) => ({
           id: item.id,
           name: item.name,
-          createdDate: this.formatDate(item.created_at),
+          createdDate: this.datePipe.transform(item?.created_at, 'dd/mm/yy HH:mm'),
           status: item.finished ? 'Encerrada' : 'Em andamento',
           totalProducts: item.promotional_flyer_products?.[0]?.count ?? 0,
         })),
@@ -74,6 +78,7 @@ export class PromotionalFlyerService {
     current_cost_price,
     current_sale_price,
     current_loyalty_price,
+    erp_import_date,
     products!inner (
       id,
       name
@@ -110,6 +115,7 @@ export class PromotionalFlyerService {
         currentLoyaltyPrice: item?.current_loyalty_price ?? 0,
         supplierId: item?.supplier.id,
         supplierName: item?.supplier.name,
+        erpImportDate: this.datePipe.transform(item?.erp_import_date, 'dd/MM/yy HH:mm'),
       })),
       count: count ?? 0,
     };
@@ -132,11 +138,6 @@ export class PromotionalFlyerService {
       console.error('Erro ao atualizar preço de venda:', err);
       throw err;
     }
-  }
-
-  private formatDate(date: string): string {
-    const d = new Date(date);
-    return d.toLocaleDateString('pt-BR');
   }
 
   async sendPricesToErp(flyerId: number, productId?: number) {
