@@ -1,7 +1,7 @@
 export interface IPromotionalflyer {
   id: number;
   name: string;
-  createdDate: string;
+  createdDate?: string | null;
   status: string;
   totalProducts: number;
 }
@@ -16,4 +16,5 @@ export interface IPromotionalFlyerProducts {
   currentLoyaltyPrice: number;
   supplierId: number;
   supplierName: string;
+  erpImportDate?: string | null;
 }
