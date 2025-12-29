@@ -63,7 +63,10 @@ serve(async (req) => {
     const ids = data.map((r) => r.id);
     const { error: updError } = await supabase
       .from('promotional_flyer_products')
-      .update({ send_to_erp: false })
+      .update({
+        send_to_erp: false,
+        erp_import_date: new Date().toISOString(),
+      })
       .in('id', ids)
       .eq('company_id', company_id);
 
