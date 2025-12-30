@@ -13,6 +13,7 @@ import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
 import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 
 import {
   FormArray,
@@ -24,12 +25,11 @@ import {
 } from '@angular/forms';
 
 import { FlexLayoutModule } from '@angular/flex-layout';
-
 import { debounceTime } from 'rxjs/internal/operators/debounceTime';
 import { distinctUntilChanged } from 'rxjs/internal/operators/distinctUntilChanged';
 import { Subject } from 'rxjs';
-
 import { NgxMaskDirective } from 'ngx-mask';
+import { CommonModule } from '@angular/common';
 
 import { PromotionalFlyerService } from '../../services/promotional-flyer.service';
 import { IPromotionalFlyerProducts } from '../../../../shared/interfaces/promotional-flyer.interface';
@@ -37,7 +37,6 @@ import { IDefaultPaginatorDataSource } from 'src/app/shared/interfaces/query-int
 
 import { Spinner } from 'src/app/shared/components/spinner/spinner';
 import { IconButton } from 'src/app/shared/components/icon-button/icon-button';
-import { CurrencyPipe } from '@angular/common';
 
 type FlyerRowForm = FormGroup<{
   salePrice: FormControl<string | null>;
@@ -47,19 +46,19 @@ type FlyerRowForm = FormGroup<{
 @Component({
   selector: 'app-promotional-flyer-product-table',
   imports: [
+    CommonModule,
     Spinner,
     MatTableModule,
     MatSortModule,
-    MatPaginator,
     MatPaginatorModule,
     MatInputModule,
+    MatButtonModule,
     FormsModule,
     FlexLayoutModule,
     MatIconModule,
     ReactiveFormsModule,
     NgxMaskDirective,
     IconButton,
-    CurrencyPipe,
   ],
   templateUrl: './promotional-flyer-product-table.html',
   styleUrl: './promotional-flyer-product-table.scss',
@@ -78,6 +77,19 @@ export class PromotionalFlyerProductTable {
   sortEvent!: Sort;
 
   dataSource = new MatTableDataSource<IPromotionalFlyerProducts>([]);
+  expandedElement: IPromotionalFlyerProducts | null = null;
+  columnsToDisplay = [
+    'expand',
+    'id',
+    'name',
+    'quote_cost',
+    'current_cost_price',
+    'current_sale_price',
+    'current_loyalty_price',
+    'sale_price',
+    'erp_import_date',
+    'send',
+  ];
 
   paginatorDataSource: IDefaultPaginatorDataSource<IPromotionalFlyerProducts> = {
     pageIndex: 0,
@@ -145,6 +157,7 @@ export class PromotionalFlyerProductTable {
   onPageChange(event: PageEvent): void {
     this.paginatorDataSource.pageSize = event.pageSize;
     this.paginatorDataSource.pageIndex = event.pageIndex;
+    this.expandedElement = null;
     this.reload();
   }
 
@@ -265,11 +278,7 @@ export class PromotionalFlyerProductTable {
     return isNaN(numericPrice) || numericPrice <= 0;
   }
 
-  showRowDetails(row: any): void {
-    console.log('Linha clicada!', {
-      id: row.id,
-      nome: row.name,
-      precoAtual: row.currentSalePrice,
-    });
+  toggleRow(row: IPromotionalFlyerProducts): void {
+    this.expandedElement = this.expandedElement === row ? null : row;
   }
 }
