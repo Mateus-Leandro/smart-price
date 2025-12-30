@@ -4,22 +4,46 @@
   border-radius: 12px;
   overflow: hidden;
   border: 1px solid $gray;
-
   width: 100%;
   min-width: 700px;
+  border-collapse: collapse;
 
-  tr:nth-child(odd) {
-    background-color: $secondary;
+  // --- LÓGICA ZEBRA
+  // 2n+1 para pintar uma linha principal sim e outra não, considerando o par (row + detail)
+
+  tr.mat-mdc-row,
+  tr.mat-row {
+    &:nth-child(4n + 1) {
+      background-color: $secondary;
+    }
+    &:nth-child(4n + 3) {
+      background-color: $gray;
+    }
   }
 
-  tr:nth-child(even) {
-    background-color: $gray;
+  // A linha de detalhe deve herdar a cor da linha imediatamente acima dela
+  .colapsed-detail-content {
+    background-color: inherit;
+    height: 0 !important;
+
+    td {
+      border-bottom-width: 0 !important;
+      padding: 0 !important;
+    }
+
+    &:hover {
+      // Evita que o hover na área de detalhe mude a cor indesejadamente
+      background-color: inherit !important;
+      cursor: default;
+    }
   }
 
-  tr:hover {
+  tr.mat-mdc-row:hover,
+  tr.mat-row:hover {
     cursor: pointer;
-    background-color: $primary;
+    background-color: $primary !important;
     color: $secondary;
+
     .only-line {
       color: $font-primary;
       border-bottom-color: $font-primary;
@@ -29,14 +53,12 @@
     .icon-button-table {
       ::ng-deep mat-icon {
         color: $secondary !important;
-        cursor: pointer;
       }
     }
 
     .icon-button-table-disabled {
       ::ng-deep mat-icon {
         color: $medium-gray !important;
-        cursor: default;
       }
     }
   }
@@ -84,4 +106,33 @@ table {
   td {
     padding: 12px 16px;
   }
+}
+
+// CONTAINER DA ANIMAÇÃO
+.element-detail-wrapper {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 225ms cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+
+  &.is-expanded {
+    grid-template-rows: 1fr;
+  }
+}
+
+.element-detail-content {
+  min-height: 0;
+}
+
+.expanded-detail-content {
+  padding: 15px;
+
+  .label {
+    font-weight: bold;
+    font-size: 12px;
+  }
+}
+
+.expanded-detail-content td {
+  border-bottom-width: 0;
 }
