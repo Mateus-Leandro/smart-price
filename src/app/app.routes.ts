@@ -13,7 +13,7 @@ export const routes: Routes = [
         path: 'promotional_flyer',
         canActivate: [authGuard],
         loadComponent: () =>
-          import('./features/promotional_flyer/pages/promotional-flyer/promotional-flyer').then(
+          import('./features/promotional-flyer/pages/promotional-flyer/promotional-flyer').then(
             (m) => m.PromotionalFlyer,
           ),
       },
@@ -21,7 +21,7 @@ export const routes: Routes = [
         path: 'promotional_flyer/:id',
         canActivate: [authGuard],
         loadComponent: () =>
-          import('./features/promotional_flyer/pages/promotional-flyer-products/promotional-flyer-products').then(
+          import('./features/promotional-flyer/pages/promotional-flyer-products/promotional-flyer-products').then(
             (m) => m.PromotionalFlyerProducts,
           ),
       },
