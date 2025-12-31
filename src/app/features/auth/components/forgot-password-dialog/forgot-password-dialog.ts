@@ -40,7 +40,7 @@ export class ForgotPasswordDialog {
 
   async submit() {
     if (this.forgotPasswordFormGroup.invalid) return;
-    this.authService.passwordReset(this.forgotPasswordFormGroup.value.email);
+    this.authService.sendPasswordResetEmail(this.forgotPasswordFormGroup.value.email);
     this.cancel();
   }
 
