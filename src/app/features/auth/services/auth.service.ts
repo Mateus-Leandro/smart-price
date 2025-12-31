@@ -37,14 +37,26 @@ export class AuthService {
     }
   }
 
-  async passwordReset(email: string) {
-    const { error } = await this.supabaseService.supabase.auth.resetPasswordForEmail(email);
+  async sendPasswordResetEmail(email: string) {
+    const { error } = await this.supabaseService.supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: 'https://smart-price-omega.vercel.app/forgot_password',
+    });
     if (error) throw `Erro ao resetar senha: ${error}`;
   }
 
   async isLogged() {
     const { data } = await this.supabaseService.supabase.auth.getSession();
     return !!data.session;
+  }
+
+  async getUser() {
+    return await this.supabaseService.supabase.auth.getUser();
+  }
+
+  async updatePassword(pass: string) {
+    return await this.supabaseService.supabase.auth.updateUser({
+      password: pass,
+    });
   }
 
   private async callPostEdgeFunction(functionName: string, body: any) {

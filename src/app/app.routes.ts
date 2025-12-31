@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth-guard';
 import { guestGuard } from './core/guards/guest-guard';
 import { MainLayout } from './core/layout/main-layout/main-layout';
+import { passRecoveryGuard } from './core/guards/pass-recovery-guard';
 
 export const routes: Routes = [
   {
@@ -37,5 +38,11 @@ export const routes: Routes = [
     canActivate: [guestGuard],
     loadComponent: () =>
       import('../app/features/auth/pages/register/register').then((m) => m.Register),
+  },
+  {
+    path: 'forgot_password',
+    canActivate: [passRecoveryGuard],
+    loadComponent: () =>
+      import('./features/auth/pages/forgot-password/forgot-password').then((m) => m.ForgotPassword),
   },
 ];
