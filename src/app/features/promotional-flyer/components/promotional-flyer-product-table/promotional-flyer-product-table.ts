@@ -30,13 +30,11 @@ import { distinctUntilChanged } from 'rxjs/internal/operators/distinctUntilChang
 import { Subject } from 'rxjs';
 import { NgxMaskDirective } from 'ngx-mask';
 import { CommonModule } from '@angular/common';
-
 import { PromotionalFlyerService } from '../../services/promotional-flyer.service';
-import { IPromotionalFlyerProducts } from '../../../../shared/interfaces/promotional-flyer.interface';
-import { IDefaultPaginatorDataSource } from 'src/app/shared/interfaces/query-interface';
-
 import { Spinner } from 'src/app/shared/components/spinner/spinner';
 import { IconButton } from 'src/app/shared/components/icon-button/icon-button';
+import { IDefaultPaginatorDataSource } from 'src/app/core/models/query.model';
+import { IPromotionalFlyerProductsView } from '../../models/flyer-view.model';
 
 type FlyerRowForm = FormGroup<{
   salePrice: FormControl<string | null>;
@@ -76,8 +74,8 @@ export class PromotionalFlyerProductTable {
 
   sortEvent!: Sort;
 
-  dataSource = new MatTableDataSource<IPromotionalFlyerProducts>([]);
-  expandedElement: IPromotionalFlyerProducts | null = null;
+  dataSource = new MatTableDataSource<IPromotionalFlyerProductsView>([]);
+  expandedElement: IPromotionalFlyerProductsView | null = null;
   columnsToDisplay = [
     'expand',
     'id',
@@ -91,7 +89,7 @@ export class PromotionalFlyerProductTable {
     'send',
   ];
 
-  paginatorDataSource: IDefaultPaginatorDataSource<IPromotionalFlyerProducts> = {
+  paginatorDataSource: IDefaultPaginatorDataSource<IPromotionalFlyerProductsView> = {
     pageIndex: 0,
     pageSize: 10,
     records: {
@@ -130,28 +128,28 @@ export class PromotionalFlyerProductTable {
     this.dataSource.sort = this.sort;
   }
 
-  async loadProductsFromPromotionalFlyer(
+  loadProductsFromPromotionalFlyer(
     flyerId: number,
-    paginatorDataSource: IDefaultPaginatorDataSource<IPromotionalFlyerProducts>,
+    paginatorDataSource: IDefaultPaginatorDataSource<IPromotionalFlyerProductsView>,
     search?: string,
-  ): Promise<void> {
+  ): void {
     this.loading = true;
+    this.promotionalFlyerService.loadProducts(flyerId, paginatorDataSource, search).subscribe({
+      next: (response) => {
+        this.paginatorDataSource.records = response;
+        this.dataSource.data = response.data;
 
-    try {
-      this.paginatorDataSource.records = await this.promotionalFlyerService.loadProducts(
-        flyerId,
-        paginatorDataSource,
-        search,
-      );
+        this.buildForm(this.dataSource.data);
 
-      this.dataSource.data = this.paginatorDataSource.records.data;
-      this.buildForm(this.dataSource.data);
-    } catch (err) {
-      console.error(`Erro ao buscar produtos do encarte ${flyerId}`, err);
-    } finally {
-      this.loading = false;
-      this.cdr.detectChanges();
-    }
+        this.loading = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error(`Erro ao buscar produtos do encarte ${flyerId}`, err);
+        this.loading = false;
+        this.cdr.detectChanges();
+      },
+    });
   }
 
   onPageChange(event: PageEvent): void {
@@ -174,14 +172,14 @@ export class PromotionalFlyerProductTable {
     return this.form.get('rows') as FormArray<FlyerRowForm>;
   }
 
-  private buildForm(data: IPromotionalFlyerProducts[]): void {
+  private buildForm(data: IPromotionalFlyerProductsView[]): void {
     const rowsArray = this.fb.array<FlyerRowForm>(
       data.map((item) =>
         this.fb.group({
           salePrice: this.fb.control<string | null>(
             item.salePrice != null ? item.salePrice.toFixed(2).replace('.', ',') : null,
           ),
-          productId: this.fb.control<number>(item.id, { nonNullable: true }),
+          productId: this.fb.control<number>(item.product.id, { nonNullable: true }),
         }),
       ),
     );
@@ -239,11 +237,12 @@ export class PromotionalFlyerProductTable {
     if (!isNaN(numericPrice)) {
       const formatted = numericPrice.toFixed(2).replace('.', ',');
       control.salePrice.setValue(formatted, { emitEvent: false });
-      try {
-        await this.promotionalFlyerService.updateSalePrice(this.flyerId, productId, numericPrice);
-      } catch (error) {
-        console.error('Falha ao atualizar preço de venda no banco');
-      }
+
+      this.promotionalFlyerService
+        .updateSalePrice(this.flyerId, productId, numericPrice)
+        .subscribe({
+          error: (error) => console.error('Falha ao atualizar preço:', error),
+        });
     }
   }
 
@@ -255,16 +254,18 @@ export class PromotionalFlyerProductTable {
     }
   }
 
-  async sendPrices(productId: number) {
-    try {
-      this.sendingProductId = productId;
-      await this.promotionalFlyerService.sendPricesToErp(this.flyerId, productId);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      this.sendingProductId = null;
-      this.cdr.detectChanges();
-    }
+  sendPrices(productId: number) {
+    this.sendingProductId = productId;
+
+    this.promotionalFlyerService.sendPricesToErp(this.flyerId, productId).subscribe({
+      error: (error) => {
+        console.error('Erro ao enviar preço:', error);
+      },
+      complete: () => {
+        this.sendingProductId = null;
+        this.cdr.detectChanges();
+      },
+    });
   }
 
   isPriceInvalid(index: number): boolean {
@@ -278,7 +279,7 @@ export class PromotionalFlyerProductTable {
     return isNaN(numericPrice) || numericPrice <= 0;
   }
 
-  toggleRow(row: IPromotionalFlyerProducts): void {
+  toggleRow(row: IPromotionalFlyerProductsView): void {
     this.expandedElement = this.expandedElement === row ? null : row;
   }
 }

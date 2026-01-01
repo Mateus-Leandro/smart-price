@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
 import { Button } from 'src/app/shared/components/button/button';
 import { FormGroup, NgForm } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
-import { ICreateCompanyUser } from 'src/app/shared/interfaces/company-user-interface';
+import { ICreateCompanyUser } from 'src/app/core/models/auth.model';
 
 @Component({
   selector: 'app-register',
