@@ -4,14 +4,15 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
 import { IconButton } from '../../../../shared/components/icon-button/icon-button';
 import { Spinner } from 'src/app/shared/components/spinner/spinner';
-import { IPromotionalflyer } from '../../../../shared/interfaces/promotional-flyer.interface';
 import { PromotionalFlyerService } from '../../services/promotional-flyer.service';
 import { Router } from '@angular/router';
-import { IDefaultPaginatorDataSource } from 'src/app/shared/interfaces/query-interface';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatFormField, MatLabel } from '@angular/material/select';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 import { MatInputModule } from '@angular/material/input';
+import { CommonModule, DatePipe } from '@angular/common';
+import { IDefaultPaginatorDataSource } from 'src/app/core/models/query.model';
+import { IPromotionalFlyerView } from '../../models/flyer-view.model';
 
 @Component({
   selector: 'app-promotional-flyer-table',
@@ -25,6 +26,7 @@ import { MatInputModule } from '@angular/material/input';
     MatFormField,
     MatLabel,
     MatInputModule,
+    CommonModule,
   ],
   templateUrl: './promotional-flyer-table.html',
   styleUrl: './promotional-flyer-table.scss',
@@ -33,8 +35,8 @@ export class PromotionalFlyerTable {
   @ViewChild(MatSort) sort!: MatSort;
   loading = false;
   searchTerm = '';
-  dataSource = new MatTableDataSource<IPromotionalflyer>([]);
-  paginatorDataSource: IDefaultPaginatorDataSource<IPromotionalflyer> = {
+  dataSource = new MatTableDataSource<IPromotionalFlyerView>([]);
+  paginatorDataSource: IDefaultPaginatorDataSource<IPromotionalFlyerView> = {
     pageIndex: 0,
     pageSize: 10,
     records: {
@@ -49,6 +51,7 @@ export class PromotionalFlyerTable {
     private promotionalFlyerService: PromotionalFlyerService,
     private cdr: ChangeDetectorRef,
     private router: Router,
+    private dataPipe: DatePipe,
   ) {}
 
   ngOnInit(): void {
@@ -78,23 +81,25 @@ export class PromotionalFlyerTable {
     };
   }
 
-  async loadPrincingRecords(
-    paginatorDataSource: IDefaultPaginatorDataSource<IPromotionalflyer>,
+  loadPrincingRecords(
+    paginatorDataSource: IDefaultPaginatorDataSource<IPromotionalFlyerView>,
     search?: string,
   ) {
-    try {
-      this.loading = true;
-      this.paginatorDataSource.records = await this.promotionalFlyerService.loadFlyers(
-        paginatorDataSource,
-        search,
-      );
-      this.dataSource.data = this.paginatorDataSource.records.data;
-    } catch (err) {
-      console.error('Erro ao carregar registros', err);
-    } finally {
-      this.loading = false;
-      this.cdr.detectChanges();
-    }
+    this.loading = true;
+
+    this.promotionalFlyerService.loadFlyers(paginatorDataSource, search).subscribe({
+      next: (response) => {
+        this.paginatorDataSource.records = response;
+        this.dataSource.data = response.data;
+        this.loading = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Erro ao carregar registros', err);
+        this.loading = false;
+        this.cdr.detectChanges();
+      },
+    });
   }
 
   navigateToPromotionalFlyerProduct(row: any) {
