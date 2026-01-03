@@ -33,8 +33,7 @@ Deno.serve(async (req) => {
 
   try {
     // 🔹 Ler corpo JSON
-    const textBody = await req.text();
-    const body = JSON.parse(textBody);
+    const body = await req.json();
     console.log('📥 Payload recebido:', body);
 
     if (!body.company || !body.user) {

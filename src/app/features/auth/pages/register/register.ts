@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -31,6 +31,7 @@ export class Register {
   constructor(
     private router: Router,
     private authService: AuthService,
+    private cdr: ChangeDetectorRef,
   ) {}
   loading = false;
 
@@ -82,16 +83,17 @@ export class Register {
 
     try {
       this.loading = true;
-      const user = await this.authService.register(newUser);
+      const response = await this.authService.register(newUser);
 
-      if (user) {
-        await this.authService.login(user.email, newUser.user.password);
+      if (response) {
+        await this.authService.login(response.user.email, newUser.user.password);
       }
     } catch (error) {
       console.error(error);
       throw error;
     } finally {
       this.loading = false;
+      this.cdr.detectChanges();
     }
   }
 }
