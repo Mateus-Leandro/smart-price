@@ -12,24 +12,89 @@
       <mat-icon matSuffix>search</mat-icon>
     </mat-form-field>
 
-    <app-table
-      [data]="products"
-      [totalCount]="paginatorDataSource.records.count"
+    <table mat-table [dataSource]="dataSource" matSort multiTemplateDataRows class="default-table">
+      <ng-container matColumnDef="expand">
+        <th mat-header-cell *matHeaderCellDef aria-label="row actions">&nbsp;</th>
+        <td mat-cell *matCellDef="let element">
+          <button
+            class="icon-button-table"
+            mat-icon-button
+            aria-label="expand row"
+            (click)="toggleRow(element); $event.stopPropagation()"
+          >
+            <mat-icon>
+              {{ expandedElement === element ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}
+            </mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef>ID</th>
+        <td mat-cell *matCellDef="let element">{{ element.id }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Descrição</th>
+        <td mat-cell *matCellDef="let element">{{ element.name }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="created_at">
+        <th mat-header-cell *matHeaderCellDef>Criado em</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.createdAt | date: 'dd/mm/yyyy HH:mm' }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="updated_at">
+        <th mat-header-cell *matHeaderCellDef>Alterado em</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.updatedAt | date: 'dd/mm/yyyy HH:mm' }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="expandedDetail">
+        <td mat-cell *matCellDef="let element" [attr.colspan]="columnsToDisplay.length">
+          <div class="element-detail-wrapper" [class.is-expanded]="element == expandedElement">
+            <div class="element-detail-content">
+              <div class="expanded-detail-content" fxLayout="column">
+                <div fxLayout="column" fxLayoutGap="5px">
+                  <span class="label">Margem por loja</span>
+                  <div fxLayout="row" fxLayoutGap="10px">
+                    <span></span>
+                    <span></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+
+      <tr
+        mat-row
+        *matRowDef="let element; columns: columnsToDisplay"
+        [class.expanded-detail-content]="expandedElement === element"
+        (click)="toggleRow(element)"
+      ></tr>
+
+      <tr
+        mat-row
+        *matRowDef="let row; columns: ['expandedDetail']"
+        class="colapsed-detail-content"
+      ></tr>
+    </table>
+    <mat-paginator
+      #paginator
+      [length]="paginatorDataSource.records.count"
       [pageSize]="paginatorDataSource.pageSize"
       [pageIndex]="paginatorDataSource.pageIndex"
-      [columns]="tableColumns"
-      [expandedDetailTemplate]="productDetailTemplate"
-      (pageChange)="onPageChange($event)"
+      [pageSizeOptions]="[5, 10, 25, 50, 100]"
+      (page)="onPageChange($event)"
+      showFirstLastButtons
     >
-    </app-table>
+    </mat-paginator>
   </div>
 </div>
-
-<ng-template #productDetailTemplate let-product>
-  <div class="expanded-detail-content" fxLayout="column">
-    <div fxLayout="row" fxLayoutGap="5px">
-      <span class="label">Detalhes do Produto: </span>
-      <span>{{ product.name }}</span>
-    </div>
-  </div>
-</ng-template>
