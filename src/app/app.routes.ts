@@ -26,6 +26,14 @@ export const routes: Routes = [
             (m) => m.PromotionalFlyerProducts,
           ),
       },
+      {
+        path: 'products',
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./features/product/pages/product-maintenance/product-maintenance').then(
+            (m) => m.ProductMaintenance,
+          ),
+      },
     ],
   },
   {
