@@ -1,14 +1,28 @@
-<div class="container">
-  <app-table
-    [data]="products"
-    [totalCount]="paginatorDataSource.records.count"
-    [pageSize]="paginatorDataSource.pageSize"
-    [pageIndex]="paginatorDataSource.pageIndex"
-    [columns]="tableColumns"
-    [expandedDetailTemplate]="productDetailTemplate"
-    (pageChange)="onPageChange($event)"
-  >
-  </app-table>
+<div class="table-container" fxLayout="column">
+  <div class="table-wrapper">
+    @if (loading) {
+      <div class="spinner-overlay">
+        <app-spinner />
+      </div>
+    }
+
+    <mat-form-field appearance="outline" class="full-width" style="margin-top: 10px">
+      <mat-label>Pesquisar item pela descrição</mat-label>
+      <input matInput type="search" (input)="onSearch($event)" />
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+
+    <app-table
+      [data]="products"
+      [totalCount]="paginatorDataSource.records.count"
+      [pageSize]="paginatorDataSource.pageSize"
+      [pageIndex]="paginatorDataSource.pageIndex"
+      [columns]="tableColumns"
+      [expandedDetailTemplate]="productDetailTemplate"
+      (pageChange)="onPageChange($event)"
+    >
+    </app-table>
+  </div>
 </div>
 
 <ng-template #productDetailTemplate let-product>
