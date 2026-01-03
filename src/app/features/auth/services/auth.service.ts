@@ -1,74 +1,65 @@
 import { Injectable } from '@angular/core';
-import { SupabaseService } from '../../../shared/services/supabase.service';
 import { Router } from '@angular/router';
 import { ICreateCompanyUser } from 'src/app/core/models/auth.model';
+import { AuthRepository } from 'src/app/core/repositories/auth.repository';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
   constructor(
-    private supabaseService: SupabaseService,
     private router: Router,
+    private repository: AuthRepository,
   ) {}
 
   async login(email: string, password: string) {
-    const { data, error } = await this.supabaseService.supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) throw `Erro ao realizar login: ${error}`;
-    this.router.navigate(['/promotional_flyer']);
+    try {
+      await firstValueFrom(this.repository.login(email, password));
+      this.router.navigate(['/promotional_flyer']);
+    } catch (error) {
+      console.log(`Erro ao realizar login: `, error);
+    }
   }
 
   async logout() {
-    const { error } = await this.supabaseService.supabase.auth.signOut();
-    if (error) throw `Erro ao realizar logout: ${error}`;
-
-    this.router.navigate(['/login']);
+    try {
+      await firstValueFrom(this.repository.logout());
+      this.router.navigate(['/login']);
+    } catch (error) {
+      console.log(`Erro ao realizar logout: `, error);
+    }
   }
 
   async register(user: ICreateCompanyUser) {
     try {
-      return await this.callPostEdgeFunction('create-enterprise-user', user);
+      return await firstValueFrom(this.repository.register(user));
     } catch (error) {
       throw `Erro ao criar usuário: ${error}`;
     }
   }
 
   async sendPasswordResetEmail(email: string) {
-    const { error } = await this.supabaseService.supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: 'https://smart-price-omega.vercel.app/forgot_password',
-    });
-    if (error) throw `Erro ao resetar senha: ${error}`;
+    try {
+      return await firstValueFrom(this.repository.sendPasswordResetEmail(email));
+    } catch (error) {
+      throw `Erro ao enviar email de recuperação de senha: ${error}`;
+    }
   }
 
   async isLogged() {
-    const { data } = await this.supabaseService.supabase.auth.getSession();
-    return !!data.session;
+    return await firstValueFrom(this.repository.isLogged());
   }
 
   async getUser() {
-    return await this.supabaseService.supabase.auth.getUser();
+    return await firstValueFrom(this.repository.getUser());
   }
 
   async updatePassword(pass: string) {
-    return await this.supabaseService.supabase.auth.updateUser({
-      password: pass,
-    });
-  }
-
-  private async callPostEdgeFunction(functionName: string, body: any) {
-    const { data, error } = await this.supabaseService.supabase.functions.invoke(functionName, {
-      method: 'POST',
-      body: JSON.stringify(body),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (error) throw error;
-    return data;
+    try {
+      return await firstValueFrom(this.repository.updatePassword(pass));
+    } catch (error) {
+      throw `Erro ao atualizar senha: ${error}`;
+    }
   }
 }

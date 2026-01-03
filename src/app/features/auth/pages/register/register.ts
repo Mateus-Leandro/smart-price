@@ -82,7 +82,7 @@ export class Register {
 
     try {
       this.loading = true;
-      const { user } = await this.authService.register(newUser);
+      const user = await this.authService.register(newUser);
 
       if (user) {
         await this.authService.login(user.email, newUser.user.password);

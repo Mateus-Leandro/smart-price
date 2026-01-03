@@ -52,9 +52,7 @@ export class ForgotPasswordForm {
   async ngOnInit() {
     this.loading = true;
     try {
-      const {
-        data: { user },
-      } = await this.authService.getUser();
+      const user = await this.authService.getUser();
       this.email = user?.email;
     } catch (error) {
       console.log('Erro ao carregar usuário', error);
