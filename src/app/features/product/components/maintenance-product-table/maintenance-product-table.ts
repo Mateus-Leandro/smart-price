@@ -9,11 +9,25 @@ import { ProductService } from '../../services/product.service';
 import { TableColumn } from 'src/app/core/models/table-app.model';
 import { Table } from 'src/app/shared/components/table/table';
 import { FlexLayoutModule } from '@angular/flex-layout';
+import { Spinner } from 'src/app/shared/components/spinner/spinner';
+import { MatFormField, MatLabel } from '@angular/material/select';
+import { MatIcon } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 
 @Component({
   selector: 'app-product-maintenance-product-table',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, Table, FlexLayoutModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    Table,
+    FlexLayoutModule,
+    Spinner,
+    MatFormField,
+    MatLabel,
+    MatIcon,
+    MatInputModule,
+  ],
   templateUrl: './maintenance-product-table.html',
 })
 export class MaintenanceProductTable implements OnInit {

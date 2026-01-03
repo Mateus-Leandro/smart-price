@@ -136,3 +136,14 @@ table {
 .expanded-detail-content td {
   border-bottom-width: 0;
 }
+
+.table-wrapper {
+  position: relative;
+  min-height: 200px;
+}
+
+.table-container {
+  margin: 10px;
+  overflow-x: auto;
+  min-height: 200px;
+}
