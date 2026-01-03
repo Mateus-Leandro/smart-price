@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, ViewChild } from '@angular/core';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
@@ -13,6 +13,7 @@ import { MatInputModule } from '@angular/material/input';
 import { CommonModule, DatePipe } from '@angular/common';
 import { IDefaultPaginatorDataSource } from 'src/app/core/models/query.model';
 import { IPromotionalFlyerView } from '../../models/flyer-view.model';
+import { LoadingService } from 'src/app/core/services/loading.service';
 
 @Component({
   selector: 'app-promotional-flyer-table',
@@ -33,7 +34,7 @@ import { IPromotionalFlyerView } from '../../models/flyer-view.model';
 })
 export class PromotionalFlyerTable {
   @ViewChild(MatSort) sort!: MatSort;
-  loading = false;
+  loading = inject(LoadingService).loading;
   searchTerm = '';
   dataSource = new MatTableDataSource<IPromotionalFlyerView>([]);
   paginatorDataSource: IDefaultPaginatorDataSource<IPromotionalFlyerView> = {
@@ -85,18 +86,14 @@ export class PromotionalFlyerTable {
     paginatorDataSource: IDefaultPaginatorDataSource<IPromotionalFlyerView>,
     search?: string,
   ) {
-    this.loading = true;
-
     this.promotionalFlyerService.loadFlyers(paginatorDataSource, search).subscribe({
       next: (response) => {
         this.paginatorDataSource.records = response;
         this.dataSource.data = response.data;
-        this.loading = false;
         this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Erro ao carregar registros', err);
-        this.loading = false;
         this.cdr.detectChanges();
       },
     });

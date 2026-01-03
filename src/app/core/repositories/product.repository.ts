@@ -2,13 +2,17 @@ import { Injectable } from '@angular/core';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { SupabaseService } from 'src/app/shared/services/supabase.service';
 import { IDefaultPaginatorDataSource } from '../models/query.model';
-import { map, from, Observable } from 'rxjs';
+import { map, from, Observable, finalize } from 'rxjs';
 import { IProductView } from '../../features/product/models/product.model';
+import { LoadingService } from '../services/loading.service';
 
 @Injectable({ providedIn: 'root' })
 export class ProductRepository {
   private supabase: SupabaseClient;
-  constructor(private supabaseService: SupabaseService) {
+  constructor(
+    private supabaseService: SupabaseService,
+    private loadingService: LoadingService,
+  ) {
     this.supabase = this.supabaseService.supabase;
   }
 
@@ -34,6 +38,7 @@ export class ProductRepository {
       query = query.ilike('name', `%${search}%`);
     }
 
+    this.loadingService.show();
     return from(query.range(fromIdx, toIdx)).pipe(
       map(({ data, count, error }) => {
         if (error) throw error;
@@ -47,6 +52,7 @@ export class ProductRepository {
 
         return { data: mappedData, count: count ?? 0 };
       }),
+      finalize(() => this.loadingService.hide()),
     );
   }
 }
