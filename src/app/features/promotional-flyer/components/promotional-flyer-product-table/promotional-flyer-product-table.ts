@@ -2,6 +2,7 @@ import {
   ChangeDetectorRef,
   Component,
   ElementRef,
+  inject,
   QueryList,
   ViewChild,
   ViewChildren,
@@ -35,6 +36,7 @@ import { Spinner } from 'src/app/shared/components/spinner/spinner';
 import { IconButton } from 'src/app/shared/components/icon-button/icon-button';
 import { IDefaultPaginatorDataSource } from 'src/app/core/models/query.model';
 import { IPromotionalFlyerProductsView } from '../../models/flyer-view.model';
+import { LoadingService } from 'src/app/core/services/loading.service';
 
 type FlyerRowForm = FormGroup<{
   salePrice: FormControl<string | null>;
@@ -68,7 +70,7 @@ export class PromotionalFlyerProductTable {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   searchTerm = '';
-  loading = false;
+  loading = inject(LoadingService).loading;
   flyerId = 0;
   sendingProductId?: number | null;
 
@@ -133,20 +135,16 @@ export class PromotionalFlyerProductTable {
     paginatorDataSource: IDefaultPaginatorDataSource<IPromotionalFlyerProductsView>,
     search?: string,
   ): void {
-    this.loading = true;
     this.promotionalFlyerService.loadProducts(flyerId, paginatorDataSource, search).subscribe({
       next: (response) => {
         this.paginatorDataSource.records = response;
         this.dataSource.data = response.data;
 
         this.buildForm(this.dataSource.data);
-
-        this.loading = false;
         this.cdr.detectChanges();
       },
       error: (err) => {
         console.error(`Erro ao buscar produtos do encarte ${flyerId}`, err);
-        this.loading = false;
         this.cdr.detectChanges();
       },
     });

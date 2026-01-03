@@ -1,9 +1,11 @@
 <div class="table-container">
-  @if (loading) {
-    <div fxLayout="row" fxFlex="100%" class="spinner-container">
-      <app-spinner />
-    </div>
-  } @else {
+  <div class="table-wrapper">
+    @if (loading()) {
+      <div class="spinner-overlay">
+        <app-spinner />
+      </div>
+    }
+
     <mat-form-field appearance="outline" class="search-input">
       <mat-label>Pesquise pelo nome do registro</mat-label>
       <input matInput type="search" (input)="onSearch($event)" />
@@ -75,5 +77,5 @@
       showFirstLastButtons
     >
     </mat-paginator>
-  }
+  </div>
 </div>

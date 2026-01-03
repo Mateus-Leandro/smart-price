@@ -1,17 +1,21 @@
 import { Injectable } from '@angular/core';
 import { SupabaseClient } from '@supabase/supabase-js';
-import { from, map, Observable, switchMap } from 'rxjs';
+import { finalize, from, map, Observable, switchMap } from 'rxjs';
 import { SupabaseService } from 'src/app/shared/services/supabase.service';
 import { IDefaultPaginatorDataSource } from '../models/query.model';
 import {
   IPromotionalFlyerProductsView,
   IPromotionalFlyerView,
 } from 'src/app/features/promotional-flyer/models/flyer-view.model';
+import { LoadingService } from '../services/loading.service';
 
 @Injectable({ providedIn: 'root' })
 export class PromotionalFlyerRepository {
   private supabase: SupabaseClient;
-  constructor(private supabaseService: SupabaseService) {
+  constructor(
+    private supabaseService: SupabaseService,
+    private loadingService: LoadingService,
+  ) {
     this.supabase = this.supabaseService.supabase;
   }
 
@@ -37,6 +41,7 @@ export class PromotionalFlyerRepository {
       query = query.ilike('name', `%${search}%`);
     }
 
+    this.loadingService.show();
     return from(query.range(fromIdx, toIdx)).pipe(
       map(({ data, count, error }) => {
         if (error) throw error;
@@ -52,6 +57,7 @@ export class PromotionalFlyerRepository {
 
         return { data: mappedData, count: count ?? 0 };
       }),
+      finalize(() => this.loadingService.hide()),
     );
   }
 
@@ -85,6 +91,7 @@ export class PromotionalFlyerRepository {
       query = query.ilike('product.name', `%${search}%`);
     }
 
+    this.loadingService.show();
     return from(query.range(fromIdx, toIdx)).pipe(
       map(({ data, count, error }) => {
         if (error) throw error;
@@ -102,6 +109,7 @@ export class PromotionalFlyerRepository {
 
         return { data: mappedData, count: count ?? 0 };
       }),
+      finalize(() => this.loadingService.hide()),
     );
   }
 

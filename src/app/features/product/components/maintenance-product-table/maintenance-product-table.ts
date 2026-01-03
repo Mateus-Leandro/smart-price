@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { PageEvent, MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
@@ -19,6 +19,7 @@ import {
   MatTableModule,
 } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
+import { LoadingService } from 'src/app/core/services/loading.service';
 
 @Component({
   selector: 'app-product-maintenance-product-table',
@@ -44,7 +45,7 @@ import { MatButtonModule } from '@angular/material/button';
   styleUrl: '../../../../global/styles/_tables.scss',
 })
 export class MaintenanceProductTable implements OnInit {
-  loading = false;
+  loading = inject(LoadingService).loading;
   searchTerm = '';
   dataSource = new MatTableDataSource<IProductView>([]);
   expandedElement: IProductView | null = null;
@@ -81,17 +82,14 @@ export class MaintenanceProductTable implements OnInit {
   }
 
   loadProducts(paginator: IDefaultPaginatorDataSource<IProductView>, search?: string) {
-    this.loading = true;
     this.productService.loadProducts(paginator, search).subscribe({
       next: (response) => {
         this.paginatorDataSource.records = response;
         this.dataSource.data = response.data;
-        this.loading = false;
         this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Erro ao carregar produtos', err);
-        this.loading = false;
         this.cdr.detectChanges();
       },
     });
