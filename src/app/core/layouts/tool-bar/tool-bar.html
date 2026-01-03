@@ -1,12 +1,18 @@
-<mat-toolbar style="padding: 20px">
+<mat-toolbar style="padding: 20px; background-color: var(--primary); color: var(--font-primary)">
   <mat-toolbar-row>
-    <app-icon-button icon="menu" (click)="menuClick.emit()"></app-icon-button>
-    <span class="title">Sistema de Gestão Varejista</span>
+    <app-icon-button
+      iconColor="var(--font-primary)"
+      icon="menu"
+      (click)="menuClick.emit()"
+    ></app-icon-button>
+    <span class="title">Jacaré Clube de Compras</span>
   </mat-toolbar-row>
 
   <mat-toolbar-row>
-    <span class="subtitle" style="padding-left: 40px"
-      >Módulo de Precificação de Produtos Promocionais</span
-    >
+    <div class="subtitle" fxLayout="row" style="padding-left: 40px; color: var(--font-primary)">
+      @if (user) {
+        <span>{{ user.email }}</span>
+      }
+    </div>
   </mat-toolbar-row>
 </mat-toolbar>
