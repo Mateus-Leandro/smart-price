@@ -1,164 +1,170 @@
 <div class="table-container" fxLayout="column">
-  @if (loading) {
-    <div fxLayout="row" fxFlex="100%" class="spinner-container">
-      <app-spinner />
-    </div>
-  }
+  <div class="table-wrapper">
+    @if (loading) {
+      <div class="spinner-overlay">
+        <app-spinner />
+      </div>
+    }
 
-  <mat-form-field appearance="outline" class="search-input">
-    <mat-label>Pesquisar item pela descrição</mat-label>
-    <input matInput type="search" (input)="onSearch($event)" />
-    <mat-icon matSuffix>search</mat-icon>
-  </mat-form-field>
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Pesquisar item pela descrição</mat-label>
+      <input matInput type="search" (input)="onSearch($event)" />
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
 
-  <table mat-table [dataSource]="dataSource" matSort multiTemplateDataRows class="default-table">
-    <ng-container matColumnDef="expand">
-      <th mat-header-cell *matHeaderCellDef aria-label="row actions">&nbsp;</th>
-      <td mat-cell *matCellDef="let element">
-        <button
-          class="icon-button-table"
-          mat-icon-button
-          aria-label="expand row"
-          (click)="toggleRow(element); $event.stopPropagation()"
-        >
-          <mat-icon>
-            {{ expandedElement === element ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}
-          </mat-icon>
-        </button>
-      </td>
-    </ng-container>
+    <table mat-table [dataSource]="dataSource" matSort multiTemplateDataRows class="default-table">
+      <ng-container matColumnDef="expand">
+        <th mat-header-cell *matHeaderCellDef aria-label="row actions">&nbsp;</th>
+        <td mat-cell *matCellDef="let element">
+          <button
+            class="icon-button-table"
+            mat-icon-button
+            aria-label="expand row"
+            (click)="toggleRow(element); $event.stopPropagation()"
+          >
+            <mat-icon>
+              {{ expandedElement === element ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}
+            </mat-icon>
+          </button>
+        </td>
+      </ng-container>
 
-    <ng-container matColumnDef="id">
-      <th mat-header-cell *matHeaderCellDef>ID</th>
-      <td mat-cell *matCellDef="let element">{{ element.product.id }}</td>
-    </ng-container>
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef>ID</th>
+        <td mat-cell *matCellDef="let element">{{ element.product.id }}</td>
+      </ng-container>
 
-    <ng-container matColumnDef="name">
-      <th mat-header-cell *matHeaderCellDef>Descrição</th>
-      <td mat-cell *matCellDef="let element">{{ element.product.name }}</td>
-    </ng-container>
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Descrição</th>
+        <td mat-cell *matCellDef="let element">{{ element.product.name }}</td>
+      </ng-container>
 
-    <ng-container matColumnDef="current_cost_price">
-      <th mat-header-cell *matHeaderCellDef>Custo (Pr. Entrada)</th>
-      <td mat-cell *matCellDef="let element">
-        {{ element.currentCostPrice | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
-      </td>
-    </ng-container>
+      <ng-container matColumnDef="current_cost_price">
+        <th mat-header-cell *matHeaderCellDef>Custo (Pr. Entrada)</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.currentCostPrice | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+        </td>
+      </ng-container>
 
-    <ng-container matColumnDef="quote_cost">
-      <th mat-header-cell *matHeaderCellDef>Custo Cotação (Pr. Ganhador)</th>
-      <td mat-cell *matCellDef="let element">
-        <div fxLayout="column">
-          {{ element.quoteCost | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
-          <span>{{ `${element?.supplier?.id} - ${element?.supplier?.name}` }}</span>
-        </div>
-      </td>
-    </ng-container>
+      <ng-container matColumnDef="quote_cost">
+        <th mat-header-cell *matHeaderCellDef>Custo Cotação (Pr. Ganhador)</th>
+        <td mat-cell *matCellDef="let element">
+          <div fxLayout="column">
+            {{ element.quoteCost | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+            <span>{{ `${element?.supplier?.id} - ${element?.supplier?.name}` }}</span>
+          </div>
+        </td>
+      </ng-container>
 
-    <ng-container matColumnDef="current_sale_price">
-      <th mat-header-cell *matHeaderCellDef>Preço de Venda</th>
-      <td mat-cell *matCellDef="let element">
-        {{ element.currentSalePrice | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
-      </td>
-    </ng-container>
+      <ng-container matColumnDef="current_sale_price">
+        <th mat-header-cell *matHeaderCellDef>Preço de Venda</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.currentSalePrice | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+        </td>
+      </ng-container>
 
-    <ng-container matColumnDef="current_loyalty_price">
-      <th mat-header-cell *matHeaderCellDef>Preço Fidelidade</th>
-      <td mat-cell *matCellDef="let element">
-        {{ element.currentLoyaltyPrice | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
-      </td>
-    </ng-container>
+      <ng-container matColumnDef="current_loyalty_price">
+        <th mat-header-cell *matHeaderCellDef>Preço Fidelidade</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.currentLoyaltyPrice | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+        </td>
+      </ng-container>
 
-    <ng-container matColumnDef="sale_price">
-      <th mat-header-cell *matHeaderCellDef>Novo Preço de Venda</th>
-      <td mat-cell *matCellDef="let element; let i = dataIndex">
-        <input
-          #priceInput
-          matInput
-          class="only-line"
-          [formControl]="rows.at(i).controls.salePrice"
-          (keyup.enter)="onEnter(i)"
-          (blur)="onPriceBlur(i)"
-          (focus)="onFocus(i)"
-          mask="separator.2"
-          thousandSeparator="."
-          decimalMarker=","
-          prefix="R$ "
-          [dropSpecialCharacters]="false"
-          [showMaskTyped]="false"
-          [allowNegativeNumbers]="false"
-          style="width: 75px"
+      <ng-container matColumnDef="sale_price">
+        <th mat-header-cell *matHeaderCellDef>Novo Preço de Venda</th>
+        <td mat-cell *matCellDef="let element; let i = dataIndex">
+          <input
+            #priceInput
+            matInput
+            class="only-line"
+            [formControl]="rows.at(i).controls.salePrice"
+            (keyup.enter)="onEnter(i)"
+            (blur)="onPriceBlur(i)"
+            (focus)="onFocus(i)"
+            mask="separator.2"
+            thousandSeparator="."
+            decimalMarker=","
+            prefix="R$ "
+            [dropSpecialCharacters]="false"
+            [showMaskTyped]="false"
+            [allowNegativeNumbers]="false"
+            style="width: 75px"
+            (click)="$event.stopPropagation()"
+          />
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="erp_import_date">
+        <th mat-header-cell *matHeaderCellDef>Preço Importado em</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.erpImportDate | date: 'dd/MM/yy HH:mm' }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="send">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td
+          mat-cell
+          *matCellDef="let element; let i = dataIndex"
           (click)="$event.stopPropagation()"
-        />
-      </td>
-    </ng-container>
+        >
+          @if (sendingProductId !== element.product.id) {
+            <app-icon-button
+              icon="send"
+              [class]="isPriceInvalid(i) ? 'icon-button-table-disabled' : 'icon-button-table'"
+              [tooltipText]="isPriceInvalid(i) ? '' : 'Enviar preços para o ERP'"
+              (click)="sendPrices(element.product.id)"
+              [disabled]="isPriceInvalid(i)"
+            ></app-icon-button>
+          } @else {
+            <app-spinner [diameter]="30"></app-spinner>
+          }
+        </td>
+      </ng-container>
 
-    <ng-container matColumnDef="erp_import_date">
-      <th mat-header-cell *matHeaderCellDef>Preço Importado em</th>
-      <td mat-cell *matCellDef="let element">
-        {{ element.erpImportDate | date: 'dd/MM/yy HH:mm' }}
-      </td>
-    </ng-container>
-
-    <ng-container matColumnDef="send">
-      <th mat-header-cell *matHeaderCellDef></th>
-      <td mat-cell *matCellDef="let element; let i = dataIndex" (click)="$event.stopPropagation()">
-        @if (sendingProductId !== element.product.id) {
-          <app-icon-button
-            icon="send"
-            [class]="isPriceInvalid(i) ? 'icon-button-table-disabled' : 'icon-button-table'"
-            [tooltipText]="isPriceInvalid(i) ? '' : 'Enviar preços para o ERP'"
-            (click)="sendPrices(element.product.id)"
-            [disabled]="isPriceInvalid(i)"
-          ></app-icon-button>
-        } @else {
-          <app-spinner [diameter]="30"></app-spinner>
-        }
-      </td>
-    </ng-container>
-
-    <ng-container matColumnDef="expandedDetail">
-      <td mat-cell *matCellDef="let element" [attr.colspan]="columnsToDisplay.length">
-        <div class="element-detail-wrapper" [class.is-expanded]="element == expandedElement">
-          <div class="element-detail-content">
-            <div class="expanded-detail-content" fxLayout="column">
-              <div fxLayout="column" fxLayoutGap="5px">
-                <span class="label">Preço dos concorrentes</span>
-                <div fxLayout="row" fxLayoutGap="10px">
-                  <span></span>
-                  <span></span>
+      <ng-container matColumnDef="expandedDetail">
+        <td mat-cell *matCellDef="let element" [attr.colspan]="columnsToDisplay.length">
+          <div class="element-detail-wrapper" [class.is-expanded]="element == expandedElement">
+            <div class="element-detail-content">
+              <div class="expanded-detail-content" fxLayout="column">
+                <div fxLayout="column" fxLayoutGap="5px">
+                  <span class="label">Preço dos concorrentes</span>
+                  <div fxLayout="row" fxLayoutGap="10px">
+                    <span></span>
+                    <span></span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </td>
-    </ng-container>
+        </td>
+      </ng-container>
 
-    <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+      <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
 
-    <tr
-      mat-row
-      *matRowDef="let element; columns: columnsToDisplay"
-      [class.expanded-detail-content]="expandedElement === element"
-      (click)="toggleRow(element)"
-    ></tr>
+      <tr
+        mat-row
+        *matRowDef="let element; columns: columnsToDisplay"
+        [class.expanded-detail-content]="expandedElement === element"
+        (click)="toggleRow(element)"
+      ></tr>
 
-    <tr
-      mat-row
-      *matRowDef="let row; columns: ['expandedDetail']"
-      class="colapsed-detail-content"
-    ></tr>
-  </table>
+      <tr
+        mat-row
+        *matRowDef="let row; columns: ['expandedDetail']"
+        class="colapsed-detail-content"
+      ></tr>
+    </table>
 
-  <mat-paginator
-    #paginator
-    [length]="paginatorDataSource.records.count"
-    [pageSize]="paginatorDataSource.pageSize"
-    [pageIndex]="paginatorDataSource.pageIndex"
-    [pageSizeOptions]="[5, 10, 25, 50, 100]"
-    (page)="onPageChange($event)"
-    showFirstLastButtons
-  >
-  </mat-paginator>
+    <mat-paginator
+      #paginator
+      [length]="paginatorDataSource.records.count"
+      [pageSize]="paginatorDataSource.pageSize"
+      [pageIndex]="paginatorDataSource.pageIndex"
+      [pageSizeOptions]="[5, 10, 25, 50, 100]"
+      (page)="onPageChange($event)"
+      showFirstLastButtons
+    >
+    </mat-paginator>
+  </div>
 </div>

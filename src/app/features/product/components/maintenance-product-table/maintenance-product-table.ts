@@ -1,18 +1,24 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
-import { PageEvent } from '@angular/material/paginator';
+import { PageEvent, MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 import { IProductView } from 'src/app/features/product/models/product.model';
 import { IDefaultPaginatorDataSource } from 'src/app/core/models/query.model';
 import { ProductService } from '../../services/product.service';
 import { TableColumn } from 'src/app/core/models/table-app.model';
-import { Table } from 'src/app/shared/components/table/table';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { Spinner } from 'src/app/shared/components/spinner/spinner';
 import { MatFormField, MatLabel } from '@angular/material/select';
-import { MatIcon } from '@angular/material/icon';
+import { MatIcon, MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import {
+  MatTable,
+  MatHeaderCellDef,
+  MatTableDataSource,
+  MatTableModule,
+} from '@angular/material/table';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-product-maintenance-product-table',
@@ -20,20 +26,29 @@ import { MatInputModule } from '@angular/material/input';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    Table,
     FlexLayoutModule,
     Spinner,
     MatFormField,
     MatLabel,
     MatIcon,
+    MatIconModule,
     MatInputModule,
+    MatPaginatorModule,
+    MatButtonModule,
+    MatTable,
+    MatHeaderCellDef,
+    MatPaginator,
+    MatTableModule,
   ],
   templateUrl: './maintenance-product-table.html',
+  styleUrl: '../../../../global/styles/_tables.scss',
 })
 export class MaintenanceProductTable implements OnInit {
   loading = false;
   searchTerm = '';
-  products: IProductView[] = [];
+  dataSource = new MatTableDataSource<IProductView>([]);
+  expandedElement: IProductView | null = null;
+  columnsToDisplay = ['expand', 'id', 'name', 'created_at', 'updated_at'];
 
   paginatorDataSource: IDefaultPaginatorDataSource<IProductView> = {
     pageIndex: 0,
@@ -70,7 +85,7 @@ export class MaintenanceProductTable implements OnInit {
     this.productService.loadProducts(paginator, search).subscribe({
       next: (response) => {
         this.paginatorDataSource.records = response;
-        this.products = response.data;
+        this.dataSource.data = response.data;
         this.loading = false;
         this.cdr.detectChanges();
       },
@@ -95,5 +110,9 @@ export class MaintenanceProductTable implements OnInit {
 
   private reload(): void {
     this.loadProducts(this.paginatorDataSource, this.searchTerm);
+  }
+
+  toggleRow(row: IProductView): void {
+    this.expandedElement = this.expandedElement === row ? null : row;
   }
 }

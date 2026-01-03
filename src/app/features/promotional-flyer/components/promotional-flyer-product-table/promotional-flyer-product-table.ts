@@ -59,7 +59,7 @@ type FlyerRowForm = FormGroup<{
     IconButton,
   ],
   templateUrl: './promotional-flyer-product-table.html',
-  styleUrl: './promotional-flyer-product-table.scss',
+  styleUrl: '../../../../global/styles/_tables.scss',
 })
 export class PromotionalFlyerProductTable {
   @ViewChild(MatSort) sort!: MatSort;
