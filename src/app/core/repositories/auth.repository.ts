@@ -32,11 +32,11 @@ export class AuthRepository {
     );
   }
 
-  register(user: ICreateCompanyUser) {
+  register(companyUser: ICreateCompanyUser) {
     return from(
       this.supabase.functions.invoke('create-enterprise-user', {
         method: 'POST',
-        body: user,
+        body: JSON.stringify(companyUser),
         headers: {
           'Content-Type': 'application/json',
         },
