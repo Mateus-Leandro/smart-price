@@ -7,6 +7,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatIcon } from '@angular/material/icon';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { AuthService } from 'src/app/features/auth/services/auth.service';
+import { IItensMenuDrawer } from '../../models/menu-drawer.model';
 
 @Component({
   selector: 'app-main-layout',
@@ -28,11 +29,16 @@ import { AuthService } from 'src/app/features/auth/services/auth.service';
 export class MainLayout {
   constructor(private authService: AuthService) {}
 
-  navItemsMenuDrawer = [
+  navItemsMenuDrawer: IItensMenuDrawer[] = [
     {
       router: '/promotional_flyer',
       textNav: 'Precificação',
       icon: 'attach_money',
+    },
+    {
+      router: '/products',
+      textNav: 'Produtos',
+      icon: 'shopping_cart',
     },
   ];
 
