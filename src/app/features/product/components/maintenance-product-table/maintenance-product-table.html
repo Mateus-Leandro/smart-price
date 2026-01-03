@@ -1,0 +1,21 @@
+<div class="container">
+  <app-table
+    [data]="products"
+    [totalCount]="paginatorDataSource.records.count"
+    [pageSize]="paginatorDataSource.pageSize"
+    [pageIndex]="paginatorDataSource.pageIndex"
+    [columns]="tableColumns"
+    [expandedDetailTemplate]="productDetailTemplate"
+    (pageChange)="onPageChange($event)"
+  >
+  </app-table>
+</div>
+
+<ng-template #productDetailTemplate let-product>
+  <div class="expanded-detail-content" fxLayout="column">
+    <div fxLayout="row" fxLayoutGap="5px">
+      <span class="label">Detalhes do Produto: </span>
+      <span>{{ product.name }}</span>
+    </div>
+  </div>
+</ng-template>
