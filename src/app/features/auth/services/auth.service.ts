@@ -18,7 +18,7 @@ export class AuthService {
       await firstValueFrom(this.repository.login(email, password));
       this.router.navigate(['/promotional_flyer']);
     } catch (error) {
-      console.log(`Erro ao realizar login: `, error);
+      throw error;
     }
   }
 
