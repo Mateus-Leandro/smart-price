@@ -9,15 +9,26 @@
   border-collapse: collapse;
 
   // --- LÓGICA ZEBRA
-  // 2n+1 para pintar uma linha principal sim e outra não, considerando o par (row + detail)
-
-  tr.mat-mdc-row,
-  tr.mat-row {
-    &:nth-child(4n + 1) {
+  // VARIANT 1: TABELA SIMPLES (Sem linhas de detalhe)
+  &.zebra-simple {
+    tr.mat-mdc-row:nth-child(even) {
+      background-color: $gray;
+    }
+    tr.mat-mdc-row:nth-child(odd) {
       background-color: $secondary;
     }
-    &:nth-child(4n + 3) {
-      background-color: $gray;
+  }
+
+  // VARIANT 2: TABELA EXPANSÍVEL (Com linhas de detalhe)
+  &.zebra-expandable {
+    tr.mat-mdc-row,
+    tr.mat-row {
+      &:nth-child(4n + 1) {
+        background-color: $secondary;
+      }
+      &:nth-child(4n + 3) {
+        background-color: $gray;
+      }
     }
   }
 
