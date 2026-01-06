@@ -11,7 +11,7 @@
       <input matInput type="search" (input)="onSearch($event)" />
       <mat-icon matSuffix>search</mat-icon>
     </mat-form-field>
-    <table mat-table class="default-table" [dataSource]="dataSource" matSort>
+    <table mat-table class="default-table zebra-simple" [dataSource]="dataSource" matSort>
       <ng-container matColumnDef="id">
         <th mat-header-cell *matHeaderCellDef>ID</th>
         <td mat-cell *matCellDef="let element">{{ element.id }}</td>
