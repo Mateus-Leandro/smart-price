@@ -40,6 +40,11 @@ export class MainLayout {
       textNav: 'Produtos',
       icon: 'shopping_cart',
     },
+    {
+      router: '/users',
+      textNav: 'Usuários',
+      icon: 'manage_accounts',
+    },
   ];
 
   logout() {

@@ -34,6 +34,14 @@ export const routes: Routes = [
             (m) => m.ProductMaintenance,
           ),
       },
+      {
+        path: 'users',
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./features/user/pages/user-maintenance/user-maintenance').then(
+            (m) => m.UserMaintenance,
+          ),
+      },
     ],
   },
   {
