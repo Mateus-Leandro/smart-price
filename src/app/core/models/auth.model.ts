@@ -15,3 +15,8 @@ export interface ICompany {
   name?: string;
   cnpj?: string;
 }
+
+export interface IUpdateUser {
+  password?: string;
+  email?: string;
+}

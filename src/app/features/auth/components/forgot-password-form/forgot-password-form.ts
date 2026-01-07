@@ -80,7 +80,9 @@ export class ForgotPasswordForm {
     this.loadingForgotPassword = true;
 
     this.authService
-      .updatePassword(this.confirmationPass.value)
+      .updateUser({
+        password: this.confirmationPass.value,
+      })
       .pipe()
       .subscribe({
         next: () => {

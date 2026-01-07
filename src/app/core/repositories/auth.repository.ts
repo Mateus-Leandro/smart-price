@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { finalize, from, map } from 'rxjs';
 import { SupabaseService } from 'src/app/shared/services/supabase.service';
-import { ICreateCompanyUser } from '../models/auth.model';
+import { ICreateCompanyUser, IUpdateUser } from '../models/auth.model';
 import { jwtDecode } from 'jwt-decode';
 import { LoadingService } from '../services/loading.service';
 
@@ -66,13 +66,9 @@ export class AuthRepository {
     );
   }
 
-  updatePassword(pass: string) {
+  updateUser(updateUserProperties: IUpdateUser) {
     this.loadingService.show();
-    return from(
-      this.supabase.auth.updateUser({
-        password: pass,
-      }),
-    ).pipe(
+    return from(this.supabase.auth.updateUser(updateUserProperties)).pipe(
       map(({ error }) => {
         if (error) throw error;
       }),
