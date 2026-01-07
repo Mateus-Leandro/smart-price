@@ -12,6 +12,6 @@ export interface IUser {
 
 export interface ICompany {
   id?: number;
-  name: string;
-  cnpj: string;
+  name?: string;
+  cnpj?: string;
 }

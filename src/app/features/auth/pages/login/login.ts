@@ -53,7 +53,7 @@ export class Login {
     });
   }
 
-  async onSubmit() {
+  onSubmit() {
     const passwordCtrl = this.loginFormGroup.get('password');
     passwordCtrl?.setErrors(null);
 
@@ -61,19 +61,22 @@ export class Login {
     if (this.loginFormGroup.invalid) return;
 
     this.loading = true;
+    this.cdr.detectChanges();
 
-    try {
-      await this.authService.login(
-        this.loginFormGroup.value.email,
-        this.loginFormGroup.value.password,
-      );
-    } catch (error) {
-      this.loginFormGroup.setErrors({ invalidCredential: true });
-      this.loginFormGroup.markAllAsTouched();
-    } finally {
-      this.loading = false;
-      this.cdr.detectChanges();
-    }
+    this.authService
+      .login(this.loginFormGroup.value.email, this.loginFormGroup.value.password)
+      .pipe()
+      .subscribe({
+        next: () => {
+          this.router.navigate(['/promotional_flyer']);
+        },
+        error: () => {
+          this.loginFormGroup.setErrors({ invalidCredential: true });
+          this.loginFormGroup.markAllAsTouched();
+          this.loading = false;
+          this.cdr.detectChanges();
+        },
+      });
   }
 
   get email() {

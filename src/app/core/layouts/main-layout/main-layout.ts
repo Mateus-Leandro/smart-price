@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { MatDrawerContainer, MatDrawer, MatDrawerContent } from '@angular/material/sidenav';
 import { ToolBar } from '../tool-bar/tool-bar';
-import { RouterModule, RouterOutlet } from '@angular/router';
+import { Route, Router, RouterModule, RouterOutlet } from '@angular/router';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { MatIcon } from '@angular/material/icon';
@@ -27,7 +27,10 @@ import { IItensMenuDrawer } from '../../models/menu-drawer.model';
   styleUrl: './main-layout.scss',
 })
 export class MainLayout {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+  ) {}
 
   navItemsMenuDrawer: IItensMenuDrawer[] = [
     {
@@ -48,6 +51,17 @@ export class MainLayout {
   ];
 
   logout() {
-    this.authService.logout();
+    this.authService
+      .logout()
+      .pipe()
+      .subscribe({
+        next: () => {
+          this.router.navigate(['/login']);
+        },
+        error: (err) => {
+          console.log('Erro ao realizar logout: ', err);
+          throw new Error(err);
+        },
+      });
   }
 }
