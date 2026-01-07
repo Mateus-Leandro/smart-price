@@ -42,6 +42,12 @@ export const routes: Routes = [
             (m) => m.UserMaintenance,
           ),
       },
+      {
+        path: 'users/form',
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./features/user/pages/register-user/register-user').then((m) => m.RegisterUser),
+      },
     ],
   },
   {

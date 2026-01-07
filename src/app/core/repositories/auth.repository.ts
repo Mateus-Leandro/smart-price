@@ -3,6 +3,7 @@ import { SupabaseClient } from '@supabase/supabase-js';
 import { from, map } from 'rxjs';
 import { SupabaseService } from 'src/app/shared/services/supabase.service';
 import { ICreateCompanyUser } from '../models/auth.model';
+import { jwtDecode } from 'jwt-decode';
 
 @Injectable({ providedIn: 'root' })
 export class AuthRepository {
@@ -89,6 +90,22 @@ export class AuthRepository {
         if (error) throw error;
 
         return !!data.session;
+      }),
+    );
+  }
+
+  getCompanyId() {
+    return from(this.supabase.auth.getSession()).pipe(
+      map(({ data, error }) => {
+        if (error) throw error;
+
+        const token = data?.session?.access_token;
+        if (!token) {
+          throw new Error('Usuário não autenticado');
+        }
+
+        const decodedToken: any = jwtDecode(token);
+        return Number(decodedToken?.app_metadata?.company_id);
       }),
     );
   }

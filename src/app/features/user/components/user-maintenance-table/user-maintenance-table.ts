@@ -19,6 +19,8 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { ReactiveFormsModule } from '@angular/forms';
+import { IconButton } from 'src/app/shared/components/icon-button/icon-button';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-user-maintenance-table',
@@ -38,6 +40,7 @@ import { ReactiveFormsModule } from '@angular/forms';
     MatHeaderCellDef,
     MatPaginator,
     MatTableModule,
+    IconButton,
   ],
   templateUrl: './user-maintenance-table.html',
   styleUrl: '../../../../global/styles/_tables.scss',
@@ -59,6 +62,7 @@ export class UserMaintenanceTable {
   constructor(
     private cdr: ChangeDetectorRef,
     private userService: UserService,
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -98,5 +102,9 @@ export class UserMaintenanceTable {
 
   private reload(): void {
     this.loadUsers(this.paginatorDataSource, this.searchTerm);
+  }
+
+  createrUser() {
+    this.router.navigate(['users/form']);
   }
 }

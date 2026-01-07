@@ -46,7 +46,7 @@ export class Register {
     this.router.navigate(['/login']);
   }
 
-  async registerNewUser(userForm: FormGroup, companyForm: FormGroup) {
+  registerNewUser(userForm: FormGroup, companyForm: FormGroup) {
     let invalid = false;
     if (companyForm.invalid) {
       invalid = true;
@@ -60,15 +60,6 @@ export class Register {
 
     if (invalid) return;
 
-    if (userForm.invalid || companyForm.invalid) return;
-
-    const invalidCompany = companyForm.invalid;
-    const invalidUser = userForm.invalid;
-
-    if (invalidCompany) companyForm.markAllAsTouched();
-    if (invalidUser) userForm.markAllAsTouched();
-    if (invalidCompany || invalidUser) return;
-
     const newUser: ICreateCompanyUser = {
       company: {
         cnpj: companyForm.value.cnpj,
@@ -81,19 +72,30 @@ export class Register {
       },
     };
 
-    try {
-      this.loading = true;
-      const response = await this.authService.register(newUser);
-
-      if (response) {
-        await this.authService.login(response.user.email, newUser.user.password);
-      }
-    } catch (error) {
-      console.error(error);
-      throw error;
-    } finally {
-      this.loading = false;
-      this.cdr.detectChanges();
-    }
+    this.authService
+      .register(newUser)
+      .pipe()
+      .subscribe({
+        next: (user) => {
+          this.authService
+            .login(user.email, newUser.user.password)
+            .pipe()
+            .subscribe({
+              next: () => {
+                this.router.navigate(['/promotional_flyer']);
+              },
+              error: (err) => {
+                console.log('Erro ao realizar login:', err);
+                this.cdr.detectChanges();
+                throw new Error(err);
+              },
+            });
+        },
+        error: (err) => {
+          console.log('Erro ao criar usuário:', err);
+          this.cdr.detectChanges();
+          throw new Error(err);
+        },
+      });
   }
 }

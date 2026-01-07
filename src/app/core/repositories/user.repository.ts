@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { SupabaseClient } from '@supabase/supabase-js';
-import { finalize, from, map, Observable } from 'rxjs';
+import { finalize, from, map, Observable, switchMap } from 'rxjs';
 import { SupabaseService } from 'src/app/shared/services/supabase.service';
 import { IDefaultPaginatorDataSource } from '../models/query.model';
 import { LoadingService } from '../services/loading.service';
 import { IUserView } from '../models/user.model';
 import { AuthService } from 'src/app/features/auth/services/auth.service';
+import { IUser } from '../models/auth.model';
 
 @Injectable({ providedIn: 'root' })
 export class UserRepository {
@@ -18,17 +19,29 @@ export class UserRepository {
     this.supabase = this.supabaseService.supabase;
   }
 
-  createUser(email: string, password: string) {
-    return from(
-      this.supabase.auth.admin.createUser({
-        email,
-        password,
-        email_confirm: true,
+  createUser(newUser: IUser) {
+    this.loadingService.show();
+    return this.authService.getCompanyIdFromLoggedUser().pipe(
+      switchMap((companyId) => {
+        if (!companyId) {
+          throw new Error('ID da empresa não encontrado.');
+        }
+
+        return from(
+          this.authService.register({
+            user: newUser,
+            company: {
+              id: companyId,
+            },
+          }),
+        );
       }),
-    ).pipe(
-      map(({ error }) => {
+      map(({ data, error }) => {
         if (error) throw error;
+
+        return data;
       }),
+      finalize(() => this.loadingService.hide()),
     );
   }
 

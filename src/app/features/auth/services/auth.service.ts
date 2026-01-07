@@ -13,30 +13,16 @@ export class AuthService {
     private repository: AuthRepository,
   ) {}
 
-  async login(email: string, password: string) {
-    try {
-      await firstValueFrom(this.repository.login(email, password));
-      this.router.navigate(['/promotional_flyer']);
-    } catch (error) {
-      throw error;
-    }
+  login(email: string, password: string) {
+    return this.repository.login(email, password);
   }
 
-  async logout() {
-    try {
-      await firstValueFrom(this.repository.logout());
-      this.router.navigate(['/login']);
-    } catch (error) {
-      console.log(`Erro ao realizar logout: `, error);
-    }
+  logout() {
+    return this.repository.logout();
   }
 
-  async register(user: ICreateCompanyUser) {
-    try {
-      return await firstValueFrom(this.repository.register(user));
-    } catch (error) {
-      throw `Erro ao criar usuário: ${error}`;
-    }
+  register(user: ICreateCompanyUser) {
+    return this.repository.register(user);
   }
 
   async sendPasswordResetEmail(email: string) {
@@ -61,5 +47,9 @@ export class AuthService {
     } catch (error) {
       throw `Erro ao atualizar senha: ${error}`;
     }
+  }
+
+  getCompanyIdFromLoggedUser() {
+    return this.repository.getCompanyId();
   }
 }
