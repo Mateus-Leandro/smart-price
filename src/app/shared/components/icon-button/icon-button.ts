@@ -1,10 +1,11 @@
 import { Component, Input } from '@angular/core';
-import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIcon, MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-icon-button',
-  imports: [MatIconModule, MatTooltipModule],
+  imports: [MatIconModule, MatTooltipModule, MatIcon, MatButtonModule],
   templateUrl: './icon-button.html',
 })
 export class IconButton {
@@ -13,6 +14,6 @@ export class IconButton {
   @Input() height: string = '36px';
   @Input() width: string = '36px';
   @Input() disabled?: boolean = false;
-  @Input() type: 'button' | 'submit' = 'button';
   @Input() tooltipText: string = '';
+  @Input() backgroundColor: string = 'var(--no-background-color)';
 }

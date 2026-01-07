@@ -10,6 +10,7 @@ $gray: #bebebe;
 
 $cancel-color: #b00020;
 $no-background-color: #00000000;
+$ripple-color: #fafafa1e;
 
 :root {
   --primary: #{$primary};
@@ -24,4 +25,5 @@ $no-background-color: #00000000;
 
   --cancel-color: #{$cancel-color};
   --no-background-color: #{$no-background-color};
+  --ripple-color: #{$ripple-color};
 }
