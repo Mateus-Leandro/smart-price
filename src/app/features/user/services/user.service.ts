@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { IUser } from 'src/app/core/models/auth.model';
 import { IDefaultPaginatorDataSource } from 'src/app/core/models/query.model';
 import { IUserView } from 'src/app/core/models/user.model';
 import { UserRepository } from 'src/app/core/repositories/user.repository';
@@ -11,5 +12,9 @@ export class UserService {
 
   loadUsers(paginator: IDefaultPaginatorDataSource<IUserView>, search?: string) {
     return this.repository.getUsers(paginator, search);
+  }
+
+  createUser(user: IUser) {
+    return this.repository.createUser(user);
   }
 }
