@@ -1,14 +1,11 @@
 <button
-  class="icon-button"
-  [type]="type"
-  mat-icon-button
-  [style.height]="height"
-  [style.width]="width"
+  class="custom-icon-button"
+  type="button"
+  matIconButton
   [style.color]="iconColor"
+  [style.background-color]="backgroundColor"
   [disabled]="disabled"
   [matTooltip]="tooltipText"
-  [matTooltipDisabled]="!tooltipText"
-  style="border: none; background-color: transparent; cursor: pointer"
 >
   <mat-icon>{{ icon }}</mat-icon>
 </button>
