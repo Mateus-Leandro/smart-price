@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { ICreateCompanyUser } from 'src/app/core/models/auth.model';
+import { ICreateCompanyUser, IUpdateUser } from 'src/app/core/models/auth.model';
 import { AuthRepository } from 'src/app/core/repositories/auth.repository';
 import { firstValueFrom } from 'rxjs';
 
@@ -37,8 +37,8 @@ export class AuthService {
     return this.repository.getUser();
   }
 
-  updatePassword(pass: string) {
-    return this.repository.updatePassword(pass);
+  updateUser(updateUser: IUpdateUser) {
+    return this.repository.updateUser(updateUser);
   }
 
   getCompanyIdFromLoggedUser() {
