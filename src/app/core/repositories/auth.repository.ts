@@ -1,14 +1,18 @@
 import { Injectable } from '@angular/core';
 import { SupabaseClient } from '@supabase/supabase-js';
-import { from, map } from 'rxjs';
+import { finalize, from, map } from 'rxjs';
 import { SupabaseService } from 'src/app/shared/services/supabase.service';
 import { ICreateCompanyUser } from '../models/auth.model';
 import { jwtDecode } from 'jwt-decode';
+import { LoadingService } from '../services/loading.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthRepository {
   private supabase: SupabaseClient;
-  constructor(private supabaseService: SupabaseService) {
+  constructor(
+    private supabaseService: SupabaseService,
+    private loadingService: LoadingService,
+  ) {
     this.supabase = this.supabaseService.supabase;
   }
 
@@ -63,6 +67,7 @@ export class AuthRepository {
   }
 
   updatePassword(pass: string) {
+    this.loadingService.show();
     return from(
       this.supabase.auth.updateUser({
         password: pass,
@@ -71,6 +76,7 @@ export class AuthRepository {
       map(({ error }) => {
         if (error) throw error;
       }),
+      finalize(() => this.loadingService.hide()),
     );
   }
 

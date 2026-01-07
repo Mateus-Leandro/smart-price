@@ -19,17 +19,23 @@ export class ToolBar {
   ) {}
   @Output() menuClick = new EventEmitter<void>();
 
-  async ngOnInit() {
-    await this.loadUser();
+  ngOnInit() {
+    this.loadUser();
   }
 
-  async loadUser() {
-    try {
-      this.user = await this.authService.getUser();
-    } catch (error) {
-      console.error('Usuário não autenticado na Toolbar', error);
-    } finally {
-      this.cdr.detectChanges();
-    }
+  loadUser() {
+    this.authService
+      .getUser()
+      .pipe()
+      .subscribe({
+        next: (user) => {
+          this.user = user;
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.log('Erro ao obter usuário: ', err);
+          throw new Error(err);
+        },
+      });
   }
 }

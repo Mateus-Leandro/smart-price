@@ -49,16 +49,21 @@ export class ForgotPasswordForm {
     });
   }
 
-  async ngOnInit() {
+  ngOnInit() {
     this.loading = true;
-    try {
-      const user = await this.authService.getUser();
-      this.email = user?.email;
-    } catch (error) {
-      console.log('Erro ao carregar usuário', error);
-    } finally {
-      this.loading = false;
-    }
+    this.authService
+      .getUser()
+      .pipe()
+      .subscribe({
+        next: (user) => {
+          this.email = user?.email;
+          this.loading = false;
+        },
+        error: (err) => {
+          console.log(err);
+          throw new Error(err);
+        },
+      });
   }
 
   get pass() {
@@ -69,18 +74,23 @@ export class ForgotPasswordForm {
     return this.forgotPasswordFormGroup.get('confirmationPass')!;
   }
 
-  async onSubmit() {
+  onSubmit() {
     this.forgotPasswordFormGroup.markAllAsTouched();
     if (this.forgotPasswordFormGroup.invalid || !this.email) return;
     this.loadingForgotPassword = true;
-    try {
-      await this.authService.updatePassword(this.confirmationPass.value);
-    } catch (error) {
-      console.error('Erro ao resetar senha: ', error);
-    } finally {
-      this.loadingForgotPassword = false;
-      this.returnToLoginPage();
-    }
+
+    this.authService
+      .updatePassword(this.confirmationPass.value)
+      .pipe()
+      .subscribe({
+        next: () => {
+          this.returnToLoginPage();
+        },
+        error: (err) => {
+          console.error('Erro ao resetar senha: ', err);
+          throw new Error(err);
+        },
+      });
   }
 
   returnToLoginPage() {

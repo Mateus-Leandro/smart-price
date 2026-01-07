@@ -25,28 +25,20 @@ export class AuthService {
     return this.repository.register(user);
   }
 
-  async sendPasswordResetEmail(email: string) {
-    try {
-      return await firstValueFrom(this.repository.sendPasswordResetEmail(email));
-    } catch (error) {
-      throw `Erro ao enviar email de recuperação de senha: ${error}`;
-    }
+  sendPasswordResetEmail(email: string) {
+    return this.repository.sendPasswordResetEmail(email);
   }
 
   async isLogged() {
     return await firstValueFrom(this.repository.isLogged());
   }
 
-  async getUser() {
-    return await firstValueFrom(this.repository.getUser());
+  getUser() {
+    return this.repository.getUser();
   }
 
-  async updatePassword(pass: string) {
-    try {
-      return await firstValueFrom(this.repository.updatePassword(pass));
-    } catch (error) {
-      throw `Erro ao atualizar senha: ${error}`;
-    }
+  updatePassword(pass: string) {
+    return this.repository.updatePassword(pass);
   }
 
   getCompanyIdFromLoggedUser() {
