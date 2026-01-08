@@ -1,4 +1,4 @@
-export interface ICreateCompanyUser {
+export interface IRegisterCompanyAndUser {
   user: IUser;
   company: ICompany;
 }
@@ -7,13 +7,18 @@ export interface IUser {
   name: string;
   email: string;
   password: string;
-  companyId?: number;
 }
 
 export interface ICompany {
-  id?: number;
-  name?: string;
-  cnpj?: string;
+  name: string;
+  cnpj: string;
+}
+
+export interface ICreateUser {
+  user: IUser;
+  company: {
+    id: number;
+  };
 }
 
 export interface IUpdateUser {

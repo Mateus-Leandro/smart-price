@@ -107,4 +107,8 @@ export class UserMaintenanceTable {
   createrUser() {
     this.router.navigate(['users/form']);
   }
+
+  navigateToUserForm(userId: number) {
+    this.router.navigate(['users/form', userId]);
+  }
 }

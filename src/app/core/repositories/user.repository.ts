@@ -5,8 +5,6 @@ import { SupabaseService } from 'src/app/shared/services/supabase.service';
 import { IDefaultPaginatorDataSource } from '../models/query.model';
 import { LoadingService } from '../services/loading.service';
 import { IUserView } from '../models/user.model';
-import { AuthService } from 'src/app/features/auth/services/auth.service';
-import { IUser } from '../models/auth.model';
 
 @Injectable({ providedIn: 'root' })
 export class UserRepository {
@@ -14,35 +12,8 @@ export class UserRepository {
   constructor(
     private supabaseService: SupabaseService,
     private loadingService: LoadingService,
-    private authService: AuthService,
   ) {
     this.supabase = this.supabaseService.supabase;
-  }
-
-  createUser(newUser: IUser) {
-    this.loadingService.show();
-    return this.authService.getCompanyIdFromLoggedUser().pipe(
-      switchMap((companyId) => {
-        if (!companyId) {
-          throw new Error('ID da empresa não encontrado.');
-        }
-
-        return from(
-          this.authService.register({
-            user: newUser,
-            company: {
-              id: companyId,
-            },
-          }),
-        );
-      }),
-      map(({ data, error }) => {
-        if (error) throw error;
-
-        return data;
-      }),
-      finalize(() => this.loadingService.hide()),
-    );
   }
 
   getUsers(
@@ -87,6 +58,47 @@ export class UserRepository {
         return { data: mappedData, count: count ?? 0 };
       }),
       finalize(() => this.loadingService.hide()),
+    );
+  }
+
+  getUserInfoByUserId(userId: string) {
+    return from(
+      this.supabase
+        .from('users')
+        .select(
+          `
+      id,
+      name,
+      email
+      `,
+        )
+        .eq('id', userId)
+        .single(),
+    ).pipe(
+      map(({ data, error }) => {
+        if (error) throw new Error();
+
+        return data;
+      }),
+    );
+  }
+
+  updateUserName(newUserName: string, userId: string) {
+    return from(
+      this.supabase
+        .from('users')
+        .update({
+          name: newUserName,
+        })
+        .eq('id', userId)
+        .select()
+        .single(),
+    ).pipe(
+      map(({ data, error }) => {
+        if (error) throw new Error();
+
+        return data;
+      }),
     );
   }
 }
