@@ -34,6 +34,16 @@ export class MainLayout {
 
   navItemsMenuDrawer: IItensMenuDrawer[] = [
     {
+      router: '/company_branches',
+      textNav: 'Filiais',
+      icon: 'domain',
+    },
+    {
+      router: '/price_competitors',
+      textNav: 'Concorrentes',
+      icon: 'groups_3',
+    },
+    {
       router: '/promotional_flyer',
       textNav: 'Precificação',
       icon: 'attach_money',
