@@ -1,6 +1,10 @@
 import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
-import { ICreateCompanyUser, IUpdateUser } from 'src/app/core/models/auth.model';
+import {
+  ICreateUser,
+  IRegisterCompanyAndUser,
+  IUpdateUser,
+  IUser,
+} from 'src/app/core/models/auth.model';
 import { AuthRepository } from 'src/app/core/repositories/auth.repository';
 import { firstValueFrom } from 'rxjs';
 
@@ -8,10 +12,7 @@ import { firstValueFrom } from 'rxjs';
   providedIn: 'root',
 })
 export class AuthService {
-  constructor(
-    private router: Router,
-    private repository: AuthRepository,
-  ) {}
+  constructor(private repository: AuthRepository) {}
 
   login(email: string, password: string) {
     return this.repository.login(email, password);
@@ -21,8 +22,8 @@ export class AuthService {
     return this.repository.logout();
   }
 
-  register(user: ICreateCompanyUser) {
-    return this.repository.register(user);
+  createUser(user: IRegisterCompanyAndUser | ICreateUser) {
+    return this.repository.createUser(user);
   }
 
   sendPasswordResetEmail(email: string) {

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { finalize, from, map } from 'rxjs';
 import { SupabaseService } from 'src/app/shared/services/supabase.service';
-import { ICreateCompanyUser, IUpdateUser } from '../models/auth.model';
+import { ICreateUser, IRegisterCompanyAndUser, IUpdateUser } from '../models/auth.model';
 import { jwtDecode } from 'jwt-decode';
 import { LoadingService } from '../services/loading.service';
 
@@ -37,11 +37,12 @@ export class AuthRepository {
     );
   }
 
-  register(companyUser: ICreateCompanyUser) {
+  createUser(user: IRegisterCompanyAndUser | ICreateUser) {
+    this.loadingService.show();
     return from(
       this.supabase.functions.invoke('create-enterprise-user', {
         method: 'POST',
-        body: JSON.stringify(companyUser),
+        body: JSON.stringify(user),
         headers: {
           'Content-Type': 'application/json',
         },
@@ -51,6 +52,7 @@ export class AuthRepository {
         if (error) throw error;
         return data;
       }),
+      finalize(() => this.loadingService.hide()),
     );
   }
 
@@ -97,6 +99,7 @@ export class AuthRepository {
   }
 
   getCompanyId() {
+    this.loadingService.show();
     return from(this.supabase.auth.getSession()).pipe(
       map(({ data, error }) => {
         if (error) throw error;
@@ -109,6 +112,7 @@ export class AuthRepository {
         const decodedToken: any = jwtDecode(token);
         return Number(decodedToken?.app_metadata?.company_id);
       }),
+      finalize(() => this.loadingService.hide()),
     );
   }
 }

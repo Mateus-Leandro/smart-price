@@ -8,9 +8,9 @@ import { CompanyRegisterForm } from '../../components/company-register-form/comp
 import { UserRegisterForm } from '../../components/user-register-form/user-register-form';
 import { Router } from '@angular/router';
 import { Button } from 'src/app/shared/components/button/button';
-import { FormGroup, NgForm } from '@angular/forms';
+import { FormGroup } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
-import { ICreateCompanyUser } from 'src/app/core/models/auth.model';
+import { IRegisterCompanyAndUser } from 'src/app/core/models/auth.model';
 
 @Component({
   selector: 'app-register',
@@ -60,7 +60,7 @@ export class Register {
 
     if (invalid) return;
 
-    const newUser: ICreateCompanyUser = {
+    const newUser: IRegisterCompanyAndUser = {
       company: {
         cnpj: companyForm.value.cnpj,
         name: companyForm.value.corporateReason,
@@ -72,27 +72,26 @@ export class Register {
       },
     };
 
+    this.loading = true;
     this.authService
-      .register(newUser)
+      .createUser(newUser)
       .pipe()
       .subscribe({
-        next: (user) => {
-          this.authService
-            .login(user.email, newUser.user.password)
-            .pipe()
-            .subscribe({
-              next: () => {
-                this.router.navigate(['/promotional_flyer']);
-              },
-              error: (err) => {
-                console.log('Erro ao realizar login:', err);
-                this.cdr.detectChanges();
-                throw new Error(err);
-              },
-            });
+        next: (data) => {
+          this.authService.login(data.user.email, newUser.user.password).subscribe({
+            next: () => {
+              this.router.navigate(['/promotional_flyer']);
+            },
+            error: (err) => {
+              console.log('Erro ao realizar login:', err);
+              this.cdr.detectChanges();
+              throw new Error(err);
+            },
+          });
         },
         error: (err) => {
           console.log('Erro ao criar usuário:', err);
+          this.loading = false;
           this.cdr.detectChanges();
           throw new Error(err);
         },
