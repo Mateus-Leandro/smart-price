@@ -94,25 +94,6 @@ Deno.serve(async (req) => {
       console.log('🏢 Empresa criada:', createdCompanyData);
       finalCompanyId = createdCompanyData.id;
       createdCompany = createdCompanyData;
-
-      console.log('🏗 Criando filial...');
-      const { data: createdCompanyBrancheData, error: companyBrancheError } = await supabase
-        .from('company_branches')
-        .insert({
-          name: company.name,
-          cnpj: company.cnpj,
-          store_number: 1,
-          company_id: finalCompanyId,
-        })
-        .select()
-        .single();
-
-      if (companyBrancheError) {
-        console.log('❌ Erro criando empresa:', empresaErr);
-        return fail('Erro ao criar empresa: ' + empresaErr.message);
-      }
-
-      console.log('🏢 Filial criada:', createdCompanyData);
     } else {
       // Se já existe um company_id, recuperar os dados da empresa
       const { data: existingCompany, error: existingErr } = await supabase
