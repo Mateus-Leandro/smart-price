@@ -17,6 +17,22 @@ export const routes: Routes = [
           import('./features/competitor/pages/competitor/competitor').then((m) => m.Competitor),
       },
       {
+        path: 'competitors/form',
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./features/competitor/pages/register-competitor/register-competitor').then(
+            (m) => m.RegisterCompetitor,
+          ),
+      },
+      {
+        path: 'competitors/form/:id',
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./features/competitor/pages/register-competitor/register-competitor').then(
+            (m) => m.RegisterCompetitor,
+          ),
+      },
+      {
         path: 'promotional_flyer',
         canActivate: [authGuard],
         loadComponent: () =>
