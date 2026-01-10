@@ -39,7 +39,7 @@ export class MainLayout {
       icon: 'domain',
     },
     {
-      router: '/price_competitors',
+      router: '/competitors',
       textNav: 'Concorrentes',
       icon: 'groups_3',
     },
