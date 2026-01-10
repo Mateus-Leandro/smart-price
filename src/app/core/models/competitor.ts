@@ -4,8 +4,3 @@ export interface ICompetitor {
   createdAt: string;
   updatedAt: string;
 }
-
-export interface IUpdateCompetitor {
-  id: number;
-  name: string;
-}
