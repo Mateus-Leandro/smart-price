@@ -11,6 +11,14 @@ export const routes: Routes = [
     children: [
       { path: '', redirectTo: 'promotional_flyer', pathMatch: 'full' },
       {
+        path: 'company_branches',
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./features/company-branche/pages/company-branche/company-branche').then(
+            (m) => m.CompanyBranche,
+          ),
+      },
+      {
         path: 'competitors',
         canActivate: [authGuard],
         loadComponent: () =>
