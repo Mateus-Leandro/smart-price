@@ -4,10 +4,8 @@ import { SupabaseService } from 'src/app/shared/services/supabase.service';
 import { LoadingService } from '../services/loading.service';
 import { finalize, from, map } from 'rxjs';
 import { IDefaultPaginatorDataSource } from '../models/query.model';
-import {
-  ICompetitor,
-  IUpdateCompetitor,
-} from 'src/app/features/competitor/models/competitor.model';
+import { IUpdateCompetitor } from 'src/app/features/competitor/models/update-competitor.model';
+import { ICompetitor } from '../models/competitor';
 
 @Injectable({ providedIn: 'root' })
 export class CompetitorRepository {

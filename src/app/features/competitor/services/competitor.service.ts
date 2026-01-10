@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { IDefaultPaginatorDataSource } from 'src/app/core/models/query.model';
 import { CompetitorRepository } from 'src/app/core/repositories/competitor.repository';
-import { ICompetitor, IUpdateCompetitor } from '../models/competitor.model';
+import { IUpdateCompetitor } from '../models/update-competitor.model';
+import { ICompetitor } from 'src/app/core/models/competitor';
 
 @Injectable({
   providedIn: 'root',

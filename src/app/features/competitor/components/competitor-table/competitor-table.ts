@@ -12,7 +12,6 @@ import {
   MatTableModule,
 } from '@angular/material/table';
 import { LoadingService } from 'src/app/core/services/loading.service';
-import { ICompetitor } from '../../models/competitor.model';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 import { IconButton } from 'src/app/shared/components/icon-button/icon-button';
 import { CommonModule } from '@angular/common';
@@ -21,6 +20,7 @@ import { MatInputModule } from '@angular/material/input';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { MatButtonModule } from '@angular/material/button';
 import { ReactiveFormsModule } from '@angular/forms';
+import { ICompetitor } from 'src/app/core/models/competitor';
 
 @Component({
   selector: 'app-competitor-table',
