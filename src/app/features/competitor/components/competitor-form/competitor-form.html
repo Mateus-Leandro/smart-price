@@ -1,0 +1,17 @@
+<form [formGroup]="competitorFormGroup">
+  <div fxLayout="row" fxLayoutGap="25px">
+    @if (competitorId) {
+      <mat-form-field appearance="outline" style="width: 35%">
+        <mat-label>ID</mat-label>
+        <input type="number" matInput formControlName="id" [readonly]="!!competitorId" />
+      </mat-form-field>
+    }
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Nome</mat-label>
+      <input type="name" matInput formControlName="name" maxlength="35" />
+      @if (name.touched && name.hasError('required')) {
+        <mat-error>Campo obrigatório</mat-error>
+      }
+    </mat-form-field>
+  </div>
+</form>

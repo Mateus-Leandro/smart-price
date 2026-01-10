@@ -4,7 +4,10 @@ import { SupabaseService } from 'src/app/shared/services/supabase.service';
 import { LoadingService } from '../services/loading.service';
 import { finalize, from, map } from 'rxjs';
 import { IDefaultPaginatorDataSource } from '../models/query.model';
-import { ICompetitor } from 'src/app/features/competitor/models/competitor.model';
+import {
+  ICompetitor,
+  IUpdateCompetitor,
+} from 'src/app/features/competitor/models/competitor.model';
 
 @Injectable({ providedIn: 'root' })
 export class CompetitorRepository {
@@ -35,6 +38,26 @@ export class CompetitorRepository {
     );
   }
 
+  updateCompetitor(updateCompetitor: IUpdateCompetitor) {
+    this.loadingService.show();
+    return from(
+      this.supabase
+        .from('competitors')
+        .update({
+          name: updateCompetitor.name,
+        })
+        .eq('id', updateCompetitor.id)
+        .select()
+        .single(),
+    ).pipe(
+      map(({ data, error }) => {
+        if (error) throw error;
+        return data;
+      }),
+      finalize(() => this.loadingService.hide()),
+    );
+  }
+
   loadCompetitors(paginator: IDefaultPaginatorDataSource<ICompetitor>, search?: string) {
     const fromIdx = paginator.pageIndex * paginator.pageSize;
     const toIdx = fromIdx + paginator.pageSize - 1;
@@ -50,7 +73,7 @@ export class CompetitorRepository {
       `,
         { count: 'exact' },
       )
-      .order('created_at', { ascending: false });
+      .order('name', { ascending: true });
 
     if (search) {
       query = query.ilike('name', `%${search}%`);
@@ -69,6 +92,31 @@ export class CompetitorRepository {
         }));
 
         return { data: mappedData, count: count ?? 0 };
+      }),
+      finalize(() => this.loadingService.hide()),
+    );
+  }
+
+  getCompetitorInfoById(competitorId: number) {
+    this.loadingService.show();
+    return from(
+      this.supabase
+        .from('competitors')
+        .select(
+          `
+      id, 
+      name, 
+      created_at, 
+      updated_at
+      `,
+        )
+        .eq('id', competitorId)
+        .single(),
+    ).pipe(
+      map(({ data, error }) => {
+        if (error) throw error;
+
+        return data;
       }),
       finalize(() => this.loadingService.hide()),
     );
