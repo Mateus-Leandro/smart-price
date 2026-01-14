@@ -4,6 +4,7 @@ import { SupabaseService } from 'src/app/shared/services/supabase.service';
 import { LoadingService } from '../services/loading.service';
 import { finalize, from, map } from 'rxjs';
 import { ICompetitorBrancheView } from 'src/app/features/competitor-branche/models/competitor-branche-view.model';
+import { ICompetitorBrancheUpsert } from 'src/app/features/competitor-branche/models/competitor-branche-upsert.model';
 
 @Injectable({ providedIn: 'root' })
 export class CompetitorBrancheRepository {
@@ -26,8 +27,8 @@ export class CompetitorBrancheRepository {
           created_at
           `,
         )
-        .eq('company_branche.id', competitorId)
-        .order('company_branche(name)', { ascending: true }),
+        .eq('competitor_id', competitorId)
+        .order('company_branche(id)', { ascending: true }),
     ).pipe(
       map(({ data, error }) => {
         if (error) throw error;
@@ -40,6 +41,25 @@ export class CompetitorBrancheRepository {
         }));
 
         return mappedData;
+      }),
+      finalize(() => this.loadingService.hide()),
+    );
+  }
+
+  upsertCompetitorBranches(competitorBrancheUpsert: ICompetitorBrancheUpsert) {
+    this.loadingService.show();
+    return from(
+      this.supabase.functions.invoke('upsert-competitor-branches', {
+        method: 'POST',
+        body: JSON.stringify(competitorBrancheUpsert),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }),
+    ).pipe(
+      map(({ data, error }) => {
+        if (error) throw error;
+        return data;
       }),
       finalize(() => this.loadingService.hide()),
     );

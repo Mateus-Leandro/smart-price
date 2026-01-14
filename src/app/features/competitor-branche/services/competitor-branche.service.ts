@@ -10,4 +10,8 @@ export class CompetitorBrancheService {
   loadCompetitorBranches(competitorId: number) {
     return this.repository.loadCompetitorBranches(competitorId);
   }
+
+  upsertCompetitorBranches(competitorBrancheUpsert: any) {
+    return this.repository.upsertCompetitorBranches(competitorBrancheUpsert);
+  }
 }

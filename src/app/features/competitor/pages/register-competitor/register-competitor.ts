@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { Spinner } from 'src/app/shared/components/spinner/spinner';
 import {
   MatCard,
@@ -15,6 +15,9 @@ import { Router } from '@angular/router';
 import { FormGroup } from '@angular/forms';
 import { CompetitorService } from '../../services/competitor.service';
 import { FlexLayoutModule } from '@angular/flex-layout';
+import { ICompetitorBrancheView } from 'src/app/features/competitor-branche/models/competitor-branche-view.model';
+import { ICompetitorBrancheUpsert } from 'src/app/features/competitor-branche/models/competitor-branche-upsert.model';
+import { CompetitorBrancheService } from 'src/app/features/competitor-branche/services/competitor-branche.service';
 
 @Component({
   selector: 'app-register-competitor',
@@ -35,9 +38,11 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 })
 export class RegisterCompetitor {
   loading = inject(LoadingService).loading;
+  selectedBranches = signal<ICompetitorBrancheView[]>([]);
   constructor(
     private router: Router,
     private competitorService: CompetitorService,
+    private competitorBrancheService: CompetitorBrancheService,
   ) {}
 
   createOrUpdateCompetitors(competitorForm: FormGroup) {
@@ -48,6 +53,7 @@ export class RegisterCompetitor {
 
     const competitorId: number | null = competitorForm?.value?.id;
     const competitorName: string = competitorForm?.value?.name;
+    const selectedBranchedId = this.selectedBranches().map((branche) => branche.id);
     if (competitorId) {
       this.competitorService
         .updateCompetitor({
@@ -56,6 +62,11 @@ export class RegisterCompetitor {
         })
         .subscribe({
           next: () => {
+            const competitorBrancheUpsert: ICompetitorBrancheUpsert = {
+              competitorId: competitorId,
+              brancheIds: selectedBranchedId,
+            };
+            this.upsertCompetitorBranches(competitorBrancheUpsert);
             this.returnToCompetitors();
           },
           error: (err) => {
@@ -64,7 +75,14 @@ export class RegisterCompetitor {
         });
     } else {
       this.competitorService.createCompetitor(competitorName).subscribe({
-        next: () => {
+        next: (competitor) => {
+          if (competitor) {
+            const competitorBrancheUpsert: ICompetitorBrancheUpsert = {
+              competitorId: competitor.id,
+              brancheIds: selectedBranchedId,
+            };
+            this.upsertCompetitorBranches(competitorBrancheUpsert);
+          }
           this.returnToCompetitors();
         },
         error: (err) => {
@@ -72,6 +90,10 @@ export class RegisterCompetitor {
         },
       });
     }
+  }
+
+  upsertCompetitorBranches(competitoBrancheUpsert: ICompetitorBrancheUpsert) {
+    this.competitorBrancheService.upsertCompetitorBranches(competitoBrancheUpsert);
   }
 
   returnToCompetitors() {
