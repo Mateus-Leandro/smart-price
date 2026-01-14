@@ -35,7 +35,7 @@ export class CompanyBrancheRepository {
       `,
         { count: 'exact' },
       )
-      .order('name', { ascending: true });
+      .order('id', { ascending: true });
 
     if (search) {
       query = query.ilike('name', `%${search}%`);
