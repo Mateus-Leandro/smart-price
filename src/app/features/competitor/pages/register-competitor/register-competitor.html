@@ -10,7 +10,7 @@
     <mat-card-subtitle> Informações do concorrente </mat-card-subtitle>
   </mat-card-header>
   <mat-card-content>
-    <app-competitor-form #competitorFormRef />
+    <app-competitor-form #competitorFormRef [(competitorBrancheList)]="selectedBranches" />
   </mat-card-content>
   <mat-card-actions>
     <div fxLayout="row" fxLayoutGap="10px" class="full-width" fxLayoutAlign="end">
