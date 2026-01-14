@@ -1,0 +1,32 @@
+<mat-form-field appearance="outline" class="full-width">
+  <mat-label>Lojas</mat-label>
+  <mat-chip-grid #chipGrid>
+    @for (branche of selectedBrancheList(); track branche.id) {
+      <mat-chip-row (removed)="removeBranche(branche.id)">
+        {{ branche.name }}
+        <button matChipRemove>
+          <mat-icon>cancel</mat-icon>
+        </button>
+      </mat-chip-row>
+    }
+  </mat-chip-grid>
+
+  <input
+    matInput
+    #trigger="matAutocompleteTrigger"
+    [value]="searchBrancheName()"
+    (input)="searchBrancheName.set($any($event.target).value)"
+    (focus)="trigger.openPanel()"
+    (click)="$event.stopPropagation(); trigger.openPanel()"
+    [matChipInputFor]="chipGrid"
+    [matAutocomplete]="auto"
+  />
+
+  <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+    @for (branche of filteredBranches(); track branche.id) {
+      <mat-option [value]="branche">
+        {{ branche.name }}
+      </mat-option>
+    }
+  </mat-autocomplete>
+</mat-form-field>
