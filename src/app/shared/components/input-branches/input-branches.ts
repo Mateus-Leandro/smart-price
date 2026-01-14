@@ -14,6 +14,7 @@ import { ICompanyBrancheView } from 'src/app/features/company-branche/models/com
 import { CompanyBrancheService } from 'src/app/features/company-branche/services/company-branche.service';
 import { IDefaultPaginatorDataSource } from 'src/app/core/models/query.model';
 import { ICompetitorBrancheView } from 'src/app/features/competitor-branche/models/competitor-branche-view.model';
+type AllowedBrancheTypes = ICompanyBrancheView | ICompetitorBrancheView;
 
 @Component({
   selector: 'app-input-branches',
@@ -29,14 +30,14 @@ import { ICompetitorBrancheView } from 'src/app/features/competitor-branche/mode
   templateUrl: './input-branches.html',
   styleUrl: './input-branches.scss',
 })
-export class InputBranches implements OnInit {
+export class InputBranches<T extends AllowedBrancheTypes> implements OnInit {
   @ViewChild(MatAutocompleteTrigger) autocompleteTrigger!: MatAutocompleteTrigger;
   readonly separatorKeysCodes: number[] = [ENTER, COMMA];
-  selectedBrancheList = model<ICompanyBrancheView[] | ICompetitorBrancheView[]>([]);
-  allBrancheList = signal<ICompanyBrancheView[] | ICompetitorBrancheView[]>([]);
+  selectedBrancheList = model<T[]>([]);
+  allBrancheList = signal<T[]>([]);
   searchBrancheName = model('');
 
-  paginatorDataSource: IDefaultPaginatorDataSource<ICompanyBrancheView> = {
+  paginatorDataSource: IDefaultPaginatorDataSource<T> = {
     pageIndex: 0,
     pageSize: 99,
     records: { count: 0, data: [] },
@@ -45,10 +46,14 @@ export class InputBranches implements OnInit {
   constructor(private companyBrancheService: CompanyBrancheService) {}
 
   ngOnInit() {
-    this.companyBrancheService.loadCompanyBranches(this.paginatorDataSource).subscribe({
-      next: (response) => this.allBrancheList.set(response.data),
-      error: (err) => console.log('Erro ao carregar lojas', err),
-    });
+    this.companyBrancheService
+      .loadCompanyBranches(
+        this.paginatorDataSource as IDefaultPaginatorDataSource<ICompanyBrancheView>,
+      )
+      .subscribe({
+        next: (response) => this.allBrancheList.set(response.data as T[]),
+        error: (err) => console.log('Erro ao carregar lojas', err),
+      });
   }
 
   removeBranche(brancheId: number) {
@@ -56,7 +61,7 @@ export class InputBranches implements OnInit {
   }
 
   selected(event: MatAutocompleteSelectedEvent): void {
-    const branche = event.option.value as ICompanyBrancheView;
+    const branche = event.option.value as T;
     const currentList = this.selectedBrancheList();
 
     if (!currentList.some((b) => b.id === branche.id)) {
