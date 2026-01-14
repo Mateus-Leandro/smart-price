@@ -1,6 +1,6 @@
-import { Component, EventEmitter, inject, Output, signal } from '@angular/core';
+import { Component, EventEmitter, inject, model, Output, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CompetitorService } from '../../services/competitor.service';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { MatFormField, MatLabel } from '@angular/material/select';
@@ -13,6 +13,7 @@ import { InputBranches } from 'src/app/shared/components/input-branches/input-br
 import { CompetitorBrancheService } from 'src/app/features/competitor-branche/services/competitor-branche.service';
 import { ICompetitorBrancheView } from 'src/app/features/competitor-branche/models/competitor-branche-view.model';
 import { Spinner } from 'src/app/shared/components/spinner/spinner';
+import { switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-competitor-form',
@@ -34,7 +35,7 @@ export class CompetitorForm {
   loading = inject(LoadingService).loading;
   competitorFormGroup: FormGroup;
   competitorId: number | null = null;
-  competitorBrancheList = signal<ICompetitorBrancheView[]>([]);
+  competitorBrancheList = model<ICompetitorBrancheView[]>([]);
   paginatorDataSource: IDefaultPaginatorDataSource<ICompanyBranche> = {
     pageIndex: 0,
     pageSize: 99,
@@ -46,6 +47,7 @@ export class CompetitorForm {
     private route: ActivatedRoute,
     private competitorService: CompetitorService,
     private competitorBrancheService: CompetitorBrancheService,
+    private router: Router,
   ) {
     this.competitorFormGroup = this.fb.group({
       id: [''],
@@ -54,31 +56,43 @@ export class CompetitorForm {
   }
 
   ngOnInit() {
-    const routerId = this?.route?.snapshot?.paramMap?.get('id');
+    const routerId = Number(this?.route?.snapshot?.paramMap?.get('id'));
+
     if (routerId) {
-      this.competitorId = Number(routerId);
-    }
+      this.competitorService
+        .getCompetitorInfoById(routerId)
+        .pipe(
+          switchMap((competitor) => {
+            if (!competitor) {
+              this.handleNotFoundError();
+            }
 
-    if (this.competitorId) {
-      this.competitorService.getCompetitorInfoById(this.competitorId).subscribe((user) => {
-        this.competitorFormGroup.patchValue({
-          id: user.id,
-          name: user.name,
+            this.competitorId = competitor.id;
+            this.competitorFormGroup.patchValue({
+              id: competitor.id,
+              name: competitor.name,
+            });
+
+            return this.competitorBrancheService.loadCompetitorBranches(competitor.id);
+          }),
+        )
+        .subscribe({
+          next: (branches) => {
+            this.competitorBrancheList.set(branches);
+          },
+          error: (err) => {
+            console.error('Erro ao carregar informarções do concorrente:', err);
+            this.handleNotFoundError();
+          },
         });
-      });
-
-      this.competitorBrancheService.loadCompetitorBranches(this.competitorId).subscribe({
-        next: (response) => {
-          this.competitorBrancheList.set(response);
-        },
-        error: (err) => {
-          console.log('Erro ao carregar lojas vinculadas ao concorrente', err);
-        },
-      });
     }
   }
 
   get name() {
     return this.competitorFormGroup.get('name')!;
+  }
+
+  private handleNotFoundError() {
+    this.router.navigate(['/competitors']);
   }
 }
