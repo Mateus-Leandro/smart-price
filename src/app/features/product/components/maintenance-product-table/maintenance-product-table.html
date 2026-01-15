@@ -64,11 +64,32 @@
           <div class="element-detail-wrapper" [class.is-expanded]="element == expandedElement">
             <div class="element-detail-content">
               <div class="expanded-detail-content" fxLayout="column">
-                <div fxLayout="column" fxLayoutGap="5px">
-                  <span class="label">Margem por loja</span>
-                  <div fxLayout="row" fxLayoutGap="10px">
-                    <span></span>
-                    <span></span>
+                <div fxLayout="column" fxLayoutGap="5px" fxLayoutAlign="start start">
+                  <b class="label">Margem por loja %</b>
+
+                  <div fxLayout="row" fxLayoutAlign="space-between" class="full-width">
+                    @for (branche of companyBrancheList; track branche.id) {
+                      <div fxLayout="column">
+                        <input
+                          style="width: 55px"
+                          class="only-line"
+                          matInput
+                          type="text"
+                          maxlength="7"
+                          mask="separator.2"
+                          suffix="%"
+                          decimalMarker=","
+                          [dropSpecialCharacters]="true"
+                          [formControl]="getMarginControl(element.id, branche.id)"
+                        />
+
+                        @let control = getMarginControl(element.id, branche.id);
+                        @if (control.invalid && control.touched) {
+                          <mat-error> margem inválida</mat-error>
+                        }
+                        <p class="branch-name">{{ branche.name }}</p>
+                      </div>
+                    }
                   </div>
                 </div>
               </div>
