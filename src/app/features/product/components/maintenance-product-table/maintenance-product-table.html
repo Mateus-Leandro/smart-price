@@ -70,22 +70,38 @@
                   <div fxLayout="row" fxLayoutAlign="space-between" class="full-width">
                     @for (branche of companyBrancheList; track branche.id) {
                       <div fxLayout="column">
-                        <input
-                          style="width: 55px"
-                          class="only-line"
-                          matInput
-                          type="text"
-                          maxlength="7"
-                          mask="separator.2"
-                          suffix="%"
-                          decimalMarker=","
-                          [dropSpecialCharacters]="true"
-                          [formControl]="getMarginControl(element.id, branche.id)"
-                        />
+                        @let marginCtrl = getMarginControl(element.id, branche.id);
 
-                        @let control = getMarginControl(element.id, branche.id);
-                        @if (control.invalid && control.touched) {
-                          <mat-error> margem inválida</mat-error>
+                        @if (marginCtrl) {
+                          <input
+                            #marginInput
+                            style="width: 55px"
+                            class="only-line"
+                            matInput
+                            type="text"
+                            maxlength="7"
+                            (focus)="onFocus($event)"
+                            (blur)="
+                              onMarginBlur(
+                                element,
+                                branche,
+                                marginCtrl,
+                                marginInput.getAttribute('data-initial')
+                              )
+                            "
+                            (focusin)="
+                              marginInput.setAttribute('data-initial', marginCtrl.value.toString())
+                            "
+                            mask="separator.2"
+                            suffix="%"
+                            decimalMarker=","
+                            [dropSpecialCharacters]="true"
+                            [formControl]="marginCtrl"
+                          />
+
+                          @if (marginCtrl.invalid && marginCtrl.touched) {
+                            <mat-error> margem inválida</mat-error>
+                          }
                         }
                         <p class="branch-name">{{ branche.name }}</p>
                       </div>
