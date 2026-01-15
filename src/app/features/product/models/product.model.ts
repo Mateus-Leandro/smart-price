@@ -1,4 +1,4 @@
-import { IMarginBranche } from './product-margin-branche-view.model';
+import { IProductMarginBranche } from '../../product-margin-branche/models/product-margin-branche-view.model';
 
 export interface IProduct {
   id: number;
@@ -11,7 +11,7 @@ export interface IProduct {
 export interface IProductView {
   id: number;
   name: string;
-  marginBranches: IMarginBranche[];
+  marginBranches: IProductMarginBranche[];
   createdAt: string;
   updatedAt: string;
 }

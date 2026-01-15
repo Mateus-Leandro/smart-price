@@ -30,6 +30,8 @@ import { LoadingService } from 'src/app/core/services/loading.service';
 import { CompanyBrancheService } from 'src/app/features/company-branche/services/company-branche.service';
 import { ICompanyBrancheView } from 'src/app/features/company-branche/models/company-branch-view.model';
 import { NgxMaskDirective } from 'ngx-mask';
+import { ProductMarginBrancheService } from 'src/app/features/product-margin-branche/services/product-margin-branche.service';
+import { AuthService } from 'src/app/features/auth/services/auth.service';
 
 type BranchGroup = FormGroup<{
   brancheId: FormControl<number>;
@@ -74,6 +76,7 @@ export class MaintenanceProductTable implements OnInit {
   columnsToDisplay = ['expand', 'id', 'name', 'created_at', 'updated_at'];
   companyBrancheList: ICompanyBrancheView[] = [];
   marginFormGroup!: FormGroup;
+  companyId!: number;
 
   paginatorDataSource: IDefaultPaginatorDataSource<IProductView> = {
     pageIndex: 0,
@@ -99,20 +102,27 @@ export class MaintenanceProductTable implements OnInit {
   constructor(
     private cdr: ChangeDetectorRef,
     private productService: ProductService,
+    private authService: AuthService,
     private companyBrancheService: CompanyBrancheService,
+    private productMarginBrancheService: ProductMarginBrancheService,
     private fb: FormBuilder,
   ) {}
 
   ngOnInit(): void {
-    this.reload();
+    this.marginFormGroup = this.fb.group({
+      rows: this.fb.array([]),
+    });
+
     this.companyBrancheService
       .loadCompanyBranches(this.companyBranchePaginatorDataSource)
       .subscribe({
         next: (branches) => {
           this.companyBrancheList = branches.data;
+          this.reload();
         },
+
         error: (err) => {
-          console.error('Erro ao carregar lojas', err);
+          console.log('Erro ao carregar lojas', err);
           this.cdr.detectChanges();
         },
       });
@@ -122,9 +132,16 @@ export class MaintenanceProductTable implements OnInit {
       this.paginatorDataSource.pageIndex = 0;
       this.reload();
     });
+  }
 
-    this.marginFormGroup = this.fb.group({
-      rows: this.fb.array([]),
+  ngAfterViewInit() {
+    this.authService.getCompanyIdFromLoggedUser().subscribe({
+      next: (companyId) => {
+        this.companyId = companyId;
+      },
+      error: (err) => {
+        console.log('Erro ao carregar companyId', err);
+      },
     });
   }
 
@@ -200,15 +217,67 @@ export class MaintenanceProductTable implements OnInit {
     return row ? (row.get('marginBranches') as FormArray<BranchGroup>) : null;
   }
 
-  getMarginControl(productId: number, branchId: number): FormControl<number> {
+  getMarginControl(productId: number, branchId: number): FormControl<number> | null {
     const brancheArray = this.getBrancheArray(productId);
-    const brancheNumber = brancheArray?.controls.find(
-      (c) => c.get('brancheId')?.value === branchId,
-    );
-    return brancheNumber?.get('margin') as FormControl<number>;
+    if (!brancheArray) return null;
+
+    const brancheGroup = brancheArray.controls.find((c) => c.get('brancheId')?.value === branchId);
+    return brancheGroup ? (brancheGroup.get('margin') as FormControl<number>) : null;
   }
 
   get rows(): FormArray<ProductMarginBrancheRowForm> {
     return this.marginFormGroup.get('rows') as FormArray<ProductMarginBrancheRowForm>;
+  }
+
+  onFocus(event: FocusEvent) {
+    const input = event.target as HTMLInputElement;
+    if (input) {
+      setTimeout(() => {
+        input.select();
+      });
+    }
+  }
+
+  onMarginBlur(
+    product: IProductView,
+    branche: ICompanyBrancheView,
+    control: FormControl,
+    initialValue: any,
+  ) {
+    if (control.invalid) {
+      return;
+    }
+
+    const newMarginBranche = control.value;
+    if (Number(newMarginBranche) === Number(initialValue)) {
+      return;
+    }
+
+    if (newMarginBranche > 0) {
+      this.productMarginBrancheService
+        .upsertProductMarginBranche({
+          companyId: this.companyId,
+          brancheId: branche.id,
+          productId: product.id,
+          margin: newMarginBranche,
+        })
+        .subscribe({
+          error: (err) => {
+            console.log('Erro ao atualizar margem: ', err);
+          },
+        });
+    } else {
+      this.productMarginBrancheService
+        .deleteProductMarginBranche({
+          companyId: this.companyId,
+          brancheId: branche.id,
+          productId: product.id,
+        })
+        .subscribe({
+          error: (err) => {
+            console.log('Erro ao deletar margem: ', err);
+          },
+        });
+    }
   }
 }
