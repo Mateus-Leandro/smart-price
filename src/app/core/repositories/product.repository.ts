@@ -28,6 +28,10 @@ export class ProductRepository {
       .select(
         `id,
         name,
+        marginBranches:product_margin_branches (
+          brancheId:branche_id,
+          margin
+        ),
         created_at,
         updated_at`,
         { count: 'exact' },
@@ -43,12 +47,15 @@ export class ProductRepository {
       map(({ data, count, error }) => {
         if (error) throw error;
 
-        const mappedData: any[] = (data || []).map((item: any) => ({
-          id: item.id,
-          name: item.name,
-          createdAt: item.created_at,
-          updatedAt: item.updated_at,
-        }));
+        const mappedData: IProductView[] = (data || []).map((item: any) => {
+          return {
+            id: item.id,
+            name: item.name,
+            marginBranches: item.marginBranches || [],
+            createdAt: item.created_at,
+            updatedAt: item.updated_at,
+          };
+        });
 
         return { data: mappedData, count: count ?? 0 };
       }),

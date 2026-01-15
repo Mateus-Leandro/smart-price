@@ -1,3 +1,5 @@
+import { IMarginBranche } from './product-margin-branche-view.model';
+
 export interface IProduct {
   id: number;
   companyId: number;
@@ -9,6 +11,7 @@ export interface IProduct {
 export interface IProductView {
   id: number;
   name: string;
+  marginBranches: IMarginBranche[];
   createdAt: string;
   updatedAt: string;
 }
