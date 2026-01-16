@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, inject } from '@angular/core';
+import { Component, inject, ViewChild } from '@angular/core';
 import { UserForm } from '../../components/user-form/user-form';
 import {
   MatCard,
@@ -16,6 +16,11 @@ import { LoadingService } from 'src/app/core/services/loading.service';
 import { AuthService } from 'src/app/features/auth/services/auth.service';
 import { Router } from '@angular/router';
 import { UserService } from '../../services/user.service';
+import { IconButton } from 'src/app/shared/components/icon-button/icon-button';
+import { MatDialog } from '@angular/material/dialog';
+import { UserPasswordChangeDialog } from '../../components/user-password-change-dialog/user-password-change-dialog';
+import { User } from '@supabase/supabase-js';
+import { ForgotPasswordDialog } from 'src/app/features/auth/components/forgot-password-dialog/forgot-password-dialog';
 
 @Component({
   selector: 'app-register-user',
@@ -30,22 +35,25 @@ import { UserService } from '../../services/user.service';
     Button,
     Spinner,
     MatCardSubtitle,
+    IconButton,
   ],
   templateUrl: './register-user.html',
 })
 export class RegisterUser {
-  companyId: number = 0;
+  @ViewChild('userFormRef') userFormRef!: UserForm;
+  loggedUserInfo!: User;
   loading = inject(LoadingService).loading;
   constructor(
     private router: Router,
     private authService: AuthService,
     private userService: UserService,
+    private dialog: MatDialog,
   ) {}
 
   ngOnInit() {
-    this.authService.getCompanyIdFromLoggedUser().subscribe({
-      next: (id) => {
-        this.companyId = id;
+    this.authService.getUser().subscribe({
+      next: (user) => {
+        this.loggedUserInfo = user;
       },
     });
   }
@@ -56,15 +64,14 @@ export class RegisterUser {
       return;
     }
 
-    const userId: string | null = userForm?.value?.id;
     const user = {
       name: userForm?.value?.name,
       email: userForm?.value?.email,
       password: userForm?.value.pass,
     };
 
-    if (userId) {
-      this.userService.updateUserName(user.name, userId).subscribe({
+    if (userForm?.value?.id) {
+      this.userService.updateUserName(user.name, userForm?.value?.id).subscribe({
         error: (err) => {
           throw new Error(err);
         },
@@ -83,7 +90,8 @@ export class RegisterUser {
           },
         });
     } else {
-      if (!this.companyId) throw new Error('Não encontrado companyid para criação do usuário!');
+      if (!this?.loggedUserInfo?.app_metadata['company_id'])
+        throw new Error('Não encontrado companyid para criação do usuário!');
 
       this.authService
         .createUser({
@@ -93,7 +101,7 @@ export class RegisterUser {
             password: user.password,
           },
           company: {
-            id: this.companyId,
+            id: this?.loggedUserInfo?.app_metadata['company_id'],
           },
         })
         .subscribe({
@@ -107,7 +115,30 @@ export class RegisterUser {
     }
   }
 
+  openChangePassDialog() {
+    this.dialog.open(UserPasswordChangeDialog, {
+      minWidth: '600px',
+      disableClose: false,
+      autoFocus: true,
+      data: this.userFormRef?.userFormGroup?.getRawValue()?.email,
+    });
+  }
+
+  openForgoutPassDialog() {
+    this.dialog.open(ForgotPasswordDialog, {
+      minWidth: '600px',
+      disableClose: false,
+      autoFocus: true,
+      data: this.userFormRef?.userFormGroup?.getRawValue()?.email,
+    });
+  }
+
   returnToUsers() {
     this.router.navigate(['/users']);
+  }
+
+  get canChangePassword(): boolean {
+    const formId = this.userFormRef?.userFormGroup?.getRawValue()?.id;
+    return !!(this.loggedUserInfo && formId === this.loggedUserInfo.id);
   }
 }

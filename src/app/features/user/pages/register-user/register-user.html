@@ -13,17 +13,32 @@
     <app-user-form #userFormRef />
   </mat-card-content>
   <mat-card-actions>
-    <div fxLayout="row" fxLayoutGap="10px" class="full-width" fxLayoutAlign="end">
-      <app-button
-        text="Cancelar"
-        (click)="returnToUsers()"
-        type="button"
-        bgColor="var(--cancel-color)"
-      />
-      <app-button
-        text="Salvar"
-        (click)="createOrUpdateUser(userFormRef.userFormGroup)"
-      ></app-button>
+    <div fxLayout="row" fxLayoutAlign="space-between" class="full-width">
+      <div fxLayout="row" fxLayoutGap="10px">
+        <app-icon-button
+          icon="lock"
+          tooltipText="Alterar Senha"
+          (click)="openChangePassDialog()"
+          [disabled]="!canChangePassword"
+        />
+        <app-icon-button
+          icon="mail_lock"
+          tooltipText="Enviar email para recuperação de senha"
+          (click)="openForgoutPassDialog()"
+        />
+      </div>
+      <div fxLayout="row" fxLayoutGap="10px" fxLayoutAlign="end">
+        <app-button
+          text="Cancelar"
+          (click)="returnToUsers()"
+          type="button"
+          bgColor="var(--cancel-color)"
+        />
+        <app-button
+          text="Salvar"
+          (click)="createOrUpdateUser(userFormRef.userFormGroup)"
+        ></app-button>
+      </div>
     </div>
   </mat-card-actions>
 </mat-card>
