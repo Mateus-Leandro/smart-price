@@ -76,11 +76,14 @@
                           <input
                             #marginInput
                             style="width: 55px"
-                            class="only-line"
+                            class="only-line margin-field"
                             matInput
                             type="text"
                             maxlength="7"
                             (focus)="onFocus($event)"
+                            (keydown.enter)="
+                              marginCtrl.invalid ? null : focusNextInput($any($event))
+                            "
                             (blur)="
                               onMarginBlur(
                                 element,

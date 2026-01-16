@@ -229,6 +229,16 @@ export class MaintenanceProductTable implements OnInit {
     return this.marginFormGroup.get('rows') as FormArray<ProductMarginBrancheRowForm>;
   }
 
+  focusNextInput(event: KeyboardEvent) {
+    event.preventDefault();
+    const allInputs = Array.from(document.querySelectorAll('.margin-field')) as HTMLInputElement[];
+    const currentIndex = allInputs.indexOf(event.target as HTMLInputElement);
+    if (currentIndex < allInputs.length - 1) {
+      const nextInput = allInputs[currentIndex + 1];
+      nextInput.focus();
+    }
+  }
+
   onFocus(event: FocusEvent) {
     const input = event.target as HTMLInputElement;
     if (input) {
