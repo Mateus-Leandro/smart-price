@@ -1,11 +1,11 @@
-import { Component, inject } from '@angular/core';
+import { Component, Inject, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { FlexLayoutModule } from '@angular/flex-layout';
 
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 
 import { Button } from 'src/app/shared/components/button/button';
 import { AuthService } from '../../services/auth.service';
@@ -35,10 +35,15 @@ export class ForgotPasswordDialog {
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<ForgotPasswordDialog>,
     private authService: AuthService,
+    @Inject(MAT_DIALOG_DATA) public data?: string,
   ) {
     this.forgotPasswordFormGroup = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
+      email: [this?.data || '', [Validators.required, Validators.email]],
     });
+
+    if (this.data) {
+      this.email.disable();
+    }
   }
 
   submit() {
