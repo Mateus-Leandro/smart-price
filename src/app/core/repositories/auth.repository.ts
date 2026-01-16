@@ -57,6 +57,7 @@ export class AuthRepository {
   }
 
   sendPasswordResetEmail(email: string) {
+    this.loadingService.show();
     return from(
       this.supabase.auth.resetPasswordForEmail(email, {
         redirectTo: 'https://smart-price-omega.vercel.app/forgot_password',
@@ -65,6 +66,7 @@ export class AuthRepository {
       map(({ error }) => {
         if (error) throw error;
       }),
+      finalize(() => this.loadingService.hide()),
     );
   }
 
