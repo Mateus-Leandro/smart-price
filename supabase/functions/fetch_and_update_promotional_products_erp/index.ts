@@ -1,10 +1,15 @@
 import { serve } from 'https://deno.land/std/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js';
+import { success, fail, handleCORS } from '../shared/responses.ts';
 
 serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return handleCORS();
+  }
+
   try {
     if (req.method !== 'POST') {
-      return new Response('A Função espera um método do tipo POST', { status: 405 });
+      return fail('A Função espera um método do tipo POST', 405);
     }
 
     const supabase = createClient(
@@ -20,12 +25,12 @@ serve(async (req) => {
       error: authError,
     } = await supabase.auth.getUser();
     if (authError || !user) {
-      return new Response('Não autenticado', { status: 401 });
+      return fail('Não autenticado', 401);
     }
 
     const company_id = user.app_metadata.company_id;
     if (!company_id) {
-      return new Response('Empresa não vinculada ao usuário', { status: 403 });
+      return fail('Empresa não vinculada ao usuário', 403);
     }
 
     const body = await req.json();
@@ -49,15 +54,11 @@ serve(async (req) => {
     const { data, error } = await query;
 
     if (error) {
-      console.error('Erro na busca:', error);
-      return new Response(JSON.stringify({ error: error.message }), { status: 500 });
+      return fail('Erro ao buscar produtos: ' + error.message, 500);
     }
 
     if (!data || data.length === 0) {
-      return new Response(JSON.stringify([]), {
-        headers: { 'Content-Type': 'application/json' },
-        status: 200,
-      });
+      return sucess([]);
     }
 
     const ids = data.map((r) => r.id);
@@ -71,14 +72,11 @@ serve(async (req) => {
       .eq('company_id', company_id);
 
     if (updError) {
-      return new Response(JSON.stringify({ error: updError.message }), { status: 500 });
+      return fail('Erro ao setar data de importação: ' + updError.message, 500);
     }
 
-    return new Response(JSON.stringify(data), {
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return success(data);
   } catch (error) {
-    console.error(`Error: ${error}`);
-    return new Response(JSON.stringify({ error: 'Internal Server Error' }), { status: 500 });
+    return fail('Internal Server Error', 500);
   }
 });
