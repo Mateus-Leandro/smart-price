@@ -9,6 +9,11 @@ $medium-gray: #6b7280;
 $gray: #bebebe;
 
 $cancel-color: #b00020;
+$error-color: #ff0000;
+$success-color: #2e7d32;
+$warning-color: #ed6c02;
+$info-color: #0288d1;
+
 $no-background-color: #00000000;
 $ripple-color: #fafafa1e;
 
@@ -24,6 +29,12 @@ $ripple-color: #fafafa1e;
   --gray: #{$gray};
 
   --cancel-color: #{$cancel-color};
+
+  --error-color: #{$error-color};
+  --sucess-color: #{$success-color};
+  --warning-color: #{$warning-color};
+  --info-color: #{$info-color};
+
   --no-background-color: #{$no-background-color};
   --ripple-color: #{$ripple-color};
 }
