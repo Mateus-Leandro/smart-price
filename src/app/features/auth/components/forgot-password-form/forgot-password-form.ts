@@ -10,6 +10,7 @@ import { Router } from '@angular/router';
 import { SupabaseService } from 'src/app/shared/services/supabase.service';
 import { Spinner } from 'src/app/shared/components/spinner/spinner';
 import { AuthService } from '../../services/auth.service';
+import { NotificationService } from 'src/app/core/services/notification.service';
 
 @Component({
   selector: 'app-forgot-password-form',
@@ -35,6 +36,7 @@ export class ForgotPasswordForm {
     private fb: FormBuilder,
     private router: Router,
     private authService: AuthService,
+    private notificationService: NotificationService,
   ) {
     this.forgotPasswordFormGroup = this.fb.group(
       {
@@ -60,8 +62,7 @@ export class ForgotPasswordForm {
           this.loading = false;
         },
         error: (err) => {
-          console.log(err);
-          throw new Error(err);
+          this.notificationService.showError(`Erro ao obter usuário: ${err.message || err}`);
         },
       });
   }
@@ -89,8 +90,7 @@ export class ForgotPasswordForm {
           this.returnToLoginPage();
         },
         error: (err) => {
-          console.error('Erro ao resetar senha: ', err);
-          throw new Error(err);
+          this.notificationService.showError(`Erro ao resetar a senha: ${err.message || err}`);
         },
       });
   }

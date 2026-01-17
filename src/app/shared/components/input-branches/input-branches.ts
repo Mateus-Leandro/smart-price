@@ -14,6 +14,7 @@ import { ICompanyBrancheView } from 'src/app/features/company-branche/models/com
 import { CompanyBrancheService } from 'src/app/features/company-branche/services/company-branche.service';
 import { IDefaultPaginatorDataSource } from 'src/app/core/models/query.model';
 import { ICompetitorBrancheView } from 'src/app/features/competitor-branche/models/competitor-branche-view.model';
+import { NotificationService } from 'src/app/core/services/notification.service';
 type AllowedBrancheTypes = ICompanyBrancheView | ICompetitorBrancheView;
 
 @Component({
@@ -43,7 +44,10 @@ export class InputBranches<T extends AllowedBrancheTypes> implements OnInit {
     records: { count: 0, data: [] },
   };
 
-  constructor(private companyBrancheService: CompanyBrancheService) {}
+  constructor(
+    private companyBrancheService: CompanyBrancheService,
+    private notificationService: NotificationService,
+  ) {}
 
   ngOnInit() {
     this.companyBrancheService
@@ -52,7 +56,9 @@ export class InputBranches<T extends AllowedBrancheTypes> implements OnInit {
       )
       .subscribe({
         next: (response) => this.allBrancheList.set(response.data as T[]),
-        error: (err) => console.log('Erro ao carregar lojas', err),
+        error: (err) => {
+          this.notificationService.showError(`Erro ao buscar lojas: ${err.message || err}`);
+        },
       });
   }
 

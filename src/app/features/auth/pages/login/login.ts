@@ -17,6 +17,7 @@ import { IconButton } from 'src/app/shared/components/icon-button/icon-button';
 import { MatDialog } from '@angular/material/dialog';
 import { ForgotPasswordDialog } from '../../components/forgot-password-dialog/forgot-password-dialog';
 import { Router } from '@angular/router';
+import { NotificationService } from 'src/app/core/services/notification.service';
 
 @Component({
   selector: 'app-login',
@@ -46,6 +47,7 @@ export class Login {
     private fb: FormBuilder,
     private dialog: MatDialog,
     private router: Router,
+    private notificationService: NotificationService,
   ) {
     this.loginFormGroup = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -70,7 +72,10 @@ export class Login {
         next: () => {
           this.router.navigate(['/promotional_flyer']);
         },
-        error: () => {
+        error: (err) => {
+          this.notificationService.showError(
+            `Não foi possível realizar o login: ${err.message || err}`,
+          );
           this.loginFormGroup.setErrors({ invalidCredential: true });
           this.loginFormGroup.markAllAsTouched();
           this.loading = false;

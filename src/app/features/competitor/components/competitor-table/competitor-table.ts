@@ -21,6 +21,7 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 import { MatButtonModule } from '@angular/material/button';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ICompetitor } from 'src/app/core/models/competitor';
+import { NotificationService } from 'src/app/core/services/notification.service';
 
 @Component({
   selector: 'app-competitor-table',
@@ -63,6 +64,7 @@ export class CompetitorTable {
     private cdr: ChangeDetectorRef,
     private competitorService: CompetitorService,
     private router: Router,
+    private notificationService: NotificationService,
   ) {}
 
   ngOnInit(): void {
@@ -83,7 +85,7 @@ export class CompetitorTable {
         this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('Erro ao carregar concorrentes', err);
+        this.notificationService.showError(`Erro ao carregar concorrentes: ${err.message || err}`);
         this.cdr.detectChanges();
       },
     });

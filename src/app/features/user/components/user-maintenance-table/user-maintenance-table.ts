@@ -4,7 +4,7 @@ import { Spinner } from 'src/app/shared/components/spinner/spinner';
 import { MatFormField, MatLabel } from '@angular/material/select';
 import { MatIcon, MatIconModule } from '@angular/material/icon';
 import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
-import { CommonModule, DatePipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import {
   MatHeaderCellDef,
   MatTable,
@@ -21,6 +21,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { ReactiveFormsModule } from '@angular/forms';
 import { IconButton } from 'src/app/shared/components/icon-button/icon-button';
 import { Router } from '@angular/router';
+import { NotificationService } from 'src/app/core/services/notification.service';
 
 @Component({
   selector: 'app-user-maintenance-table',
@@ -63,6 +64,7 @@ export class UserMaintenanceTable {
     private cdr: ChangeDetectorRef,
     private userService: UserService,
     private router: Router,
+    private notificationService: NotificationService,
   ) {}
 
   ngOnInit(): void {
@@ -83,7 +85,7 @@ export class UserMaintenanceTable {
         this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('Erro ao carregar usuários', err);
+        this.notificationService.showError(`Erro ao buscar usuários: ${err.message || err}`);
         this.cdr.detectChanges();
       },
     });

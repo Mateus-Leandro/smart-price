@@ -32,6 +32,7 @@ import { ICompanyBrancheView } from 'src/app/features/company-branche/models/com
 import { NgxMaskDirective } from 'ngx-mask';
 import { ProductMarginBrancheService } from 'src/app/features/product-margin-branche/services/product-margin-branche.service';
 import { AuthService } from 'src/app/features/auth/services/auth.service';
+import { NotificationService } from 'src/app/core/services/notification.service';
 
 type BranchGroup = FormGroup<{
   brancheId: FormControl<number>;
@@ -106,6 +107,7 @@ export class MaintenanceProductTable implements OnInit {
     private companyBrancheService: CompanyBrancheService,
     private productMarginBrancheService: ProductMarginBrancheService,
     private fb: FormBuilder,
+    private notificationService: NotificationService,
   ) {}
 
   ngOnInit(): void {
@@ -122,7 +124,7 @@ export class MaintenanceProductTable implements OnInit {
         },
 
         error: (err) => {
-          console.log('Erro ao carregar lojas', err);
+          this.notificationService.showError(`Erro ao carregar lojas: ${err.message || err}`);
           this.cdr.detectChanges();
         },
       });
@@ -140,7 +142,7 @@ export class MaintenanceProductTable implements OnInit {
         this.companyId = companyId;
       },
       error: (err) => {
-        console.log('Erro ao carregar companyId', err);
+        this.notificationService.showError(`Erro ao carregar companyId: ${err.message || err}`);
       },
     });
   }
@@ -154,7 +156,7 @@ export class MaintenanceProductTable implements OnInit {
         this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('Erro ao carregar produtos', err);
+        this.notificationService.showError(`Erro ao carregar produtos: ${err.message || err}`);
         this.cdr.detectChanges();
       },
     });
@@ -273,7 +275,7 @@ export class MaintenanceProductTable implements OnInit {
         })
         .subscribe({
           error: (err) => {
-            console.log('Erro ao atualizar margem: ', err);
+            this.notificationService.showError(`Erro ao atualizar margem: ${err.message || err}`);
           },
         });
     } else {
@@ -285,7 +287,7 @@ export class MaintenanceProductTable implements OnInit {
         })
         .subscribe({
           error: (err) => {
-            console.log('Erro ao deletar margem: ', err);
+            this.notificationService.showError(`Erro ao deletar margem: ${err.message || err}`);
           },
         });
     }

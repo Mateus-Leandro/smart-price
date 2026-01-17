@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, model, Output, signal } from '@angular/core';
+import { Component, EventEmitter, inject, model, Output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CompetitorService } from '../../services/competitor.service';
@@ -14,6 +14,7 @@ import { CompetitorBrancheService } from 'src/app/features/competitor-branche/se
 import { ICompetitorBrancheView } from 'src/app/features/competitor-branche/models/competitor-branche-view.model';
 import { Spinner } from 'src/app/shared/components/spinner/spinner';
 import { switchMap } from 'rxjs';
+import { NotificationService } from 'src/app/core/services/notification.service';
 
 @Component({
   selector: 'app-competitor-form',
@@ -48,6 +49,7 @@ export class CompetitorForm {
     private competitorService: CompetitorService,
     private competitorBrancheService: CompetitorBrancheService,
     private router: Router,
+    private notificationService: NotificationService,
   ) {
     this.competitorFormGroup = this.fb.group({
       id: [''],
@@ -81,7 +83,9 @@ export class CompetitorForm {
             this.competitorBrancheList.set(branches);
           },
           error: (err) => {
-            console.error('Erro ao carregar informarções do concorrente:', err);
+            this.notificationService.showError(
+              `Erro ao carregar informarções do concorrente: ${err.message || err}`,
+            );
             this.handleNotFoundError();
           },
         });

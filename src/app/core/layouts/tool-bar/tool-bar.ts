@@ -4,6 +4,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { User } from '@supabase/supabase-js';
 import { AuthService } from 'src/app/features/auth/services/auth.service';
 import { IconButton } from 'src/app/shared/components/icon-button/icon-button';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-tool-bar',
@@ -16,6 +17,7 @@ export class ToolBar {
   constructor(
     private authService: AuthService,
     private cdr: ChangeDetectorRef,
+    private notificationService: NotificationService,
   ) {}
   @Output() menuClick = new EventEmitter<void>();
 
@@ -33,8 +35,7 @@ export class ToolBar {
           this.cdr.detectChanges();
         },
         error: (err) => {
-          console.log('Erro ao obter usuário: ', err);
-          throw new Error(err);
+          this.notificationService.showError(`Erro ao obter usuário: ${err.message || err}`);
         },
       });
   }

@@ -95,7 +95,7 @@ export class UserRepository {
         .single(),
     ).pipe(
       map(({ data, error }) => {
-        if (error) throw new Error();
+        if (error) throw error;
 
         return data;
       }),
