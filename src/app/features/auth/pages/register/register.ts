@@ -11,6 +11,7 @@ import { Button } from 'src/app/shared/components/button/button';
 import { FormGroup } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { IRegisterCompanyAndUser } from 'src/app/core/models/auth.model';
+import { NotificationService } from 'src/app/core/services/notification.service';
 
 @Component({
   selector: 'app-register',
@@ -32,6 +33,7 @@ export class Register {
     private router: Router,
     private authService: AuthService,
     private cdr: ChangeDetectorRef,
+    private notificationService: NotificationService,
   ) {}
   loading = false;
 
@@ -83,17 +85,17 @@ export class Register {
               this.router.navigate(['/promotional_flyer']);
             },
             error: (err) => {
-              console.log('Erro ao realizar login:', err);
+              this.notificationService.showError(
+                `Não foi possível realizar o login: ${err.message || err}`,
+              );
               this.cdr.detectChanges();
-              throw new Error(err);
             },
           });
         },
         error: (err) => {
-          console.log('Erro ao criar usuário:', err);
+          this.notificationService.showError(`Erro ao criar usuário: ${err.message || err}`);
           this.loading = false;
           this.cdr.detectChanges();
-          throw new Error(err);
         },
       });
   }

@@ -14,6 +14,7 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { IDefaultPaginatorDataSource } from 'src/app/core/models/query.model';
 import { IPromotionalFlyerView } from '../../models/flyer-view.model';
 import { LoadingService } from 'src/app/core/services/loading.service';
+import { NotificationService } from 'src/app/core/services/notification.service';
 
 @Component({
   selector: 'app-promotional-flyer-table',
@@ -52,7 +53,7 @@ export class PromotionalFlyerTable {
     private promotionalFlyerService: PromotionalFlyerService,
     private cdr: ChangeDetectorRef,
     private router: Router,
-    private dataPipe: DatePipe,
+    private notificationService: NotificationService,
   ) {}
 
   ngOnInit(): void {
@@ -93,7 +94,7 @@ export class PromotionalFlyerTable {
         this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('Erro ao carregar registros', err);
+        this.notificationService.showError(`Erro ao buscar cotações: ${err.message || err}`);
         this.cdr.detectChanges();
       },
     });

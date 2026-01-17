@@ -10,6 +10,7 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 import { MatIconModule } from '@angular/material/icon';
 import { PasswordMatchValidator } from 'src/app/shared/validators/password-match.validator';
 import { switchMap } from 'rxjs';
+import { NotificationService } from 'src/app/core/services/notification.service';
 
 @Component({
   selector: 'app-user-password-change-dialog',
@@ -36,6 +37,7 @@ export class UserPasswordChangeDialog {
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<UserPasswordChangeDialog>,
     private authService: AuthService,
+    private notificationService: NotificationService,
     @Inject(MAT_DIALOG_DATA) public email: string,
   ) {
     this.userPasswordChangeGroup = this.fb.group(
@@ -68,7 +70,7 @@ export class UserPasswordChangeDialog {
           this.dialogRef.close(true);
         },
         error: (err) => {
-          console.log('Erro ao alterar senha', err);
+          this.notificationService.showError(`Erro ao alterar senha: ${err.message || err}`);
         },
       });
   }

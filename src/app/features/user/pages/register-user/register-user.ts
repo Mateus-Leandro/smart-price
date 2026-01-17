@@ -21,6 +21,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { UserPasswordChangeDialog } from '../../components/user-password-change-dialog/user-password-change-dialog';
 import { User } from '@supabase/supabase-js';
 import { ForgotPasswordDialog } from 'src/app/features/auth/components/forgot-password-dialog/forgot-password-dialog';
+import { NotificationService } from 'src/app/core/services/notification.service';
 
 @Component({
   selector: 'app-register-user',
@@ -48,6 +49,7 @@ export class RegisterUser {
     private authService: AuthService,
     private userService: UserService,
     private dialog: MatDialog,
+    private notificationService: NotificationService,
   ) {}
 
   ngOnInit() {
@@ -73,7 +75,7 @@ export class RegisterUser {
     if (userForm?.value?.id) {
       this.userService.updateUserName(user.name, userForm?.value?.id).subscribe({
         error: (err) => {
-          throw new Error(err);
+          this.notificationService.showError(`Erro ao atualizar usuário: ${err.message || err}`);
         },
       });
 
@@ -86,7 +88,7 @@ export class RegisterUser {
             this.returnToUsers();
           },
           error: (err) => {
-            throw new Error(err);
+            this.notificationService.showError(`Erro ao atualizar usuário: ${err.message || err}`);
           },
         });
     } else {
@@ -109,7 +111,7 @@ export class RegisterUser {
             this.returnToUsers();
           },
           error: (err) => {
-            throw new Error(err);
+            this.notificationService.showError(`Erro ao criar usuário: ${err.message || err}`);
           },
         });
     }

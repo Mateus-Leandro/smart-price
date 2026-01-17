@@ -37,6 +37,7 @@ import { IconButton } from 'src/app/shared/components/icon-button/icon-button';
 import { IDefaultPaginatorDataSource } from 'src/app/core/models/query.model';
 import { IPromotionalFlyerProductsView } from '../../models/flyer-view.model';
 import { LoadingService } from 'src/app/core/services/loading.service';
+import { NotificationService } from 'src/app/core/services/notification.service';
 
 type FlyerRowForm = FormGroup<{
   salePrice: FormControl<string | null>;
@@ -109,6 +110,7 @@ export class PromotionalFlyerProductTable {
     private cdr: ChangeDetectorRef,
     private route: ActivatedRoute,
     private fb: FormBuilder,
+    private notificationService: NotificationService,
   ) {}
 
   ngOnInit(): void {
@@ -144,7 +146,9 @@ export class PromotionalFlyerProductTable {
         this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error(`Erro ao buscar produtos do encarte ${flyerId}`, err);
+        this.notificationService.showError(
+          `Erro ao buscar produtos do encarte ${flyerId}: ${err.message || err}`,
+        );
         this.cdr.detectChanges();
       },
     });
@@ -239,7 +243,11 @@ export class PromotionalFlyerProductTable {
       this.promotionalFlyerService
         .updateSalePrice(this.flyerId, productId, numericPrice)
         .subscribe({
-          error: (error) => console.error('Falha ao atualizar preço:', error),
+          error: (err) => {
+            this.notificationService.showError(
+              `Erro ao atualizar preço. Item: ${productId} | Erro: ${err.message || err}`,
+            );
+          },
         });
     }
   }
@@ -256,8 +264,10 @@ export class PromotionalFlyerProductTable {
     this.sendingProductId = productId;
 
     this.promotionalFlyerService.sendPricesToErp(this.flyerId, productId).subscribe({
-      error: (error) => {
-        console.error('Erro ao enviar preço:', error);
+      error: (err) => {
+        this.notificationService.showError(
+          `Erro ao marcar preço para ser enviado ao ERP. Produto: ${productId} | Erro: ${err.message || err}`,
+        );
       },
       complete: () => {
         this.sendingProductId = null;

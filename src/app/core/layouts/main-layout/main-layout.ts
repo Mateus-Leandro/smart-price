@@ -8,6 +8,7 @@ import { MatIcon } from '@angular/material/icon';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { AuthService } from 'src/app/features/auth/services/auth.service';
 import { IItensMenuDrawer } from '../../models/menu-drawer.model';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-main-layout',
@@ -28,6 +29,7 @@ import { IItensMenuDrawer } from '../../models/menu-drawer.model';
 })
 export class MainLayout {
   constructor(
+    private notificationService: NotificationService,
     private authService: AuthService,
     private router: Router,
   ) {}
@@ -69,8 +71,7 @@ export class MainLayout {
           this.router.navigate(['/login']);
         },
         error: (err) => {
-          console.log('Erro ao realizar logout: ', err);
-          throw new Error(err);
+          this.notificationService.showError(`Erro ao realizar logout: ${err.message || err}`);
         },
       });
   }

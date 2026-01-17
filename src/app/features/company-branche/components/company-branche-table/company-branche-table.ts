@@ -13,6 +13,7 @@ import { CompanyBrancheService } from '../../services/company-branche.service';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { MatInputModule } from '@angular/material/input';
 import { CnpjPipe } from 'src/app/shared/pipes/cnpj/cnpj-pipe';
+import { NotificationService } from 'src/app/core/services/notification.service';
 
 @Component({
   selector: 'app-company-branche-table',
@@ -39,7 +40,10 @@ export class CompanyBrancheTable {
   dataSource = new MatTableDataSource<ICompanyBrancheView>([]);
   private search$ = new Subject<string>();
 
-  constructor(private companyBrancheService: CompanyBrancheService) {}
+  constructor(
+    private companyBrancheService: CompanyBrancheService,
+    private notificationService: NotificationService,
+  ) {}
 
   paginatorDataSource: IDefaultPaginatorDataSource<ICompanyBrancheView> = {
     pageIndex: 0,
@@ -67,7 +71,7 @@ export class CompanyBrancheTable {
         this.dataSource.data = response.data;
       },
       error: (err) => {
-        console.error('Erro ao carregar filiais', err);
+        this.notificationService.showError(`Erro ao carregar filiais: ${err.message || err}`);
       },
     });
   }

@@ -18,6 +18,7 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 import { ICompetitorBrancheView } from 'src/app/features/competitor-branche/models/competitor-branche-view.model';
 import { ICompetitorBrancheUpsert } from 'src/app/features/competitor-branche/models/competitor-branche-upsert.model';
 import { CompetitorBrancheService } from 'src/app/features/competitor-branche/services/competitor-branche.service';
+import { NotificationService } from 'src/app/core/services/notification.service';
 
 @Component({
   selector: 'app-register-competitor',
@@ -43,6 +44,7 @@ export class RegisterCompetitor {
     private router: Router,
     private competitorService: CompetitorService,
     private competitorBrancheService: CompetitorBrancheService,
+    private notificationService: NotificationService,
   ) {}
 
   createOrUpdateCompetitors(competitorForm: FormGroup) {
@@ -70,7 +72,9 @@ export class RegisterCompetitor {
             this.returnToCompetitors();
           },
           error: (err) => {
-            throw new Error(err);
+            this.notificationService.showError(
+              `Erro ao atualizar informações do concorrente: ${err.message || err}`,
+            );
           },
         });
     } else {
@@ -86,14 +90,20 @@ export class RegisterCompetitor {
           this.returnToCompetitors();
         },
         error: (err) => {
-          throw new Error(err);
+          this.notificationService.showError(`Erro ao criar concorrente: ${err.message || err}`);
         },
       });
     }
   }
 
   upsertCompetitorBranches(competitoBrancheUpsert: ICompetitorBrancheUpsert) {
-    this.competitorBrancheService.upsertCompetitorBranches(competitoBrancheUpsert);
+    this.competitorBrancheService.upsertCompetitorBranches(competitoBrancheUpsert).subscribe({
+      error: (err) => {
+        this.notificationService.showError(
+          `Erro ao vincular lojas ao concorrente: ${err.message || err}`,
+        );
+      },
+    });
   }
 
   returnToCompetitors() {
