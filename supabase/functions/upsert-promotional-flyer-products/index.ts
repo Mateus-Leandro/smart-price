@@ -1,17 +1,20 @@
 import { serve } from 'https://deno.land/std@0.192.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { success, fail, handleCORS } from '../shared/responses.ts';
 
 serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return handleCORS();
+  }
+
   try {
     if (req.method !== 'POST') {
-      return new Response('A Função espera um método do tipo POST', { status: 405 });
+      return fail('Método não permitido', 405);
     }
 
     const payload = await req.json();
     if (!Array.isArray(payload)) {
-      return new Response(JSON.stringify({ error: 'Payload enviado não é um array!' }), {
-        status: 400,
-      });
+      return fail('Payload enviado não é um array!', 400);
     }
 
     const supabase = createClient(
@@ -27,12 +30,12 @@ serve(async (req) => {
       error: authError,
     } = await supabase.auth.getUser();
     if (authError || !user) {
-      return new Response('Não autenticado', { status: 401 });
+      return fail('Não autenticado', 401);
     }
 
     const company_id = user.app_metadata.company_id;
     if (!company_id) {
-      return new Response('Não encontrado empresa vinculada ao usuário!', { status: 400 });
+      return fail('Não encontrado empresa vinculada ao usuário!', 400);
     }
 
     const results: any[] = [];
@@ -52,12 +55,9 @@ serve(async (req) => {
       } = item;
 
       if (!promotional_flyer_id || (!product_id && !product_name)) {
-        return new Response(JSON.stringify({ error: 'Campos obrigatórios ausentes', item }), {
-          status: 400,
-        });
+        return fail('Campos obrigatórios ausentes', 400);
       }
 
-      // Verifica se o produto existe NESTA empresa (Chave Composta)
       const { data: existingProduct } = await supabase
         .from('products')
         .select('id')
@@ -65,7 +65,6 @@ serve(async (req) => {
         .eq('company_id', company_id)
         .maybeSingle();
 
-      // Cria produto se não existir para esta empresa
       if (!existingProduct) {
         const { error: productError } = await supabase.from('products').insert({
           id: product_id,
@@ -74,14 +73,10 @@ serve(async (req) => {
         });
 
         if (productError) {
-          console.error('Erro ao criar produto:', productError);
-          return new Response(JSON.stringify({ error: 'Erro ao criar produto', productError }), {
-            status: 500,
-          });
+          return fail('Erro ao criar produto', 500);
         }
       }
 
-      // Upsert do fornecedor
       const { data, upsertSupplierError } = await supabase
         .from('suppliers')
         .upsert(
@@ -99,22 +94,12 @@ serve(async (req) => {
         .single();
 
       if (upsertSupplierError) {
-        console.error(
-          `Erro ao realizar upsert do fornecedor ${quote_supplier_id}:`,
-          upsertSupplierError,
-        );
-        return new Response(
-          JSON.stringify({
-            error: `Erro ao realizar upsert do fornecedor ${quote_supplier_id}:`,
-            upsertSupplierError,
-          }),
-          {
-            status: 500,
-          },
+        return new fail(
+          `Erro ao realizar upsert do fornecedor ${quote_supplier_id}: ${upsertSupplierError}`,
+          500,
         );
       }
 
-      // Upsert flyer x product
       const { data: flyerProduct, error: flyerError } = await supabase
         .from('promotional_flyer_products')
         .upsert(
@@ -136,10 +121,7 @@ serve(async (req) => {
         .single();
 
       if (flyerError) {
-        console.error('Erro no vínculo:', flyerError);
-        return new Response(JSON.stringify({ error: 'Erro ao vincular produto', flyerError }), {
-          status: 500,
-        });
+        return fail('Erro ao vincular produto', 500);
       }
 
       results.push({
@@ -149,10 +131,8 @@ serve(async (req) => {
       });
     }
 
-    return new Response(JSON.stringify({ success: true, results }), {
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return success(results);
   } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), { status: 500 });
+    return fail(`Erro ao atualizar produtos do encarte: ${err.message}`, 500);
   }
 });

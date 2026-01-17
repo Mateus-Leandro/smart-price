@@ -1,43 +1,16 @@
 import { createClient } from 'npm:@supabase/supabase-js@2.39.0';
+import { corsHeaders } from '../shared/cors.ts';
+import { success, fail, handleCORS } from '../shared/responses.ts';
 
-// ----------------------
-// Headers CORS
-// ----------------------
-export const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
-
-// ----------------------
-// Respostas
-// ----------------------
-const success = (body: any) =>
-  new Response(JSON.stringify({ success: true, ...body }), {
-    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-  });
-
-const fail = (msg: string, status = 400) =>
-  new Response(JSON.stringify({ success: false, message: msg }), {
-    status,
-    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-  });
-
-// ----------------------
-// Edge Function
-// ----------------------
 Deno.serve(async (req) => {
-  // 🔹 Preflight OPTIONS
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
+    return handleCORS();
   }
 
   try {
-    // 🔹 Ler corpo JSON
     const body = await req.json();
-    console.log('📥 Payload recebido:', body);
 
     if (!body.company || !body.user) {
-      console.log('❌ Payload inválido');
       return fail('Payload inválido. Envie { company, user }.');
     }
 
@@ -48,17 +21,10 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
     );
 
-    console.log('🔐 Supabase Client criado');
-
     let finalCompanyId = company?.id ?? null;
     let createdCompany: any = null;
 
-    // ------------------------------------------------------------
-    // 1️⃣ Criar empresa SE não tiver ID
-    // ------------------------------------------------------------
     if (!finalCompanyId) {
-      console.log('🔎 Verificando CNPJ:', company.cnpj);
-
       const { data: companyExists, error: checkErr } = await supabase
         .from('companys')
         .select('id, name, cnpj')
@@ -66,16 +32,12 @@ Deno.serve(async (req) => {
         .maybeSingle();
 
       if (checkErr) {
-        console.log('❌ Erro ao consultar empresa:', checkErr);
-        return fail('Erro ao verificar CNPJ.');
+        return fail('Erro ao verificar CNPJ. ' + checkErr);
       }
 
       if (companyExists) {
-        console.log('❌ CNPJ já cadastrado');
         return fail('Já existe uma empresa cadastrada com este CNPJ.');
       }
-
-      console.log('🏗 Criando empresa...');
 
       const { data: createdCompanyData, error: empresaErr } = await supabase
         .from('companys')
@@ -87,15 +49,12 @@ Deno.serve(async (req) => {
         .single();
 
       if (empresaErr) {
-        console.log('❌ Erro criando empresa:', empresaErr);
         return fail('Erro ao criar empresa: ' + empresaErr.message);
       }
 
-      console.log('🏢 Empresa criada:', createdCompanyData);
       finalCompanyId = createdCompanyData.id;
       createdCompany = createdCompanyData;
     } else {
-      // Se já existe um company_id, recuperar os dados da empresa
       const { data: existingCompany, error: existingErr } = await supabase
         .from('companys')
         .select('id, name, cnpj')
@@ -103,17 +62,11 @@ Deno.serve(async (req) => {
         .single();
 
       if (existingErr) {
-        console.log('❌ Erro ao recuperar empresa existente:', existingErr);
-        return fail('Erro ao recuperar dados da empresa.');
+        return fail('Erro ao recuperar dados da empresa.' + existingErr);
       }
 
       createdCompany = existingCompany;
     }
-
-    // ------------------------------------------------------------
-    // 2️⃣ Criar usuário auth
-    // ------------------------------------------------------------
-    console.log('👤 Criando usuário auth:', user.email);
 
     const { data: authUser, error: authErr } = await supabase.auth.admin.createUser({
       email: user.email,
@@ -122,9 +75,6 @@ Deno.serve(async (req) => {
     });
 
     if (authErr) {
-      console.log('❌ Erro createUser:', authErr);
-      console.log('❌ Mensagem erro:', authErr.message);
-      console.log(JSON.stringify(user));
       if (authErr.message.includes('address has already been registered')) {
         return fail('O e-mail informado já está em uso.');
       }
@@ -143,13 +93,6 @@ Deno.serve(async (req) => {
       },
     });
 
-    console.log('👤 Auth user criado, ID:', createdUserId);
-
-    // ------------------------------------------------------------
-    // 3️⃣ Atualizar tabela public.users
-    // ------------------------------------------------------------
-    console.log('🔗 Atualizando users.company_id');
-
     const { error: updateUserErr } = await supabase
       .from('users')
       .update({
@@ -160,13 +103,9 @@ Deno.serve(async (req) => {
       .eq('id', createdUserId);
 
     if (updateUserErr) {
-      console.log('❌ Erro update users:', updateUserErr);
       return fail('Usuário criado, mas falhou ao vincular empresa: ' + updateUserErr.message);
     }
 
-    console.log('🎉 Cadastro completo!');
-
-    // Retornar o objeto com user e company
     const createdUser = {
       id: createdUserId,
       email: user.email,
@@ -178,7 +117,6 @@ Deno.serve(async (req) => {
       company: createdCompany,
     });
   } catch (err) {
-    console.log('💥 Erro inesperado:', err);
     return fail('Erro inesperado: ' + err.message, 500);
   }
 });

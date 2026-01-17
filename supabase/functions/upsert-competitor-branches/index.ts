@@ -1,19 +1,15 @@
 import { serve } from 'https://deno.land/std@0.192.0/http/server.ts';
 import { createClient } from 'jsr:@supabase/supabase-js@2';
-
-export const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { success, fail, handleCORS } from '../shared/responses.ts';
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
+    return handleCORS();
   }
 
   try {
     if (req.method !== 'POST') {
-      return new Response('A Função espera um método do tipo POST', { status: 405 });
+      return fail('Método não permitido', 405);
     }
 
     const supabase = createClient(
@@ -28,18 +24,19 @@ serve(async (req) => {
       data: { user },
       error: authError,
     } = await supabase.auth.getUser();
+
     if (authError || !user) {
-      return new Response('Não autenticado', { status: 401 });
+      return fail('Não autenticado', 401);
     }
 
     const companyId = user.app_metadata.company_id;
     if (!companyId) {
-      return new Response('Empresa não vinculada ao usuário', { status: 403 });
+      return fail('Empresa não vinculada', 403);
     }
 
     const { competitorId, brancheIds } = await req.json();
     if (!competitorId) {
-      return new Response('Necessário informar competitorId', { status: 400 });
+      return fail('competitorId obrigatório', 400);
     }
 
     const { error: deleteError } = await supabase
@@ -67,18 +64,8 @@ serve(async (req) => {
       resultData = data;
     }
 
-    return new Response(
-      JSON.stringify({ message: 'Filiais vinculadas ao concorrente:', data: resultData }),
-      { headers: { 'Content-Type': 'application/json' }, status: 200 },
-    );
+    return success(resultData);
   } catch (error) {
-    console.error(`Error: ${error.message}`);
-    return new Response(
-      JSON.stringify({ error: error.message || 'Erro ao vincular filiais ao concorrente!' }),
-      {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' },
-      },
-    );
+    return fail(error.message);
   }
 });
