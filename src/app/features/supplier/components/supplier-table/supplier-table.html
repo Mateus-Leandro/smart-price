@@ -1,0 +1,66 @@
+<div class="table-container" fxLayout="column">
+  <div class="table-wrapper">
+    @if (loading()) {
+      <div class="spinner-overlay">
+        <app-spinner />
+      </div>
+    }
+
+    <div fxLayout="row" fxLayoutGap="15px" style="padding-top: 10px">
+      <mat-form-field appearance="outline" class="full-width" style="margin-top: 10px">
+        <mat-label>Pesquisar fornecedor pelo nome</mat-label>
+        <input
+          matInput
+          type="search"
+          (input)="onSearch($event)"
+          placeholder="Ex: Nome do concorrente"
+        />
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <table mat-table [dataSource]="dataSource" matSort class="default-table zebra-simple">
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
+        <td mat-cell *matCellDef="let element">{{ element.id }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Nome</th>
+        <td mat-cell *matCellDef="let element">{{ element.name }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="cnpj">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>CNPJ</th>
+        <td mat-cell *matCellDef="let element">{{ element.cnpj | cnpj }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="created_at">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Criado em</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.createdAt | date: 'dd/MM/yyyy HH:mm' }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="updated_at">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Alterado em</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.updatedAt | date: 'dd/MM/yyyy HH:mm' }}
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+      <tr mat-row *matRowDef="let row; columns: columnsToDisplay" style="cursor: pointer"></tr>
+    </table>
+
+    <mat-paginator
+      [length]="paginatorDataSource.records.count"
+      [pageSize]="paginatorDataSource.pageSize"
+      [pageIndex]="paginatorDataSource.pageIndex"
+      [pageSizeOptions]="[5, 10, 25, 50, 100]"
+      (page)="onPageChange($event)"
+      showFirstLastButtons
+    >
+    </mat-paginator>
+  </div>
+</div>

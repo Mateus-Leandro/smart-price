@@ -41,6 +41,11 @@ export class MainLayout {
       icon: 'domain',
     },
     {
+      router: '/suppliers',
+      textNav: 'Fornecedores',
+      icon: 'local_shipping',
+    },
+    {
       router: '/competitors',
       textNav: 'Concorrentes',
       icon: 'groups_3',

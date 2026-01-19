@@ -19,6 +19,12 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'suppliers',
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./features/supplier/pages/supplier/supplier').then((m) => m.Supplier),
+      },
+      {
         path: 'competitors',
         canActivate: [authGuard],
         loadComponent: () =>
