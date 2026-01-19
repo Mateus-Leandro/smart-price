@@ -13,6 +13,7 @@ import { SupplierService } from '../../services/supplier.service';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { CnpjPipe } from '../../../../shared/pipes/cnpj/cnpj-pipe';
+import { DeliveryTypePipe } from '../../../../shared/pipes/delivery-type/delivery-type-pipe';
 
 @Component({
   selector: 'app-supplier-table',
@@ -24,13 +25,14 @@ import { CnpjPipe } from '../../../../shared/pipes/cnpj/cnpj-pipe';
     MatTableModule,
     MatIconModule,
     CnpjPipe,
+    DeliveryTypePipe,
   ],
   templateUrl: './supplier-table.html',
   styleUrl: '../../../../global/styles/_tables.scss',
 })
 export class SupplierTable {
   loading = inject(LoadingService).loading;
-  columnsToDisplay = ['id', 'name', 'cnpj', 'created_at', 'updated_at'];
+  columnsToDisplay = ['id', 'name', 'delivery_type', 'cnpj', 'created_at', 'updated_at'];
   dataSource = new MatTableDataSource<ISupplierView>([]);
   searchTerm = '';
 

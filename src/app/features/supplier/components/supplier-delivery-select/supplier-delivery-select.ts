@@ -1,6 +1,6 @@
 import { Component, model } from '@angular/core';
 import { MatFormField, MatLabel, MatSelect } from '@angular/material/select';
-import { SupplierDeliveryType } from '../../enums/supplier-delivery-type.enum';
+import { SupplierDeliveryTypeEnum } from '../../enums/supplier-delivery-type.enum';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 
 @Component({
@@ -10,10 +10,12 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
   styleUrl: './supplier-delivery-select.scss',
 })
 export class SupplierDeliverySelect {
-  selectedValue = model<SupplierDeliveryType>();
+  selectedValue = model<SupplierDeliveryTypeEnum>();
 
-  public SupplierDeliveryTypeList = Object.entries(SupplierDeliveryType).map(([key, value]) => ({
-    label: key,
-    value: value,
-  }));
+  public SupplierDeliveryTypeList = Object.entries(SupplierDeliveryTypeEnum).map(
+    ([key, value]) => ({
+      label: key,
+      value: value,
+    }),
+  );
 }

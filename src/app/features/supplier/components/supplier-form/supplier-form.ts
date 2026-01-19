@@ -8,7 +8,7 @@ import { SupplierService } from '../../services/supplier.service';
 import { NotificationService } from 'src/app/core/services/notification.service';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { SupplierDeliverySelect } from '../supplier-delivery-select/supplier-delivery-select';
-import { SupplierDeliveryType } from '../../enums/supplier-delivery-type.enum';
+import { SupplierDeliveryTypeEnum } from '../../enums/supplier-delivery-type.enum';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
@@ -40,7 +40,7 @@ export class SupplierForm {
     this.supplierFormGroup = this.fb.group({
       id: [''],
       name: [''],
-      supplierDeliveryType: [SupplierDeliveryType.PORTA],
+      supplierDeliveryType: [SupplierDeliveryTypeEnum.PORTA],
     });
   }
 
