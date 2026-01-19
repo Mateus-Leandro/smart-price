@@ -81,12 +81,14 @@ export class AuthRepository {
   }
 
   getUser() {
+    this.loadingService.show();
     return from(this.supabase.auth.getUser()).pipe(
       map(({ data, error }) => {
         if (error) throw error;
 
         return data.user;
       }),
+      finalize(() => this.loadingService.hide()),
     );
   }
 
