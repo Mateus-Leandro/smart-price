@@ -1,14 +1,17 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, EventEmitter, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, inject, Output } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormField, MatLabel } from '@angular/material/select';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { PasswordMatchValidator } from 'src/app/shared/validators/password-match.validator';
 import { UserService } from '../../services/user.service';
+import { NotificationService } from 'src/app/core/services/notification.service';
+import { Spinner } from 'src/app/shared/components/spinner/spinner';
+import { LoadingService } from 'src/app/core/services/loading.service';
 
 @Component({
   selector: 'app-user-form',
@@ -21,11 +24,13 @@ import { UserService } from '../../services/user.service';
     CommonModule,
     MatLabel,
     MatIconModule,
+    Spinner,
   ],
   templateUrl: './user-form.html',
 })
 export class UserForm {
   @Output() submitForm = new EventEmitter<FormGroup>();
+  loading = inject(LoadingService).loading;
 
   userFormGroup: FormGroup;
   userId: string | null = null;
@@ -35,6 +40,8 @@ export class UserForm {
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
     private userService: UserService,
+    private router: Router,
+    private notificationService: NotificationService,
   ) {
     this.userFormGroup = this.fb.group(
       {
@@ -56,17 +63,30 @@ export class UserForm {
   ngOnInit() {
     this.userId = this?.route?.snapshot?.paramMap?.get('id');
     if (this.userId) {
-      this.userService.getUserInfoByUserId(this.userId).subscribe((user) => {
-        this.userFormGroup.patchValue({
-          id: this.userId,
-          email: user.email,
-          name: user.name,
-        });
-        this.userFormGroup.get('pass')?.disable();
-        this.userFormGroup.get('confirmationPass')?.disable();
+      this.userService.getUserInfoByUserId(this.userId).subscribe({
+        next: (user) => {
+          this.userFormGroup.patchValue({
+            id: this.userId,
+            email: user.email,
+            name: user.name,
+          });
+          this.userFormGroup.get('pass')?.disable();
+          this.userFormGroup.get('confirmationPass')?.disable();
+        },
+        error: (err) => {
+          this.notificationService.showError(
+            `Erro ao carregar informações do usuário: ${err.message || err}`,
+          );
+          this.handleNotFoundError();
+        },
       });
     }
   }
+
+  private handleNotFoundError() {
+    this.router.navigate(['/users']);
+  }
+
   onSubmit() {
     this.userFormGroup.markAllAsTouched();
     if (this.userFormGroup.invalid) return;

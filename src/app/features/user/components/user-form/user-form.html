@@ -1,3 +1,9 @@
+@if (loading()) {
+  <div class="spinner-overlay">
+    <app-spinner />
+  </div>
+}
+
 <form [formGroup]="userFormGroup">
   <div fxLayout="column" fxLayoutGap="10px">
     <div fxLayout="row" fxLayoutGap="25px">
