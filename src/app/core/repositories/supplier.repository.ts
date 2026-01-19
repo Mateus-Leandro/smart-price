@@ -4,7 +4,8 @@ import { SupabaseService } from 'src/app/shared/services/supabase.service';
 import { LoadingService } from '../services/loading.service';
 import { IDefaultPaginatorDataSource } from '../models/query.model';
 import { finalize, from, map, Observable } from 'rxjs';
-import { ISupplierView } from 'src/app/features/supplier/model/supplie-view.model';
+import { ISupplierView } from 'src/app/features/supplier/model/supplier-view.model';
+import { IUpdateSupplier } from 'src/app/features/supplier/model/supplier-update.model';
 
 @Injectable({ providedIn: 'root' })
 export class SupplierRepository {
@@ -84,6 +85,25 @@ export class SupplierRepository {
         if (error) throw error;
 
         return data;
+      }),
+      finalize(() => this.loadingService.hide()),
+    );
+  }
+
+  updateSupplier(supplierUpdate: IUpdateSupplier) {
+    this.loadingService.show();
+    return from(
+      this.supabase
+        .from('suppliers')
+        .update({
+          delivery_type: supplierUpdate.deliveryType,
+        })
+        .eq('id', supplierUpdate.supplierId)
+        .select()
+        .single(),
+    ).pipe(
+      map(({ error }) => {
+        if (error) throw error;
       }),
       finalize(() => this.loadingService.hide()),
     );

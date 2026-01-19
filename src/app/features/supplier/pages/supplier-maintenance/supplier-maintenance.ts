@@ -4,9 +4,12 @@ import { MatCardModule } from '@angular/material/card';
 import { SupplierForm } from '../../components/supplier-form/supplier-form';
 import { Button } from 'src/app/shared/components/button/button';
 import { LoadingService } from 'src/app/core/services/loading.service';
-import { Route, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { FormGroup } from '@angular/forms';
 import { FlexLayoutModule } from '@angular/flex-layout';
+import { SupplierService } from '../../services/supplier.service';
+import { IUpdateSupplier } from '../../model/supplier-update.model';
+import { NotificationService } from 'src/app/core/services/notification.service';
 
 @Component({
   selector: 'app-supplier-maintenance',
@@ -16,17 +19,28 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 })
 export class SupplierMaintenance {
   loading = inject(LoadingService).loading;
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private supplierService: SupplierService,
+    private notificationService: NotificationService,
+  ) {}
 
   saveSupplier(supplierFormGroup: FormGroup) {
-    if (supplierFormGroup.invalid) {
-      supplierFormGroup.markAllAsTouched();
-      return;
-    }
+    console.log(supplierFormGroup.get('supplierDeliveryType')?.value);
+    const updateSupplier: IUpdateSupplier = {
+      deliveryType: supplierFormGroup.get('supplierDeliveryType')?.value,
+      supplierId: supplierFormGroup.getRawValue().id,
+    };
+    this.supplierService.updateSupplier(updateSupplier).subscribe({
+      next: () => {
+        this.notificationService.showSuccess('Fornecedor salvo com sucesso!');
+      },
+      error: (err) => {
+        this.notificationService.showError(`Erro ao atualizar fornecedor: ${err.message || err}`);
+      },
+    });
 
     this.returnToSuppliers();
-
-    console.log(supplierFormGroup.get('supplierDeliveryType')?.value);
   }
 
   returnToSuppliers() {

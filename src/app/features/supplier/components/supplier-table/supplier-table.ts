@@ -3,7 +3,7 @@ import { Spinner } from 'src/app/shared/components/spinner/spinner';
 import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { ISupplierView } from '../../model/supplie-view.model';
+import { ISupplierView } from '../../model/supplier-view.model';
 import { LoadingService } from 'src/app/core/services/loading.service';
 import { IDefaultPaginatorDataSource } from 'src/app/core/models/query.model';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
