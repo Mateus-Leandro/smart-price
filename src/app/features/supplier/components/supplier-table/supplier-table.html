@@ -30,6 +30,11 @@
         <td mat-cell *matCellDef="let element">{{ element.name }}</td>
       </ng-container>
 
+      <ng-container matColumnDef="delivery_type">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Tipo de Frete</th>
+        <td mat-cell *matCellDef="let element">{{ element.deliveryType | deliveryType }}</td>
+      </ng-container>
+
       <ng-container matColumnDef="cnpj">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>CNPJ</th>
         <td mat-cell *matCellDef="let element">{{ element.cnpj | cnpj }}</td>

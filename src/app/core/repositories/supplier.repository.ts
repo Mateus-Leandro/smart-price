@@ -31,6 +31,7 @@ export class SupplierRepository {
         id,
         name,
         cnpj,
+        delivery_type,
         created_at,
         updated_at
         `,
@@ -51,6 +52,7 @@ export class SupplierRepository {
           return {
             id: item.id,
             name: item.name,
+            deliveryType: item.delivery_type,
             cnpj: item.cnpj,
             createdAt: item.created_at,
             updatedAt: item.updated_at,
