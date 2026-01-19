@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -12,6 +12,8 @@ import { FormGroup } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { IRegisterCompanyAndUser } from 'src/app/core/models/auth.model';
 import { NotificationService } from 'src/app/core/services/notification.service';
+import { LoadingService } from 'src/app/core/services/loading.service';
+import { Spinner } from 'src/app/shared/components/spinner/spinner';
 
 @Component({
   selector: 'app-register',
@@ -24,6 +26,7 @@ import { NotificationService } from 'src/app/core/services/notification.service'
     CompanyRegisterForm,
     UserRegisterForm,
     Button,
+    Spinner,
   ],
   templateUrl: './register.html',
   styleUrls: ['./register.scss'],
@@ -35,7 +38,7 @@ export class Register {
     private cdr: ChangeDetectorRef,
     private notificationService: NotificationService,
   ) {}
-  loading = false;
+  loading = inject(LoadingService).loading;
 
   nextTab(tabs: MatTabGroup, companyForm: FormGroup) {
     if (companyForm.invalid) {
@@ -74,7 +77,6 @@ export class Register {
       },
     };
 
-    this.loading = true;
     this.authService
       .createUser(newUser)
       .pipe()
@@ -94,7 +96,6 @@ export class Register {
         },
         error: (err) => {
           this.notificationService.showError(`Erro ao criar usuário: ${err.message || err}`);
-          this.loading = false;
           this.cdr.detectChanges();
         },
       });
