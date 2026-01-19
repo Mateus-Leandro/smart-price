@@ -61,4 +61,31 @@ export class SupplierRepository {
       finalize(() => this.loadingService.hide()),
     );
   }
+
+  getSupplierInfoById(supplierId: number) {
+    this.loadingService.show();
+    return from(
+      this.supabase
+        .from('suppliers')
+        .select(
+          `
+        id,
+        name,
+        cnpj,
+        deliveryType:delivery_type,
+        createdAt:created_at,
+        updatedAt:updated_at
+       `,
+        )
+        .eq('id', supplierId)
+        .single(),
+    ).pipe(
+      map(({ data, error }) => {
+        if (error) throw error;
+
+        return data;
+      }),
+      finalize(() => this.loadingService.hide()),
+    );
+  }
 }

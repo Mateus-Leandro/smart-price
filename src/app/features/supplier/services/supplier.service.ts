@@ -12,4 +12,8 @@ export class SupplierService {
   getSuppliers(paginator: IDefaultPaginatorDataSource<ISupplierView>, search?: string) {
     return this.repository.getSuppliers(paginator, search);
   }
+
+  getSupplierInfoById(supplierId: number) {
+    return this.repository.getSupplierInfoById(supplierId);
+  }
 }

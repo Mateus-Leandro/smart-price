@@ -59,7 +59,7 @@ export class SupplierTable {
     });
   }
 
-  loadCompetitors(paginator: IDefaultPaginatorDataSource<ISupplierView>, search?: string) {
+  loadSuppliers(paginator: IDefaultPaginatorDataSource<ISupplierView>, search?: string) {
     this.supplierService.getSuppliers(paginator, search).subscribe({
       next: (response) => {
         this.paginatorDataSource.records = response;
@@ -85,14 +85,10 @@ export class SupplierTable {
   }
 
   private reload(): void {
-    this.loadCompetitors(this.paginatorDataSource, this.searchTerm);
+    this.loadSuppliers(this.paginatorDataSource, this.searchTerm);
   }
 
-  createCompetitor() {
-    this.router.navigate(['competitors/form']);
-  }
-
-  navigateToCompetitorForm(competitorId: number) {
-    this.router.navigate(['competitors/form', competitorId]);
+  navigateToSupplierForm(supplierId: number) {
+    this.router.navigate(['suppliers/form', supplierId]);
   }
 }

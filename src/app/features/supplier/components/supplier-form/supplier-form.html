@@ -1,0 +1,38 @@
+@if (loading()) {
+  <div class="spinner-overlay">
+    <app-spinner />
+  </div>
+}
+
+<form [formGroup]="supplierFormGroup">
+  <div fxLayout="column" fxLayoutGap="10px">
+    <div fxLayout="row" fxLayoutGap="25px" class="full-width">
+      <div fxLayout="column" style="width: 290px">
+        <mat-form-field appearance="outline" style="width: 100%">
+          <mat-label>ID</mat-label>
+          <input type="number" matInput formControlName="id" />
+        </mat-form-field>
+
+        <app-supplier-delivery-select
+          [(selectedValue)]="supplierFormGroup.controls['supplierDeliveryType'].value"
+          style="width: 100%"
+        />
+      </div>
+
+      <div fxFlex>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Nome</mat-label>
+          <input type="text" matInput formControlName="name" />
+        </mat-form-field>
+      </div>
+    </div>
+    @if (supplierDeliveryType?.value === 'PAID') {
+      <div fxLayout="row" fxLayoutGap="5px" style="color: var(--primary)">
+        <mat-icon style="font-size: 18px; width: 18px; height: 18px">info</mat-icon>
+        <span class="mat-caption" style="font-weight: 500"
+          >Fornecedores BH possuem taxa de frete.</span
+        >
+      </div>
+    }
+  </div>
+</form>

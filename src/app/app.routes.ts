@@ -19,6 +19,14 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'suppliers/form/:id',
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./features/supplier/pages/supplier-maintenance/supplier-maintenance').then(
+            (m) => m.SupplierMaintenance,
+          ),
+      },
+      {
         path: 'suppliers',
         canActivate: [authGuard],
         loadComponent: () =>

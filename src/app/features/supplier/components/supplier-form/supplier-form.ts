@@ -1,0 +1,88 @@
+import { Component, EventEmitter, inject, Output } from '@angular/core';
+import { Spinner } from 'src/app/shared/components/spinner/spinner';
+import { MatInputModule } from '@angular/material/input';
+import { LoadingService } from 'src/app/core/services/loading.service';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { SupplierService } from '../../services/supplier.service';
+import { NotificationService } from 'src/app/core/services/notification.service';
+import { FlexLayoutModule } from '@angular/flex-layout';
+import { SupplierDeliverySelect } from '../supplier-delivery-select/supplier-delivery-select';
+import { SupplierDeliveryType } from '../../enums/supplier-delivery-type.enum';
+import { MatIconModule } from '@angular/material/icon';
+
+@Component({
+  selector: 'app-supplier-form',
+  imports: [
+    Spinner,
+    MatInputModule,
+    ReactiveFormsModule,
+    FlexLayoutModule,
+    SupplierDeliverySelect,
+    MatIconModule,
+  ],
+  templateUrl: './supplier-form.html',
+  styleUrl: './supplier-form.scss',
+})
+export class SupplierForm {
+  @Output() submitForm = new EventEmitter<FormGroup>();
+  loading = inject(LoadingService).loading;
+  supplierFormGroup: FormGroup;
+  supplierId: number | null = null;
+
+  constructor(
+    private fb: FormBuilder,
+    private route: ActivatedRoute,
+    private supplierService: SupplierService,
+    private router: Router,
+    private notificationService: NotificationService,
+  ) {
+    this.supplierFormGroup = this.fb.group({
+      id: [''],
+      name: [''],
+      supplierDeliveryType: [SupplierDeliveryType.PORTA],
+    });
+  }
+
+  ngOnInit() {
+    const routerId = Number(this?.route?.snapshot?.paramMap?.get('id'));
+
+    if (routerId) {
+      this.supplierService.getSupplierInfoById(routerId).subscribe({
+        next: (supplier) => {
+          if (!supplier) {
+            this.handleNotFoundError();
+          }
+
+          this.supplierId = supplier.id;
+          this.supplierFormGroup.patchValue({
+            id: supplier.id,
+            name: supplier.name,
+            supplierDeliveryType: supplier.deliveryType,
+          });
+
+          this.supplierFormGroup.get('id')?.disable();
+          this.supplierFormGroup.get('name')?.disable();
+        },
+        error: (err) => {
+          this.notificationService.showError(
+            `Erro ao carregar informarções do fornecedor: ${err.message || err}`,
+          );
+          this.handleNotFoundError();
+        },
+      });
+    }
+  }
+
+  get name() {
+    return this.supplierFormGroup.get('name')!;
+  }
+
+  get supplierDeliveryType() {
+    return this.supplierFormGroup.get('supplierDeliveryType');
+  }
+
+  private handleNotFoundError() {
+    this.router.navigate(['/suppliers']);
+  }
+}
