@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormArray,
@@ -33,6 +33,10 @@ import { NgxMaskDirective } from 'ngx-mask';
 import { ProductMarginBrancheService } from 'src/app/features/product-margin-branche/services/product-margin-branche.service';
 import { AuthService } from 'src/app/features/auth/services/auth.service';
 import { NotificationService } from 'src/app/core/services/notification.service';
+import { IconButton } from 'src/app/shared/components/icon-button/icon-button';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MarginFilterEnum } from '../../enums/margin-filter.enum';
 
 type BranchGroup = FormGroup<{
   brancheId: FormControl<number>;
@@ -65,11 +69,17 @@ type ProductMarginBrancheRowForm = FormGroup<{
     MatTableModule,
     NgxMaskDirective,
     ReactiveFormsModule,
+    IconButton,
+    MatMenuModule,
+    MatTooltipModule,
   ],
   templateUrl: './maintenance-product-table.html',
   styleUrl: '../../../../global/styles/_tables.scss',
 })
 export class MaintenanceProductTable implements OnInit {
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  currentFilter: MarginFilterEnum = MarginFilterEnum.ALL;
+  protected readonly MarginFilterEnum = MarginFilterEnum;
   loading = inject(LoadingService).loading;
   searchTerm = '';
   dataSource = new MatTableDataSource<IProductView>([]);
@@ -147,8 +157,12 @@ export class MaintenanceProductTable implements OnInit {
     });
   }
 
-  loadProducts(paginator: IDefaultPaginatorDataSource<IProductView>, search?: string) {
-    this.productService.loadProducts(paginator, search).subscribe({
+  loadProducts(
+    paginator: IDefaultPaginatorDataSource<IProductView>,
+    marginFilter: MarginFilterEnum,
+    search?: string,
+  ) {
+    this.productService.loadProducts(paginator, marginFilter, search).subscribe({
       next: (response) => {
         this.paginatorDataSource.records = response;
         this.dataSource.data = response.data;
@@ -174,7 +188,7 @@ export class MaintenanceProductTable implements OnInit {
   }
 
   private reload(): void {
-    this.loadProducts(this.paginatorDataSource, this.searchTerm);
+    this.loadProducts(this.paginatorDataSource, this.currentFilter, this.searchTerm);
   }
 
   toggleRow(row: IProductView): void {
@@ -290,6 +304,29 @@ export class MaintenanceProductTable implements OnInit {
             this.notificationService.showError(`Erro ao deletar margem: ${err.message || err}`);
           },
         });
+    }
+  }
+
+  setFilter(filter: MarginFilterEnum) {
+    if (this.currentFilter === filter) return;
+
+    this.currentFilter = filter;
+
+    if (this.paginatorDataSource) {
+      this.paginator.firstPage();
+    }
+
+    this.loadProducts(this.paginatorDataSource, this.currentFilter, this.searchTerm);
+  }
+
+  getFilterLabel(): string {
+    switch (this.currentFilter) {
+      case MarginFilterEnum.WITH_MARGIN:
+        return 'Só com margem';
+      case MarginFilterEnum.WITHOUT_MARGIN:
+        return 'Só sem margem';
+      default:
+        return 'Todos';
     }
   }
 }
