@@ -79,8 +79,8 @@ export class Register {
       .createUser(newUser)
       .pipe()
       .subscribe({
-        next: (data) => {
-          this.authService.login(data.user.email, newUser.user.password).subscribe({
+        next: (response) => {
+          this.authService.login(response.data.user.email, newUser.user.password).subscribe({
             next: () => {
               this.router.navigate(['/promotional_flyer']);
             },
