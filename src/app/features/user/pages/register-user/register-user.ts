@@ -72,8 +72,10 @@ export class RegisterUser {
       password: userForm?.value.pass,
     };
 
-    if (userForm?.value?.id) {
-      this.userService.updateUserName(user.name, userForm?.value?.id).subscribe({
+    const userId = userForm?.getRawValue()?.id;
+
+    if (userId) {
+      this.userService.updateUserName(user.name, userId).subscribe({
         error: (err) => {
           this.notificationService.showError(`Erro ao atualizar usuário: ${err.message || err}`);
         },
