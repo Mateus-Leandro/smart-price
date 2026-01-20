@@ -1,0 +1,16 @@
+<app-icon-button
+  icon="filter_list"
+  [matMenuTriggerFor]="filterMenu"
+  [tooltipText]="completTollTipText()"
+>
+  <mat-menu #filterMenu="matMenu">
+    @for (item of filterOptionsWithAll; track $index) {
+      <button mat-menu-item (click)="selectedFilter.set(item.value)">
+        <mat-icon>
+          {{ selectedFilter() === item.value ? 'radio_button_checked' : 'radio_button_unchecked' }}
+        </mat-icon>
+        <span>{{ item.label }}</span>
+      </button>
+    }
+  </mat-menu>
+</app-icon-button>
