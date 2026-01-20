@@ -38,6 +38,7 @@ import { IDefaultPaginatorDataSource } from 'src/app/core/models/query.model';
 import { IPromotionalFlyerProductsView } from '../../models/flyer-view.model';
 import { LoadingService } from 'src/app/core/services/loading.service';
 import { NotificationService } from 'src/app/core/services/notification.service';
+import { MatTooltip } from '@angular/material/tooltip';
 
 type FlyerRowForm = FormGroup<{
   salePrice: FormControl<string | null>;
@@ -60,6 +61,7 @@ type FlyerRowForm = FormGroup<{
     ReactiveFormsModule,
     NgxMaskDirective,
     IconButton,
+    MatTooltip,
   ],
   templateUrl: './promotional-flyer-product-table.html',
   styleUrl: '../../../../global/styles/_tables.scss',
