@@ -6,6 +6,7 @@ import { IDefaultPaginatorDataSource } from '../models/query.model';
 import { finalize, from, map, Observable } from 'rxjs';
 import { ISupplierView } from 'src/app/features/supplier/model/supplier-view.model';
 import { IUpdateSupplier } from 'src/app/features/supplier/model/supplier-update.model';
+import { SupplierDeliveryTypeEnum } from 'src/app/features/supplier/enums/supplier-delivery-type.enum';
 
 @Injectable({ providedIn: 'root' })
 export class SupplierRepository {
@@ -19,6 +20,7 @@ export class SupplierRepository {
 
   getSuppliers(
     paginator: IDefaultPaginatorDataSource<ISupplierView>,
+    deliveryType: null | SupplierDeliveryTypeEnum,
     search?: string,
   ): Observable<{ data: ISupplierView[]; count: number }> {
     const fromIdx = paginator.pageIndex * paginator.pageSize;
@@ -41,6 +43,10 @@ export class SupplierRepository {
 
     if (search) {
       query = query.ilike('name', `%${search}%`);
+    }
+
+    if (deliveryType) {
+      query = query.eq('delivery_type', deliveryType);
     }
 
     this.loadingService.show();

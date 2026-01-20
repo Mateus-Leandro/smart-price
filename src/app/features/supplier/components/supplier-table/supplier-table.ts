@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, effect, inject, signal } from '@angular/core';
 import { Spinner } from 'src/app/shared/components/spinner/spinner';
 import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
@@ -14,6 +14,10 @@ import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { CnpjPipe } from '../../../../shared/pipes/cnpj/cnpj-pipe';
 import { DeliveryTypePipe } from '../../../../shared/pipes/delivery-type/delivery-type-pipe';
+import { IconFilterButton } from 'src/app/shared/components/icon-filter-button/icon-filter-button';
+import { FlexLayoutModule } from '@angular/flex-layout';
+import { SupplierDeliveryTypeEnum } from '../../enums/supplier-delivery-type.enum';
+import { IFilterOptions } from 'src/app/shared/components/icon-filter-button/icon-filter-list';
 
 @Component({
   selector: 'app-supplier-table',
@@ -26,6 +30,8 @@ import { DeliveryTypePipe } from '../../../../shared/pipes/delivery-type/deliver
     MatIconModule,
     CnpjPipe,
     DeliveryTypePipe,
+    IconFilterButton,
+    FlexLayoutModule,
   ],
   templateUrl: './supplier-table.html',
   styleUrl: '../../../../global/styles/_tables.scss',
@@ -35,7 +41,14 @@ export class SupplierTable {
   columnsToDisplay = ['id', 'name', 'delivery_type', 'cnpj', 'created_at', 'updated_at'];
   dataSource = new MatTableDataSource<ISupplierView>([]);
   searchTerm = '';
+  filterOptions: IFilterOptions<SupplierDeliveryTypeEnum>[] = Object.entries(
+    SupplierDeliveryTypeEnum,
+  ).map(([key, value]) => ({
+    label: key,
+    value: value,
+  }));
 
+  selectedDeliveryFilterType = signal<null | SupplierDeliveryTypeEnum>(null);
   paginatorDataSource: IDefaultPaginatorDataSource<ISupplierView> = {
     pageIndex: 0,
     pageSize: 10,
@@ -49,20 +62,33 @@ export class SupplierTable {
     private supplierService: SupplierService,
     private router: Router,
     private notificationService: NotificationService,
-  ) {}
-
-  ngOnInit(): void {
-    this.reload();
-
-    this.search$.pipe(debounceTime(300), distinctUntilChanged()).subscribe((value) => {
-      this.searchTerm = value;
+  ) {
+    effect(() => {
+      const filterValue = this.selectedDeliveryFilterType();
       this.paginatorDataSource.pageIndex = 0;
-      this.reload();
+
+      this.reload(filterValue);
     });
   }
 
-  loadSuppliers(paginator: IDefaultPaginatorDataSource<ISupplierView>, search?: string) {
-    this.supplierService.getSuppliers(paginator, search).subscribe({
+  aplicarFiltro(filterValue: any) {
+    console.log(filterValue);
+  }
+
+  ngOnInit(): void {
+    this.search$.pipe(debounceTime(300), distinctUntilChanged()).subscribe((value) => {
+      this.searchTerm = value;
+      this.paginatorDataSource.pageIndex = 0;
+      this.reload(this.selectedDeliveryFilterType());
+    });
+  }
+
+  loadSuppliers(
+    paginator: IDefaultPaginatorDataSource<ISupplierView>,
+    deliveryType: null | SupplierDeliveryTypeEnum,
+    search?: string,
+  ) {
+    this.supplierService.getSuppliers(paginator, deliveryType, search).subscribe({
       next: (response) => {
         this.paginatorDataSource.records = response;
         this.dataSource.data = response.data;
@@ -83,11 +109,11 @@ export class SupplierTable {
   onPageChange(event: PageEvent): void {
     this.paginatorDataSource.pageSize = event.pageSize;
     this.paginatorDataSource.pageIndex = event.pageIndex;
-    this.reload();
+    this.reload(this.selectedDeliveryFilterType());
   }
 
-  private reload(): void {
-    this.loadSuppliers(this.paginatorDataSource, this.searchTerm);
+  private reload(deliveryType: null | SupplierDeliveryTypeEnum): void {
+    this.loadSuppliers(this.paginatorDataSource, deliveryType, this.searchTerm);
   }
 
   navigateToSupplierForm(supplierId: number) {

@@ -17,6 +17,12 @@
         />
         <mat-icon matSuffix>search</mat-icon>
       </mat-form-field>
+      <app-icon-filter-button
+        [itemsOptions]="filterOptions"
+        [(selectedFilter)]="selectedDeliveryFilterType"
+        toolTipText="Tipo de frete"
+        style="padding-top: 7px"
+      />
     </div>
 
     <table mat-table [dataSource]="dataSource" matSort class="default-table zebra-simple">
