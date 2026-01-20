@@ -87,10 +87,11 @@ export class ForgotPasswordForm {
       .pipe()
       .subscribe({
         next: () => {
+          this.notificationService.showSuccess(`Senha alterada com sucesso!`);
           this.returnToLoginPage();
         },
         error: (err) => {
-          this.notificationService.showError(`Erro ao resetar a senha: ${err.message || err}`);
+          this.notificationService.showError(`Erro ao alterar a senha: ${err.message || err}`);
         },
       });
   }

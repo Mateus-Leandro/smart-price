@@ -87,6 +87,7 @@ export class RegisterUser {
         })
         .subscribe({
           next: () => {
+            this.notificationService.showSuccess(`Usuário atualizado com sucesso!`);
             this.returnToUsers();
           },
           error: (err) => {
@@ -111,6 +112,7 @@ export class RegisterUser {
         .subscribe({
           next: () => {
             this.returnToUsers();
+            this.notificationService.showSuccess(`Usuário criado com sucesso`);
           },
           error: (err) => {
             this.notificationService.showError(`Erro ao criar usuário: ${err.message || err}`);

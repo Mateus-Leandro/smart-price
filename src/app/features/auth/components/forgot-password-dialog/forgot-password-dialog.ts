@@ -11,6 +11,7 @@ import { Button } from 'src/app/shared/components/button/button';
 import { AuthService } from '../../services/auth.service';
 import { Spinner } from 'src/app/shared/components/spinner/spinner';
 import { LoadingService } from 'src/app/core/services/loading.service';
+import { NotificationService } from 'src/app/core/services/notification.service';
 
 @Component({
   selector: 'app-forgot-password-dialog',
@@ -35,6 +36,7 @@ export class ForgotPasswordDialog {
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<ForgotPasswordDialog>,
     private authService: AuthService,
+    private notificationService: NotificationService,
     @Inject(MAT_DIALOG_DATA) public data?: string,
   ) {
     this.forgotPasswordFormGroup = this.fb.group({
@@ -49,12 +51,22 @@ export class ForgotPasswordDialog {
   submit() {
     if (this.forgotPasswordFormGroup.invalid) return;
 
+    const email = this.forgotPasswordFormGroup.value.email;
+
     this.authService
-      .sendPasswordResetEmail(this.forgotPasswordFormGroup.value.email)
+      .sendPasswordResetEmail(email)
       .pipe()
       .subscribe({
         next: () => {
+          this.notificationService.showSuccess(
+            `Enviado link para recuperação da senha no email: ${email}`,
+          );
           this.cancel();
+        },
+        error: (err) => {
+          this.notificationService.showError(
+            `Erro ao enviar link para recuperação da senha: ${err.message || err}`,
+          );
         },
       });
   }

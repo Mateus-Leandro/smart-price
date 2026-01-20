@@ -70,6 +70,7 @@ export class RegisterCompetitor {
             };
             this.upsertCompetitorBranches(competitorBrancheUpsert);
             this.returnToCompetitors();
+            this.notificationService.showSuccess(`Concorrente atualizado com sucesso!`);
           },
           error: (err) => {
             this.notificationService.showError(
@@ -86,6 +87,7 @@ export class RegisterCompetitor {
               brancheIds: selectedBranchedId,
             };
             this.upsertCompetitorBranches(competitorBrancheUpsert);
+            this.notificationService.showSuccess(`Concorrente criado corretamente!`);
           }
           this.returnToCompetitors();
         },

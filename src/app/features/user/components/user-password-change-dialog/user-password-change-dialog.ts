@@ -68,6 +68,7 @@ export class UserPasswordChangeDialog {
       .subscribe({
         next: () => {
           this.dialogRef.close(true);
+          this.notificationService.showSuccess(`Senha alterada com sucesso!`);
         },
         error: (err) => {
           this.notificationService.showError(`Erro ao alterar senha: ${err.message || err}`);

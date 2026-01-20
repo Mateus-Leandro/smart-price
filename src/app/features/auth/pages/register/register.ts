@@ -84,6 +84,7 @@ export class Register {
         next: (response) => {
           this.authService.login(response.data.user.email, newUser.user.password).subscribe({
             next: () => {
+              this.notificationService.showSuccess(`Usuário criado com sucesso!`);
               this.router.navigate(['/promotional_flyer']);
             },
             error: (err) => {
