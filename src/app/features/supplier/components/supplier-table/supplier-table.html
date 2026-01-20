@@ -6,8 +6,8 @@
       </div>
     }
 
-    <div fxLayout="row" fxLayoutGap="15px" style="padding-top: 10px">
-      <mat-form-field appearance="outline" class="full-width" style="margin-top: 10px">
+    <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px" style="padding: 10px 0px">
+      <mat-form-field appearance="outline" class="full-width" subscriptSizing="dynamic">
         <mat-label>Pesquisar fornecedor pelo nome</mat-label>
         <input
           matInput
@@ -21,7 +21,6 @@
         [itemsOptions]="filterOptions"
         [(selectedFilter)]="selectedDeliveryFilterType"
         toolTipText="Tipo de frete"
-        style="padding-top: 7px"
       />
     </div>
 

@@ -12,7 +12,7 @@ export class DeliveryTypePipe implements PipeTransform {
       case SupplierDeliveryTypeEnum.BH:
         return 'BH';
       case SupplierDeliveryTypeEnum.PORTA:
-        return 'Porta';
+        return 'PORTA';
       default:
         return '';
     }
