@@ -13,6 +13,7 @@ import { IconButton } from '../icon-button/icon-button';
 export class IconFilterButton<T> {
   @Input() itemsOptions: IFilterOptions<T>[] = [];
   @Input() toolTipText: string = 'Filtro';
+  @Input() showOptionAll: boolean = false;
   selectedFilter = model<T | null>(null);
   filterOptionsWithAll: { label: string; value: any }[] = [];
 
@@ -23,6 +24,16 @@ export class IconFilterButton<T> {
   });
 
   ngOnInit() {
-    this.filterOptionsWithAll = [{ label: 'Todos', value: null }, ...this.itemsOptions];
+    if (this.showOptionAll) {
+      this.filterOptionsWithAll = [{ label: 'Todos', value: null }, ...this.itemsOptions];
+    } else {
+      this.filterOptionsWithAll = this.itemsOptions;
+    }
+  }
+
+  getElementIcon(item: IFilterOptions<T>) {
+    return this.selectedFilter() === item.value || (!this.selectedFilter() && !item.value)
+      ? 'radio_button_checked'
+      : 'radio_button_unchecked';
   }
 }

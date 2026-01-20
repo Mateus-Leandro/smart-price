@@ -7,7 +7,7 @@
     @for (item of filterOptionsWithAll; track $index) {
       <button mat-menu-item (click)="selectedFilter.set(item.value)">
         <mat-icon>
-          {{ selectedFilter() === item.value ? 'radio_button_checked' : 'radio_button_unchecked' }}
+          {{ getElementIcon(item) }}
         </mat-icon>
         <span>{{ item.label }}</span>
       </button>

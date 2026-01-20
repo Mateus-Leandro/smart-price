@@ -18,6 +18,7 @@
         <mat-icon matSuffix>search</mat-icon>
       </mat-form-field>
       <app-icon-filter-button
+        [showOptionAll]="true"
         [itemsOptions]="filterOptions"
         [(selectedFilter)]="selectedDeliveryFilterType"
         toolTipText="Tipo de frete"
