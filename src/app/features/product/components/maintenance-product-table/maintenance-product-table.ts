@@ -1,4 +1,12 @@
-import { ChangeDetectorRef, Component, inject, OnInit, ViewChild } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  inject,
+  OnInit,
+  signal,
+  ViewChild,
+  effect,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormArray,
@@ -13,7 +21,6 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 import { IProductView } from 'src/app/features/product/models/product.model';
 import { IDefaultPaginatorDataSource } from 'src/app/core/models/query.model';
 import { ProductService } from '../../services/product.service';
-import { TableColumn } from 'src/app/core/models/table-app.model';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { Spinner } from 'src/app/shared/components/spinner/spinner';
 import { MatFormField, MatLabel } from '@angular/material/select';
@@ -33,10 +40,11 @@ import { NgxMaskDirective } from 'ngx-mask';
 import { ProductMarginBrancheService } from 'src/app/features/product-margin-branche/services/product-margin-branche.service';
 import { AuthService } from 'src/app/features/auth/services/auth.service';
 import { NotificationService } from 'src/app/core/services/notification.service';
-import { IconButton } from 'src/app/shared/components/icon-button/icon-button';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MarginFilterEnum } from '../../enums/margin-filter.enum';
+import { IconFilterButton } from 'src/app/shared/components/icon-filter-button/icon-filter-button';
+import { IFilterOptions } from 'src/app/shared/components/icon-filter-button/icon-filter-list';
 
 type BranchGroup = FormGroup<{
   brancheId: FormControl<number>;
@@ -69,16 +77,15 @@ type ProductMarginBrancheRowForm = FormGroup<{
     MatTableModule,
     NgxMaskDirective,
     ReactiveFormsModule,
-    IconButton,
     MatMenuModule,
     MatTooltipModule,
+    IconFilterButton,
   ],
   templateUrl: './maintenance-product-table.html',
   styleUrl: '../../../../global/styles/_tables.scss',
 })
 export class MaintenanceProductTable implements OnInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
-  currentFilter: MarginFilterEnum = MarginFilterEnum.ALL;
   protected readonly MarginFilterEnum = MarginFilterEnum;
   loading = inject(LoadingService).loading;
   searchTerm = '';
@@ -88,6 +95,13 @@ export class MaintenanceProductTable implements OnInit {
   companyBrancheList: ICompanyBrancheView[] = [];
   marginFormGroup!: FormGroup;
   companyId!: number;
+
+  selectedMarginFilterType = signal<MarginFilterEnum>(MarginFilterEnum.ALL);
+
+  filterOptions: IFilterOptions<MarginFilterEnum>[] = [
+    { label: 'Com Margem', value: MarginFilterEnum.WITH_MARGIN },
+    { label: 'Sem Margem', value: MarginFilterEnum.WITHOUT_MARGIN },
+  ];
 
   paginatorDataSource: IDefaultPaginatorDataSource<IProductView> = {
     pageIndex: 0,
@@ -101,13 +115,6 @@ export class MaintenanceProductTable implements OnInit {
     records: { data: [], count: 0 },
   };
 
-  tableColumns: TableColumn[] = [
-    { key: 'id', label: 'ID' },
-    { key: 'name', label: 'Nome' },
-    { key: 'createdAt', label: 'Criado em', type: 'date' },
-    { key: 'updatedAt', label: 'Alterado em', type: 'date' },
-  ];
-
   private search$ = new Subject<string>();
 
   constructor(
@@ -118,21 +125,27 @@ export class MaintenanceProductTable implements OnInit {
     private productMarginBrancheService: ProductMarginBrancheService,
     private fb: FormBuilder,
     private notificationService: NotificationService,
-  ) {}
+  ) {
+    effect(() => {
+      const filterValue = this.selectedMarginFilterType();
+      if (this.companyBrancheList.length > 0) {
+        this.paginatorDataSource.pageIndex = 0;
+        this.reload(filterValue);
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.marginFormGroup = this.fb.group({
       rows: this.fb.array([]),
     });
-
     this.companyBrancheService
       .loadCompanyBranches(this.companyBranchePaginatorDataSource)
       .subscribe({
         next: (branches) => {
           this.companyBrancheList = branches.data;
-          this.reload();
+          this.reload(this.selectedMarginFilterType());
         },
-
         error: (err) => {
           this.notificationService.showError(`Erro ao carregar lojas: ${err.message || err}`);
           this.cdr.detectChanges();
@@ -142,7 +155,7 @@ export class MaintenanceProductTable implements OnInit {
     this.search$.pipe(debounceTime(300), distinctUntilChanged()).subscribe((value) => {
       this.searchTerm = value;
       this.paginatorDataSource.pageIndex = 0;
-      this.reload();
+      this.reload(this.selectedMarginFilterType());
     });
   }
 
@@ -179,7 +192,7 @@ export class MaintenanceProductTable implements OnInit {
   onPageChange(event: PageEvent): void {
     this.paginatorDataSource.pageSize = event.pageSize;
     this.paginatorDataSource.pageIndex = event.pageIndex;
-    this.reload();
+    this.reload(this.selectedMarginFilterType());
   }
 
   onSearch(event: Event): void {
@@ -187,8 +200,8 @@ export class MaintenanceProductTable implements OnInit {
     this.search$.next(value);
   }
 
-  private reload(): void {
-    this.loadProducts(this.paginatorDataSource, this.currentFilter, this.searchTerm);
+  private reload(marginFilter: MarginFilterEnum): void {
+    this.loadProducts(this.paginatorDataSource, marginFilter, this.searchTerm);
   }
 
   toggleRow(row: IProductView): void {
@@ -304,29 +317,6 @@ export class MaintenanceProductTable implements OnInit {
             this.notificationService.showError(`Erro ao deletar margem: ${err.message || err}`);
           },
         });
-    }
-  }
-
-  setFilter(filter: MarginFilterEnum) {
-    if (this.currentFilter === filter) return;
-
-    this.currentFilter = filter;
-
-    if (this.paginatorDataSource) {
-      this.paginator.firstPage();
-    }
-
-    this.loadProducts(this.paginatorDataSource, this.currentFilter, this.searchTerm);
-  }
-
-  getFilterLabel(): string {
-    switch (this.currentFilter) {
-      case MarginFilterEnum.WITH_MARGIN:
-        return 'Só com margem';
-      case MarginFilterEnum.WITHOUT_MARGIN:
-        return 'Só sem margem';
-      default:
-        return 'Todos';
     }
   }
 }

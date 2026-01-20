@@ -6,47 +6,18 @@
       </div>
     }
 
-    <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
-      <mat-form-field appearance="outline" style="margin-top: 10px" class="full-width">
+    <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px" style="padding: 10px 0px">
+      <mat-form-field appearance="outline" class="full-width" subscriptSizing="dynamic">
         <mat-label>Pesquisar item pela descrição</mat-label>
         <input matInput type="search" (input)="onSearch($event)" />
         <mat-icon matSuffix>search</mat-icon>
       </mat-form-field>
 
-      <app-icon-button
-        icon="filter_list"
-        [matMenuTriggerFor]="filterMenu"
-        [matTooltip]="'Filtro atual: ' + getFilterLabel()"
-        style="padding-bottom: 18px"
-      >
-      </app-icon-button>
-
-      <mat-menu #filterMenu="matMenu">
-        <button mat-menu-item (click)="setFilter(MarginFilterEnum.ALL)">
-          <mat-icon>{{
-            currentFilter == MarginFilterEnum.ALL
-              ? 'radio_button_checked'
-              : 'radio_button_unchecked'
-          }}</mat-icon>
-          <span>Todos</span>
-        </button>
-        <button mat-menu-item (click)="setFilter(MarginFilterEnum.WITH_MARGIN)">
-          <mat-icon>{{
-            currentFilter === MarginFilterEnum.WITH_MARGIN
-              ? 'radio_button_checked'
-              : 'radio_button_unchecked'
-          }}</mat-icon>
-          <span>Itens com margem por loja</span>
-        </button>
-        <button mat-menu-item (click)="setFilter(MarginFilterEnum.WITHOUT_MARGIN)">
-          <mat-icon>{{
-            currentFilter === MarginFilterEnum.WITHOUT_MARGIN
-              ? 'radio_button_checked'
-              : 'radio_button_unchecked'
-          }}</mat-icon>
-          <span>Itens sem margem por loja</span>
-        </button>
-      </mat-menu>
+      <app-icon-filter-button
+        [itemsOptions]="filterOptions"
+        [(selectedFilter)]="selectedMarginFilterType"
+        toolTipText="Margem"
+      />
     </div>
 
     <table
