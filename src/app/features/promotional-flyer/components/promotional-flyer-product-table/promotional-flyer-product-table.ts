@@ -43,6 +43,7 @@ import { IPromotionalFlyerProductsView } from 'src/app/core/models/promotional-f
 
 type FlyerRowForm = FormGroup<{
   salePrice: FormControl<string | null>;
+  shippingPrice: FormControl<string | null>;
   loyaltyPrice: FormControl<string | null>;
   productId: FormControl<number>;
 }>;
@@ -77,6 +78,9 @@ export class PromotionalFlyerProductTable {
   @ViewChildren('loyaltyPriceInput')
   loyaltyPriceInputs!: QueryList<ElementRef<HTMLInputElement>>;
 
+  @ViewChildren('shippingPriceInput')
+  shippingPriceInputs!: QueryList<ElementRef<HTMLInputElement>>;
+
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   readonly ProductPriceType = ProductPriceType;
@@ -94,6 +98,7 @@ export class PromotionalFlyerProductTable {
     'expand',
     'id',
     'name',
+    'shipping_price',
     'quote_cost',
     'current_cost_price',
     'current_sale_price',
@@ -194,6 +199,9 @@ export class PromotionalFlyerProductTable {
           salePrice: this.fb.control<string | null>(
             item.salePrice != null ? item.salePrice.toFixed(2).replace('.', ',') : '0,00',
           ),
+          shippingPrice: this.fb.control<string | null>(
+            item.shippingPrice != null ? item.shippingPrice.toFixed(2).replace('.', ',') : '0,00',
+          ),
           loyaltyPrice: this.fb.control<string | null>(
             item.loyaltyPrice != null ? item.loyaltyPrice.toFixed(2).replace('.', ',') : '0,00',
           ),
@@ -252,16 +260,11 @@ export class PromotionalFlyerProductTable {
   }
 
   async onPriceBlur(
-    initialSalePrice: string,
-    index: number,
-    productPriceType: ProductPriceType,
+    initialPrice: string,
     productId: number,
+    control: FormControl<string | null>,
+    columnName: string,
   ): Promise<void> {
-    const control =
-      productPriceType == ProductPriceType.SalePrice
-        ? this.rows.at(index).controls.salePrice
-        : this.rows.at(index).controls.loyaltyPrice;
-
     const value = control.value;
 
     if (!value) {
@@ -270,7 +273,7 @@ export class PromotionalFlyerProductTable {
     }
 
     let cleanPriceValue = value.replace('R$ ', '').replace(/\./g, '').replace(',', '.');
-    let cleanInitialPriceValue = initialSalePrice
+    let cleanInitialPriceValue = initialPrice
       .replace('R$ ', '')
       .replace(/\./g, '')
       .replace(',', '.');
@@ -285,7 +288,7 @@ export class PromotionalFlyerProductTable {
       control.setValue(formatted, { emitEvent: false });
 
       this.promotionalFlyerService
-        .updateProductPrice(this.flyerId, productId, numericPrice, productPriceType)
+        .updateProductPrice(this.flyerId, productId, numericPrice, columnName)
         .subscribe({
           error: (err) => {
             this.notificationService.showError(
@@ -296,12 +299,7 @@ export class PromotionalFlyerProductTable {
     }
   }
 
-  onFocus(index: number, type: ProductPriceType) {
-    const inputs =
-      type === ProductPriceType.SalePrice
-        ? this.salePriceInputs.toArray()
-        : this.loyaltyPriceInputs.toArray();
-
+  onFocus(index: number, inputs: ElementRef<HTMLInputElement>[]) {
     const current = inputs[index];
     if (current) {
       current.nativeElement.select();

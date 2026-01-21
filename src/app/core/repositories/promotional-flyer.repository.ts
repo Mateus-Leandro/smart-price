@@ -4,7 +4,6 @@ import { finalize, from, map, Observable } from 'rxjs';
 import { SupabaseService } from 'src/app/shared/services/supabase.service';
 import { IDefaultPaginatorDataSource } from '../models/query.model';
 import { LoadingService } from '../services/loading.service';
-import { ProductPriceType } from 'src/app/core/enums/product.enum';
 import {
   IPromotionalFlyerProductsView,
   IPromotionalFlyerView,
@@ -76,6 +75,7 @@ export class PromotionalFlyerRepository {
         `
         sale_price,
         loyalty_price, 
+        shipping_price,
         quote_cost,
         current_cost_price, 
         current_sale_price,
@@ -101,6 +101,7 @@ export class PromotionalFlyerRepository {
         const mappedData: IPromotionalFlyerProductsView[] = (data || []).map((item: any) => ({
           salePrice: item.sale_price,
           loyaltyPrice: item.loyalty_price,
+          shippingPrice: item.shipping_price,
           quoteCost: item.quote_cost,
           currentCostPrice: item.current_cost_price,
           currentSalePrice: item.current_sale_price,
@@ -120,11 +121,8 @@ export class PromotionalFlyerRepository {
     flyerId: number,
     productId: number,
     price: number,
-    productPriceType: ProductPriceType,
+    columnName: string,
   ): Observable<void> {
-    const columnName =
-      productPriceType === ProductPriceType.SalePrice ? 'sale_price' : 'loyalty_price';
-
     const updateData = {
       [columnName]: price,
       updated_at: new Date().toISOString(),

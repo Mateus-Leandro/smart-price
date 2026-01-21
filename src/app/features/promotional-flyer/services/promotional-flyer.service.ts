@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { PromotionalFlyerRepository } from 'src/app/core/repositories/promotional-flyer.repository';
 import { IDefaultPaginatorDataSource } from 'src/app/core/models/query.model';
-import { ProductPriceType } from '../../../core/enums/product.enum';
 import {
   IPromotionalFlyerProductsView,
   IPromotionalFlyerView,
@@ -25,13 +24,8 @@ export class PromotionalFlyerService {
     return this.repository.getProducts(flyerId, paginator, search);
   }
 
-  updateProductPrice(
-    flyerId: number,
-    productId: number,
-    price: number,
-    productPriceType: ProductPriceType,
-  ) {
-    return this.repository.updateProductPrice(flyerId, productId, price, productPriceType);
+  updateProductPrice(flyerId: number, productId: number, price: number, columnName: string) {
+    return this.repository.updateProductPrice(flyerId, productId, price, columnName);
   }
 
   sendPricesToErp(flyerId: number, productId?: number) {

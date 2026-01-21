@@ -52,6 +52,43 @@
         </td>
       </ng-container>
 
+      <ng-container matColumnDef="shipping_price">
+        <th mat-header-cell *matHeaderCellDef>Preço do Frete</th>
+        <td mat-cell *matCellDef="let element; let i = dataIndex">
+          <input
+            #shippingPriceInput
+            matInput
+            class="only-line"
+            [formControl]="rows.at(i).controls.shippingPrice"
+            (keyup.enter)="onEnter(i, ProductPriceType.SalePrice)"
+            (blur)="
+              onPriceBlur(
+                shippingPriceInput.getAttribute('initial-shipping-price') || '0',
+                element.product.id,
+                rows.at(i).controls.shippingPrice,
+                'shipping_price'
+              )
+            "
+            (focus)="onFocus(i, shippingPriceInputs.toArray())"
+            (focusin)="
+              shippingPriceInput.setAttribute(
+                'initial-shipping-price',
+                rows.at(i).controls.shippingPrice.value?.toString() || '0'
+              )
+            "
+            mask="separator.2"
+            thousandSeparator="."
+            decimalMarker=","
+            prefix="R$ "
+            [dropSpecialCharacters]="false"
+            [showMaskTyped]="false"
+            [allowNegativeNumbers]="false"
+            style="width: 75px"
+            (click)="$event.stopPropagation()"
+          />
+        </td>
+      </ng-container>
+
       <ng-container matColumnDef="quote_cost">
         <th mat-header-cell *matHeaderCellDef>Pr.Cotação (Ganhador)</th>
         <td mat-cell *matCellDef="let element">
@@ -83,12 +120,12 @@
             (blur)="
               onPriceBlur(
                 salePriceInput.getAttribute('initial-sale-price') || '0',
-                i,
-                ProductPriceType.SalePrice,
-                element.product.id
+                element.product.id,
+                rows.at(i).controls.salePrice,
+                'sale_price'
               )
             "
-            (focus)="onFocus(i, ProductPriceType.SalePrice)"
+            (focus)="onFocus(i, salePriceInputs.toArray())"
             (focusin)="
               salePriceInput.setAttribute(
                 'initial-sale-price',
@@ -131,12 +168,12 @@
             (blur)="
               onPriceBlur(
                 loyaltyPriceInput.getAttribute('initial-loyalty-price') || '0',
-                i,
-                ProductPriceType.LoyaltyPrice,
-                element.product.id
+                element.product.id,
+                rows.at(i).controls.loyaltyPrice,
+                'loyalty_price'
               )
             "
-            (focus)="onFocus(i, ProductPriceType.LoyaltyPrice)"
+            (focus)="onFocus(i, loyaltyPriceInputs.toArray())"
             (focusin)="
               loyaltyPriceInput.setAttribute(
                 'initial-loyalty-price',

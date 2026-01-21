@@ -20,6 +20,7 @@ export interface IPromotionalFlyerView {
 export interface IPromotionalFlyerProductsView {
   salePrice?: number;
   loyaltyPrice?: number;
+  shippingPrice?: number;
   quoteCost?: number;
   currentCostPrice?: number;
   currentSalePrice?: number;
