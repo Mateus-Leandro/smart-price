@@ -212,43 +212,30 @@ export class PromotionalFlyerProductTable {
     this.form.setControl('rows', rowsArray);
   }
 
-  onEnter(index: number, type: ProductPriceType): void {
-    const loyaltyPriceInputs = this.loyaltyPriceInputs.toArray();
-    const salePriceInputs = this.salePriceInputs.toArray();
-
-    let current;
-    let next;
-
-    if (type === ProductPriceType.SalePrice) {
-      current = salePriceInputs[index];
-      next = loyaltyPriceInputs[index];
-    } else {
-      current = loyaltyPriceInputs[index];
-      next = salePriceInputs[index + 1];
+  onEnter(
+    currentElement: ElementRef<HTMLInputElement>,
+    nextElement: ElementRef<HTMLInputElement>,
+  ): void {
+    if (currentElement) {
+      currentElement.nativeElement.blur();
     }
 
-    if (current) {
-      current.nativeElement.blur();
-    }
-
-    if (next) {
-      setTimeout(() => next.nativeElement.focus());
+    if (nextElement) {
+      setTimeout(() => nextElement.nativeElement.focus());
     } else if (this.paginator) {
       this.paginator.nextPage();
-      this.focusFirstInputAfterLoad(ProductPriceType.SalePrice);
+      this.focusFirstInputAfterLoad();
     }
   }
 
-  private focusFirstInputAfterLoad(type: ProductPriceType): void {
+  private focusFirstInputAfterLoad(): void {
     const interval = setInterval(() => {
       if (!this.loading()) {
         clearInterval(interval);
 
         setTimeout(() => {
-          const list =
-            type === ProductPriceType.SalePrice ? this.salePriceInputs : this.loyaltyPriceInputs;
-
-          if (list?.first) {
+          const list = this.shippingPriceInputs;
+          if (list.first) {
             list.first.nativeElement.focus();
             list.first.nativeElement.select();
           }

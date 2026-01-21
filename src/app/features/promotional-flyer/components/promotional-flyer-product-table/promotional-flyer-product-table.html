@@ -60,7 +60,9 @@
             matInput
             class="only-line"
             [formControl]="rows.at(i).controls.shippingPrice"
-            (keyup.enter)="onEnter(i, ProductPriceType.SalePrice)"
+            (keyup.enter)="
+              onEnter(this.shippingPriceInputs.toArray()[i], this.salePriceInputs.toArray()[i])
+            "
             (blur)="
               onPriceBlur(
                 shippingPriceInput.getAttribute('initial-shipping-price') || '0',
@@ -116,7 +118,9 @@
             matInput
             class="only-line"
             [formControl]="rows.at(i).controls.salePrice"
-            (keyup.enter)="onEnter(i, ProductPriceType.SalePrice)"
+            (keyup.enter)="
+              onEnter(this.salePriceInputs.toArray()[i], this.loyaltyPriceInputs.toArray()[i])
+            "
             (blur)="
               onPriceBlur(
                 salePriceInput.getAttribute('initial-sale-price') || '0',
@@ -164,7 +168,12 @@
             thousandSeparator="."
             decimalMarker=","
             prefix="R$ "
-            (keyup.enter)="onEnter(i, ProductPriceType.LoyaltyPrice)"
+            (keyup.enter)="
+              onEnter(
+                this.loyaltyPriceInputs.toArray()[i],
+                this.shippingPriceInputs.toArray()[i + 1]
+              )
+            "
             (blur)="
               onPriceBlur(
                 loyaltyPriceInput.getAttribute('initial-loyalty-price') || '0',
