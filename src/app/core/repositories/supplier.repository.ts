@@ -4,9 +4,8 @@ import { SupabaseService } from 'src/app/shared/services/supabase.service';
 import { LoadingService } from '../services/loading.service';
 import { IDefaultPaginatorDataSource } from '../models/query.model';
 import { finalize, from, map, Observable } from 'rxjs';
-import { ISupplierView } from 'src/app/features/supplier/model/supplier-view.model';
-import { IUpdateSupplier } from 'src/app/features/supplier/model/supplier-update.model';
-import { SupplierDeliveryTypeEnum } from 'src/app/features/supplier/enums/supplier-delivery-type.enum';
+import { SupplierDeliveryTypeEnum } from 'src/app/core/enums/supplier.enum';
+import { ISupplierView, IUpdateSupplier } from '../models/supplier.model';
 
 @Injectable({ providedIn: 'root' })
 export class SupplierRepository {

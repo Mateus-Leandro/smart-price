@@ -3,9 +3,9 @@ import { SupabaseClient } from '@supabase/supabase-js';
 import { SupabaseService } from 'src/app/shared/services/supabase.service';
 import { IDefaultPaginatorDataSource } from '../models/query.model';
 import { map, from, Observable, finalize } from 'rxjs';
-import { IProductView } from '../../features/product/models/product.model';
 import { LoadingService } from '../services/loading.service';
-import { MarginFilterEnum } from 'src/app/features/product/enums/margin-filter.enum';
+import { IProductView } from '../models/product.model';
+import { MarginFilterEnum } from '../enums/product.enum';
 
 @Injectable({ providedIn: 'root' })
 export class ProductRepository {

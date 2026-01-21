@@ -1,6 +1,6 @@
 import { Component, model } from '@angular/core';
 import { MatFormField, MatLabel, MatSelect } from '@angular/material/select';
-import { SupplierDeliveryTypeEnum } from '../../enums/supplier-delivery-type.enum';
+import { SupplierDeliveryTypeEnum } from '../../../../core/enums/supplier.enum';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 
 @Component({

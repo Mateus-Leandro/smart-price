@@ -1,13 +1,3 @@
-export interface IPromotionalFlyer {
-  id: number;
-  name: string;
-  companyId: number;
-  idIntegral: number;
-  createdAt?: string | null;
-  updatedAt?: string | null;
-  finished: boolean;
-}
-
 export interface IPromotionalFlyerProducts {
   id: number;
   companyId: number;

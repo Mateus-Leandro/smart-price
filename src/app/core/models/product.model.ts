@@ -1,4 +1,4 @@
-import { IProductMarginBranche } from '../../product-margin-branche/models/product-margin-branche-view.model';
+import { IProductMarginBranche } from './product-margin.model';
 
 export interface IProduct {
   id: number;

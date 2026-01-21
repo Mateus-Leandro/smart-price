@@ -8,7 +8,7 @@ import { SupplierService } from '../../services/supplier.service';
 import { NotificationService } from 'src/app/core/services/notification.service';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { SupplierDeliverySelect } from '../supplier-delivery-select/supplier-delivery-select';
-import { SupplierDeliveryTypeEnum } from '../../enums/supplier-delivery-type.enum';
+import { SupplierDeliveryTypeEnum } from '../../../../core/enums/supplier.enum';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({

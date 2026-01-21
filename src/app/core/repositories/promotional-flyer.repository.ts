@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
 import { SupabaseClient } from '@supabase/supabase-js';
-import { finalize, from, map, Observable, switchMap } from 'rxjs';
+import { finalize, from, map, Observable } from 'rxjs';
 import { SupabaseService } from 'src/app/shared/services/supabase.service';
 import { IDefaultPaginatorDataSource } from '../models/query.model';
+import { LoadingService } from '../services/loading.service';
+import { ProductPriceType } from 'src/app/core/enums/product.enum';
 import {
   IPromotionalFlyerProductsView,
   IPromotionalFlyerView,
-} from 'src/app/features/promotional-flyer/models/flyer-view.model';
-import { LoadingService } from '../services/loading.service';
-import { ProductPriceType } from 'src/app/features/promotional-flyer/enums/product-price-type.enum';
+} from '../models/promotional-flyer.model';
 
 @Injectable({ providedIn: 'root' })
 export class PromotionalFlyerRepository {

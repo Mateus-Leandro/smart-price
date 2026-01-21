@@ -4,7 +4,7 @@ import { SupabaseService } from 'src/app/shared/services/supabase.service';
 import { LoadingService } from '../services/loading.service';
 import { IDefaultPaginatorDataSource } from '../models/query.model';
 import { finalize, from, map } from 'rxjs';
-import { ICompanyBrancheView } from 'src/app/features/company-branche/models/company-branch-view.model';
+import { ICompanyBrancheView } from '../models/company-branche.model';
 
 @Injectable({ providedIn: 'root' })
 export class CompanyBrancheRepository {

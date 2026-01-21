@@ -2,9 +2,11 @@ import { Injectable } from '@angular/core';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { SupabaseService } from 'src/app/shared/services/supabase.service';
 import { LoadingService } from '../services/loading.service';
-import { IUpserProductMarginBranche } from 'src/app/features/product-margin-branche/models/product-margin-branche-upsert.model';
-import { finalize, from, map } from 'rxjs';
-import { IDeleteProductMarginBranche } from 'src/app/features/product-margin-branche/models/product-margin-branche-delete.model';
+import { from, map } from 'rxjs';
+import {
+  IDeleteProductMarginBranche,
+  IUpserProductMarginBranche,
+} from '../models/product-margin.model';
 
 @Injectable({ providedIn: 'root' })
 export class ProductMarginBrancheRepository {

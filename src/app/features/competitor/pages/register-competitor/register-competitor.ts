@@ -15,10 +15,12 @@ import { Router } from '@angular/router';
 import { FormGroup } from '@angular/forms';
 import { CompetitorService } from '../../services/competitor.service';
 import { FlexLayoutModule } from '@angular/flex-layout';
-import { ICompetitorBrancheView } from 'src/app/features/competitor-branche/models/competitor-branche-view.model';
-import { ICompetitorBrancheUpsert } from 'src/app/features/competitor-branche/models/competitor-branche-upsert.model';
 import { CompetitorBrancheService } from 'src/app/features/competitor-branche/services/competitor-branche.service';
 import { NotificationService } from 'src/app/core/services/notification.service';
+import {
+  ICompetitorBrancheUpsert,
+  ICompetitorBrancheView,
+} from 'src/app/core/models/competitor-branche.model';
 
 @Component({
   selector: 'app-register-competitor',

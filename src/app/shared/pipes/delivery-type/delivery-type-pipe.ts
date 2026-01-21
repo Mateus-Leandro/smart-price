@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { SupplierDeliveryTypeEnum } from 'src/app/features/supplier/enums/supplier-delivery-type.enum';
+import { SupplierDeliveryTypeEnum } from 'src/app/core/enums/supplier.enum';
 
 @Pipe({
   name: 'deliveryType',

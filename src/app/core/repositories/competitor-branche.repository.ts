@@ -3,8 +3,10 @@ import { SupabaseClient } from '@supabase/supabase-js';
 import { SupabaseService } from 'src/app/shared/services/supabase.service';
 import { LoadingService } from '../services/loading.service';
 import { finalize, from, map } from 'rxjs';
-import { ICompetitorBrancheView } from 'src/app/features/competitor-branche/models/competitor-branche-view.model';
-import { ICompetitorBrancheUpsert } from 'src/app/features/competitor-branche/models/competitor-branche-upsert.model';
+import {
+  ICompetitorBrancheUpsert,
+  ICompetitorBrancheView,
+} from '../models/competitor-branche.model';
 
 @Injectable({ providedIn: 'root' })
 export class CompetitorBrancheRepository {

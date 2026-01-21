@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
 import { IDefaultPaginatorDataSource } from 'src/app/core/models/query.model';
 import { SupplierRepository } from 'src/app/core/repositories/supplier.repository';
-import { ISupplierView } from '../model/supplier-view.model';
-import { IUpdateSupplier } from '../model/supplier-update.model';
-import { SupplierDeliveryTypeEnum } from '../enums/supplier-delivery-type.enum';
+import { SupplierDeliveryTypeEnum } from '../../../core/enums/supplier.enum';
+import { ISupplierView, IUpdateSupplier } from 'src/app/core/models/supplier.model';
 
 @Injectable({
   providedIn: 'root',

@@ -8,8 +8,8 @@ import { Router } from '@angular/router';
 import { FormGroup } from '@angular/forms';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { SupplierService } from '../../services/supplier.service';
-import { IUpdateSupplier } from '../../model/supplier-update.model';
 import { NotificationService } from 'src/app/core/services/notification.service';
+import { IUpdateSupplier } from 'src/app/core/models/supplier.model';
 
 @Component({
   selector: 'app-supplier-maintenance',

@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
+import {
+  IDeleteProductMarginBranche,
+  IUpserProductMarginBranche,
+} from 'src/app/core/models/product-margin.model';
 import { ProductMarginBrancheRepository } from 'src/app/core/repositories/product-margin-branche.repository';
-import { IUpserProductMarginBranche } from '../models/product-margin-branche-upsert.model';
-import { IDeleteProductMarginBranche } from '../models/product-margin-branche-delete.model';
 
 @Injectable({
   providedIn: 'root',

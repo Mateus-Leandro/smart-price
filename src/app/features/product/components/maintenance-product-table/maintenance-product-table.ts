@@ -18,7 +18,6 @@ import {
 } from '@angular/forms';
 import { PageEvent, MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
-import { IProductView } from 'src/app/features/product/models/product.model';
 import { IDefaultPaginatorDataSource } from 'src/app/core/models/query.model';
 import { ProductService } from '../../services/product.service';
 import { FlexLayoutModule } from '@angular/flex-layout';
@@ -35,16 +34,17 @@ import {
 import { MatButtonModule } from '@angular/material/button';
 import { LoadingService } from 'src/app/core/services/loading.service';
 import { CompanyBrancheService } from 'src/app/features/company-branche/services/company-branche.service';
-import { ICompanyBrancheView } from 'src/app/features/company-branche/models/company-branch-view.model';
 import { NgxMaskDirective } from 'ngx-mask';
 import { ProductMarginBrancheService } from 'src/app/features/product-margin-branche/services/product-margin-branche.service';
 import { AuthService } from 'src/app/features/auth/services/auth.service';
 import { NotificationService } from 'src/app/core/services/notification.service';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MarginFilterEnum } from '../../enums/margin-filter.enum';
 import { IconFilterButton } from 'src/app/shared/components/icon-filter-button/icon-filter-button';
 import { IFilterOptions } from 'src/app/shared/components/icon-filter-button/icon-filter-list';
+import { ICompanyBrancheView } from 'src/app/core/models/company-branche.model';
+import { IProductView } from 'src/app/core/models/product.model';
+import { MarginFilterEnum } from 'src/app/core/enums/product.enum';
 
 type BranchGroup = FormGroup<{
   brancheId: FormControl<number>;

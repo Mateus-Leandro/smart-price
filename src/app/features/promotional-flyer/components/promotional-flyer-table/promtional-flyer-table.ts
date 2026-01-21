@@ -10,11 +10,11 @@ import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatFormField, MatLabel } from '@angular/material/select';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 import { MatInputModule } from '@angular/material/input';
-import { CommonModule, DatePipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { IDefaultPaginatorDataSource } from 'src/app/core/models/query.model';
-import { IPromotionalFlyerView } from '../../models/flyer-view.model';
 import { LoadingService } from 'src/app/core/services/loading.service';
 import { NotificationService } from 'src/app/core/services/notification.service';
+import { IPromotionalFlyerView } from 'src/app/core/models/promotional-flyer.model';
 
 @Component({
   selector: 'app-promotional-flyer-table',

@@ -10,11 +10,11 @@ import {
   MatAutocompleteSelectedEvent,
 } from '@angular/material/autocomplete';
 import { MatInputModule } from '@angular/material/input';
-import { ICompanyBrancheView } from 'src/app/features/company-branche/models/company-branch-view.model';
 import { CompanyBrancheService } from 'src/app/features/company-branche/services/company-branche.service';
 import { IDefaultPaginatorDataSource } from 'src/app/core/models/query.model';
-import { ICompetitorBrancheView } from 'src/app/features/competitor-branche/models/competitor-branche-view.model';
 import { NotificationService } from 'src/app/core/services/notification.service';
+import { ICompanyBrancheView } from 'src/app/core/models/company-branche.model';
+import { ICompetitorBrancheView } from 'src/app/core/models/competitor-branche.model';
 type AllowedBrancheTypes = ICompanyBrancheView | ICompetitorBrancheView;
 
 @Component({

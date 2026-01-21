@@ -7,13 +7,13 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { CommonModule } from '@angular/common';
 import { LoadingService } from 'src/app/core/services/loading.service';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
-import { ICompanyBrancheView } from '../../models/company-branch-view.model';
 import { IDefaultPaginatorDataSource } from 'src/app/core/models/query.model';
 import { CompanyBrancheService } from '../../services/company-branche.service';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { MatInputModule } from '@angular/material/input';
 import { CnpjPipe } from 'src/app/shared/pipes/cnpj/cnpj-pipe';
 import { NotificationService } from 'src/app/core/services/notification.service';
+import { ICompanyBrancheView } from 'src/app/core/models/company-branche.model';
 
 @Component({
   selector: 'app-company-branche-table',

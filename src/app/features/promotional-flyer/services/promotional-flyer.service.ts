@@ -1,8 +1,11 @@
 import { Injectable } from '@angular/core';
 import { PromotionalFlyerRepository } from 'src/app/core/repositories/promotional-flyer.repository';
 import { IDefaultPaginatorDataSource } from 'src/app/core/models/query.model';
-import { IPromotionalFlyerProductsView, IPromotionalFlyerView } from '../models/flyer-view.model';
-import { ProductPriceType } from '../enums/product-price-type.enum';
+import { ProductPriceType } from '../../../core/enums/product.enum';
+import {
+  IPromotionalFlyerProductsView,
+  IPromotionalFlyerView,
+} from 'src/app/core/models/promotional-flyer.model';
 
 @Injectable({
   providedIn: 'root',

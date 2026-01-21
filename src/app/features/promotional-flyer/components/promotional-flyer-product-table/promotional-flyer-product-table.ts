@@ -35,11 +35,11 @@ import { PromotionalFlyerService } from '../../services/promotional-flyer.servic
 import { Spinner } from 'src/app/shared/components/spinner/spinner';
 import { IconButton } from 'src/app/shared/components/icon-button/icon-button';
 import { IDefaultPaginatorDataSource } from 'src/app/core/models/query.model';
-import { IPromotionalFlyerProductsView } from '../../models/flyer-view.model';
 import { LoadingService } from 'src/app/core/services/loading.service';
 import { NotificationService } from 'src/app/core/services/notification.service';
 import { MatTooltip } from '@angular/material/tooltip';
-import { ProductPriceType } from '../../enums/product-price-type.enum';
+import { ProductPriceType } from '../../../../core/enums/product.enum';
+import { IPromotionalFlyerProductsView } from 'src/app/core/models/promotional-flyer.model';
 
 type FlyerRowForm = FormGroup<{
   salePrice: FormControl<string | null>;

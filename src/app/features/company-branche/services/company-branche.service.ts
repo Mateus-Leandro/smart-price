@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
+import { ICompanyBrancheView } from 'src/app/core/models/company-branche.model';
 import { IDefaultPaginatorDataSource } from 'src/app/core/models/query.model';
-import { ICompanyBrancheView } from '../models/company-branch-view.model';
 import { CompanyBrancheRepository } from 'src/app/core/repositories/company-branche.repository';
 
 @Injectable({

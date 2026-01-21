@@ -11,10 +11,10 @@ import { ICompanyBranche } from 'src/app/core/models/company-branche.model';
 import { LoadingService } from 'src/app/core/services/loading.service';
 import { InputBranches } from 'src/app/shared/components/input-branches/input-branches';
 import { CompetitorBrancheService } from 'src/app/features/competitor-branche/services/competitor-branche.service';
-import { ICompetitorBrancheView } from 'src/app/features/competitor-branche/models/competitor-branche-view.model';
 import { Spinner } from 'src/app/shared/components/spinner/spinner';
 import { switchMap } from 'rxjs';
 import { NotificationService } from 'src/app/core/services/notification.service';
+import { ICompetitorBrancheView } from 'src/app/core/models/competitor-branche.model';
 
 @Component({
   selector: 'app-competitor-form',
