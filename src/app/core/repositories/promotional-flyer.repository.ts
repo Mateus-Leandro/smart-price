@@ -8,6 +8,7 @@ import {
   IPromotionalFlyerView,
 } from 'src/app/features/promotional-flyer/models/flyer-view.model';
 import { LoadingService } from '../services/loading.service';
+import { ProductPriceType } from 'src/app/features/promotional-flyer/enums/product-price-type.enum';
 
 @Injectable({ providedIn: 'root' })
 export class PromotionalFlyerRepository {
@@ -73,7 +74,8 @@ export class PromotionalFlyerRepository {
       .from('promotional_flyer_products')
       .select(
         `
-        sale_price, 
+        sale_price,
+        loyalty_price, 
         quote_cost,
         current_cost_price, 
         current_sale_price,
@@ -98,6 +100,7 @@ export class PromotionalFlyerRepository {
 
         const mappedData: IPromotionalFlyerProductsView[] = (data || []).map((item: any) => ({
           salePrice: item.sale_price,
+          loyaltyPrice: item.loyalty_price,
           quoteCost: item.quote_cost,
           currentCostPrice: item.current_cost_price,
           currentSalePrice: item.current_sale_price,
@@ -113,13 +116,23 @@ export class PromotionalFlyerRepository {
     );
   }
 
-  updateSalePrice(flyerId: number, productId: number, salePrice: number): Observable<void> {
+  updateProductPrice(
+    flyerId: number,
+    productId: number,
+    price: number,
+    productPriceType: ProductPriceType,
+  ): Observable<void> {
+    const columnName =
+      productPriceType === ProductPriceType.SalePrice ? 'sale_price' : 'loyalty_price';
+
+    const updateData = {
+      [columnName]: price,
+      updated_at: new Date().toISOString(),
+    };
+
     const promise = this.supabase
       .from('promotional_flyer_products')
-      .update({
-        sale_price: salePrice,
-        updated_at: new Date().toISOString(),
-      })
+      .update(updateData)
       .eq('promotional_flyer_id', flyerId)
       .eq('product_id', productId);
 

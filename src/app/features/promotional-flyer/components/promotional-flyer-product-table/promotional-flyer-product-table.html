@@ -71,6 +71,43 @@
         </td>
       </ng-container>
 
+      <ng-container matColumnDef="sale_price">
+        <th mat-header-cell *matHeaderCellDef>Novo Preço de Venda</th>
+        <td mat-cell *matCellDef="let element; let i = dataIndex">
+          <input
+            #salePriceInput
+            matInput
+            class="only-line"
+            [formControl]="rows.at(i).controls.salePrice"
+            (keyup.enter)="onEnter(i, ProductPriceType.SalePrice)"
+            (blur)="
+              onPriceBlur(
+                salePriceInput.getAttribute('initial-sale-price') || '0',
+                i,
+                ProductPriceType.SalePrice,
+                element.product.id
+              )
+            "
+            (focus)="onFocus(i, ProductPriceType.SalePrice)"
+            (focusin)="
+              salePriceInput.setAttribute(
+                'initial-sale-price',
+                rows.at(i).controls.salePrice.value?.toString() || '0'
+              )
+            "
+            mask="separator.2"
+            thousandSeparator="."
+            decimalMarker=","
+            prefix="R$ "
+            [dropSpecialCharacters]="false"
+            [showMaskTyped]="false"
+            [allowNegativeNumbers]="false"
+            style="width: 75px"
+            (click)="$event.stopPropagation()"
+          />
+        </td>
+      </ng-container>
+
       <ng-container matColumnDef="current_loyalty_price">
         <th mat-header-cell *matHeaderCellDef>Preço Fidelidade</th>
         <td mat-cell *matCellDef="let element">
@@ -78,21 +115,34 @@
         </td>
       </ng-container>
 
-      <ng-container matColumnDef="sale_price">
-        <th mat-header-cell *matHeaderCellDef>Novo Preço de Venda</th>
+      <ng-container matColumnDef="loyalty_price">
+        <th mat-header-cell *matHeaderCellDef>Novo Preço Fidelidade</th>
         <td mat-cell *matCellDef="let element; let i = dataIndex">
           <input
-            #priceInput
+            #loyaltyPriceInput
             matInput
             class="only-line"
-            [formControl]="rows.at(i).controls.salePrice"
-            (keyup.enter)="onEnter(i)"
-            (blur)="onPriceBlur(i)"
-            (focus)="onFocus(i)"
+            [formControl]="rows.at(i).controls.loyaltyPrice"
             mask="separator.2"
             thousandSeparator="."
             decimalMarker=","
             prefix="R$ "
+            (keyup.enter)="onEnter(i, ProductPriceType.LoyaltyPrice)"
+            (blur)="
+              onPriceBlur(
+                loyaltyPriceInput.getAttribute('initial-loyalty-price') || '0',
+                i,
+                ProductPriceType.LoyaltyPrice,
+                element.product.id
+              )
+            "
+            (focus)="onFocus(i, ProductPriceType.LoyaltyPrice)"
+            (focusin)="
+              loyaltyPriceInput.setAttribute(
+                'initial-loyalty-price',
+                rows.at(i).controls.loyaltyPrice.value?.toString() || '0,00'
+              )
+            "
             [dropSpecialCharacters]="false"
             [showMaskTyped]="false"
             [allowNegativeNumbers]="false"

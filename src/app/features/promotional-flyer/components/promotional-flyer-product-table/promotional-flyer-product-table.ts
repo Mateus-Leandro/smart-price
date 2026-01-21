@@ -39,9 +39,11 @@ import { IPromotionalFlyerProductsView } from '../../models/flyer-view.model';
 import { LoadingService } from 'src/app/core/services/loading.service';
 import { NotificationService } from 'src/app/core/services/notification.service';
 import { MatTooltip } from '@angular/material/tooltip';
+import { ProductPriceType } from '../../enums/product-price-type.enum';
 
 type FlyerRowForm = FormGroup<{
   salePrice: FormControl<string | null>;
+  loyaltyPrice: FormControl<string | null>;
   productId: FormControl<number>;
 }>;
 
@@ -68,9 +70,16 @@ type FlyerRowForm = FormGroup<{
 })
 export class PromotionalFlyerProductTable {
   @ViewChild(MatSort) sort!: MatSort;
-  @ViewChildren('priceInput')
-  priceInputs!: QueryList<ElementRef<HTMLInputElement>>;
+
+  @ViewChildren('salePriceInput')
+  salePriceInputs!: QueryList<ElementRef<HTMLInputElement>>;
+
+  @ViewChildren('loyaltyPriceInput')
+  loyaltyPriceInputs!: QueryList<ElementRef<HTMLInputElement>>;
+
   @ViewChild(MatPaginator) paginator!: MatPaginator;
+
+  readonly ProductPriceType = ProductPriceType;
 
   searchTerm = '';
   loading = inject(LoadingService).loading;
@@ -88,8 +97,9 @@ export class PromotionalFlyerProductTable {
     'quote_cost',
     'current_cost_price',
     'current_sale_price',
-    'current_loyalty_price',
     'sale_price',
+    'current_loyalty_price',
+    'loyalty_price',
     'erp_import_date',
     'send',
   ];
@@ -180,10 +190,13 @@ export class PromotionalFlyerProductTable {
     const rowsArray = this.fb.array<FlyerRowForm>(
       data.map((item) =>
         this.fb.group({
-          salePrice: this.fb.control<string | null>(
-            item.salePrice != null ? item.salePrice.toFixed(2).replace('.', ',') : null,
-          ),
           productId: this.fb.control<number>(item.product.id, { nonNullable: true }),
+          salePrice: this.fb.control<string | null>(
+            item.salePrice != null ? item.salePrice.toFixed(2).replace('.', ',') : '0,00',
+          ),
+          loyaltyPrice: this.fb.control<string | null>(
+            item.loyaltyPrice != null ? item.loyaltyPrice.toFixed(2).replace('.', ',') : '0,00',
+          ),
         }),
       ),
     );
@@ -191,59 +204,88 @@ export class PromotionalFlyerProductTable {
     this.form.setControl('rows', rowsArray);
   }
 
-  onEnter(index: number): void {
-    const inputs = this.priceInputs.toArray();
-    const current = inputs[index];
-    const next = inputs[index + 1];
+  onEnter(index: number, type: ProductPriceType): void {
+    const loyaltyPriceInputs = this.loyaltyPriceInputs.toArray();
+    const salePriceInputs = this.salePriceInputs.toArray();
+
+    let current;
+    let next;
+
+    if (type === ProductPriceType.SalePrice) {
+      current = salePriceInputs[index];
+      next = loyaltyPriceInputs[index];
+    } else {
+      current = loyaltyPriceInputs[index];
+      next = salePriceInputs[index + 1];
+    }
 
     if (current) {
       current.nativeElement.blur();
     }
 
     if (next) {
-      setTimeout(() => {
-        next.nativeElement.focus();
-      });
-    } else if (this.paginator && this.paginator.hasNextPage()) {
+      setTimeout(() => next.nativeElement.focus());
+    } else if (this.paginator) {
       this.paginator.nextPage();
-      this.focusFirstInputAfterLoad();
+      this.focusFirstInputAfterLoad(ProductPriceType.SalePrice);
     }
   }
 
-  private focusFirstInputAfterLoad(): void {
+  private focusFirstInputAfterLoad(type: ProductPriceType): void {
     const interval = setInterval(() => {
-      if (!this.loading) {
+      if (!this.loading()) {
         clearInterval(interval);
+
         setTimeout(() => {
-          if (this.priceInputs.first) {
-            this.priceInputs.first.nativeElement.focus();
-            this.priceInputs.first.nativeElement.select();
+          const list =
+            type === ProductPriceType.SalePrice ? this.salePriceInputs : this.loyaltyPriceInputs;
+
+          if (list?.first) {
+            list.first.nativeElement.focus();
+            list.first.nativeElement.select();
           }
-        }, 200);
+        }, 100);
       }
     }, 50);
+
     setTimeout(() => clearInterval(interval), 5000);
   }
 
-  async onPriceBlur(index: number): Promise<void> {
-    const control = this.rows.at(index).controls;
-    let value = control.salePrice.value;
-    const productId = control.productId.value;
+  async onPriceBlur(
+    initialSalePrice: string,
+    index: number,
+    productPriceType: ProductPriceType,
+    productId: number,
+  ): Promise<void> {
+    const control =
+      productPriceType == ProductPriceType.SalePrice
+        ? this.rows.at(index).controls.salePrice
+        : this.rows.at(index).controls.loyaltyPrice;
+
+    const value = control.value;
 
     if (!value) {
-      control.salePrice.setValue('0,00', { emitEvent: false });
+      control.setValue('0,00', { emitEvent: false });
       return;
     }
 
-    let cleanValue = value.replace('R$ ', '').replace(/\./g, '').replace(',', '.');
-    const numericPrice = parseFloat(cleanValue);
+    let cleanPriceValue = value.replace('R$ ', '').replace(/\./g, '').replace(',', '.');
+    let cleanInitialPriceValue = initialSalePrice
+      .replace('R$ ', '')
+      .replace(/\./g, '')
+      .replace(',', '.');
+
+    const numericPrice = parseFloat(cleanPriceValue);
+    const numericInitialPrice = parseFloat(cleanInitialPriceValue);
+
+    if (numericPrice === numericInitialPrice) return;
 
     if (!isNaN(numericPrice)) {
       const formatted = numericPrice.toFixed(2).replace('.', ',');
-      control.salePrice.setValue(formatted, { emitEvent: false });
+      control.setValue(formatted, { emitEvent: false });
 
       this.promotionalFlyerService
-        .updateSalePrice(this.flyerId, productId, numericPrice)
+        .updateProductPrice(this.flyerId, productId, numericPrice, productPriceType)
         .subscribe({
           error: (err) => {
             this.notificationService.showError(
@@ -254,8 +296,12 @@ export class PromotionalFlyerProductTable {
     }
   }
 
-  onFocus(index: number) {
-    const inputs = this.priceInputs.toArray();
+  onFocus(index: number, type: ProductPriceType) {
+    const inputs =
+      type === ProductPriceType.SalePrice
+        ? this.salePriceInputs.toArray()
+        : this.loyaltyPriceInputs.toArray();
+
     const current = inputs[index];
     if (current) {
       current.nativeElement.select();

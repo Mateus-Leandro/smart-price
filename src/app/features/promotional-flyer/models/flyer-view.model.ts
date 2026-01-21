@@ -9,6 +9,7 @@ export interface IPromotionalFlyerView {
 
 export interface IPromotionalFlyerProductsView {
   salePrice?: number;
+  loyaltyPrice?: number;
   quoteCost?: number;
   currentCostPrice?: number;
   currentSalePrice?: number;
