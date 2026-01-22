@@ -45,3 +45,6 @@ Thumbs.db
 #Others
 LICENSE
 .npmrc
+
+#env file
+src/environments/environment.ts
