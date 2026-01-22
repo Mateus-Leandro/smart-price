@@ -1,3 +1,5 @@
+# Smart Price
+
 ## 💡 Origem e Motivo
 
 O projeto surgiu a partir da necessidade de um cliente em integrar seu **ERP COBOL** e otimizar seu processo de precificação. Antes desta solução, o trabalho era realizado de forma manual através de planilhas de Excel, o que tornava o processo lento e passível de erros. A ferramenta foi desenvolvida para automatizar essa gestão e garantir a integridade dos dados entre a análise de mercado e o ERP.
@@ -20,3 +22,28 @@ O projeto tem o objetivo de consolidar informações externas para auxiliar na p
 - ⚡ [Supabase CLI](https://supabase.com/docs/guides/local-development/cli/getting-started?queryGroups=platform&platform=npm) (Interface de linha de comando)
 - 🟢 [NodeJS](https://nodejs.org/en/download/current) (Ambiente de execução)
 - 🦕 [Deno](https://deno.com/) (Runtime para Edge Functions/Backend)
+
+## ⚙️ Configuração de Ambiente
+
+Para rodar o projeto localmente, siga os passos de configuração abaixo:
+
+1. Na raiz do projeto, navegue até a pasta de configurações de ambiente:
+   `src/environments/`
+
+2. Crie o arquivo **`environment.ts`** utilizando o arquivo de exemplo como base:
+
+   ```bash
+   cp src/environments/environment.example.ts src/environments/environment.ts
+   ```
+
+3. Abra o arquivo src/environments/environment.ts e preencha as variáveis com as credenciais obtidas no painel do Vercel:
+
+**# NEXT_PUBLIC_SUPABASE_URL:** URL do projeto no Supabase.
+
+**# NEXT_PUBLIC_SUPABASE_ANON_KEY:** Chave anônima (public) do Supabase.
+
+## 👤 Este projeto foi desenvolvido e mantido por:
+
+- **Mateus Leandro**  
+  🔗 GitHub: https://github.com/Mateus-Leandro  
+  🔗 LinkedIn: https://www.linkedin.com/in/mateus-chagas/
