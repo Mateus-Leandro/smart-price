@@ -13,7 +13,6 @@ import { Button } from 'src/app/shared/components/button/button';
 import { CommonModule } from '@angular/common';
 import { LoginErrorStateMatcher } from 'src/app/shared/matchers/login-error-state-matcher';
 import { MatIconModule } from '@angular/material/icon';
-import { IconButton } from 'src/app/shared/components/icon-button/icon-button';
 import { MatDialog } from '@angular/material/dialog';
 import { ForgotPasswordDialog } from '../../components/forgot-password-dialog/forgot-password-dialog';
 import { Router } from '@angular/router';
@@ -30,7 +29,6 @@ import { NotificationService } from 'src/app/core/services/notification.service'
     CommonModule,
     ReactiveFormsModule,
     MatIconModule,
-    IconButton,
   ],
   templateUrl: './login.html',
   styleUrl: './login.scss',

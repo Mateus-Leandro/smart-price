@@ -2,7 +2,7 @@
   <div fxFlex fxLayout="row" class="box-right">
     <div fxLayout="column" class="box-left" fxFlex="30%" fxFlex.lt-lg="100%">
       <div fxLayout="column" fxFlex="100%" fxLayoutAlign="space-between" style="padding: 32px 24px">
-        <div fxLayout="row" fxLayoutAlign="center" fxFlex="50%">
+        <div fxLayout="row" fxLayoutAlign="center" fxFlex="45%">
           <img src="assets/images/logo_jacare_v2.png" alt="Smart Price" class="logo" />
         </div>
 
@@ -10,7 +10,7 @@
           [formGroup]="loginFormGroup"
           (ngSubmit)="onSubmit()"
           fxLayout="column"
-          fxLayoutGap="16px"
+          fxLayoutGap="10px"
         >
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Email</mat-label>
@@ -23,7 +23,7 @@
             }
           </mat-form-field>
 
-          <mat-form-field appearance="outline" class="full-width">
+          <mat-form-field appearance="outline">
             <mat-label>Senha</mat-label>
             <input
               matInput
@@ -31,12 +31,9 @@
               formControlName="password"
               [errorStateMatcher]="matcher"
             />
-            <app-icon-button
-              matSuffix
-              [icon]="passwordVisible() ? 'visibility' : 'visibility_off'"
-              type="button"
-              (click)="togglePasswordVisibility()"
-            />
+            <mat-icon matSuffix (click)="togglePasswordVisibility()">
+              {{ passwordVisible() ? 'visibility' : 'visibility_off' }}
+            </mat-icon>
             @if (password.hasError('required')) {
               <mat-error>Campo obrigatório</mat-error>
             }
@@ -44,41 +41,40 @@
               <mat-error>Email ou senha incorreta</mat-error>
             }
           </mat-form-field>
-          @if (!loading) {
-            <div fxLayout="row" fxLayoutAlign="end">
+          <div fxLayout="column" fxLayoutGap="18px" style="margin-top: 24px">
+            <div fxLayout="row" fxLayoutAlign="center">
               <app-button
-                text="Esqueci a minha senha"
-                height="20px"
-                textColor="var(--cancel-color)"
-                bgColor="transparent"
-                (click)="openForgotPasswordDialog()"
+                text="Entrar"
+                width="250px"
+                height="52px"
+                fontSize="18px"
+                [disabled]="loginFormGroup.invalid"
+                [loading]="loading"
+                type="submit"
               />
             </div>
-          }
-
-          <div
-            fxLayout="column"
-            fxLayoutAlign="center center"
-            fxLayoutGap="18px"
-            style="margin-top: 24px"
-          >
-            <app-button
-              text="Entrar"
-              width="250px"
-              height="52px"
-              fontSize="18px"
-              [disabled]="loginFormGroup.invalid"
-              [loading]="loading"
-              type="submit"
-            />
             @if (!loading) {
-              <app-button
-                text="Cadastrar-se"
-                height="20px"
-                textColor="var(--primary)"
-                bgColor="transparent"
-                (click)="navigateToRegister()"
-              />
+              <div fxLayout="row" fxLayoutAlign="center">
+                <app-button
+                  fontSize="15px"
+                  text="Cadastrar-se"
+                  height="20px"
+                  textColor="var(--primary)"
+                  bgColor="transparent"
+                  (click)="navigateToRegister()"
+                />
+              </div>
+
+              <div fxLayout="row" fxLayoutAlign="end">
+                <app-button
+                  fontSize="13px"
+                  text="Esqueci a minha senha"
+                  height="20px"
+                  textColor="var(--cancel-color)"
+                  bgColor="transparent"
+                  (click)="openForgotPasswordDialog()"
+                />
+              </div>
             }
           </div>
         </form>
