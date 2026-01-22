@@ -49,6 +49,17 @@ export class PromotionalFlyerTable {
   private search$ = new Subject<string>();
   sendingFlyerId?: number | null;
 
+  columnsToDisplay = [
+    'id',
+    'id_quote',
+    'name',
+    'branche_id',
+    'created_date',
+    'status',
+    'produtos',
+    'send',
+  ];
+
   constructor(
     private promotionalFlyerService: PromotionalFlyerService,
     private cdr: ChangeDetectorRef,
@@ -124,6 +135,10 @@ export class PromotionalFlyerTable {
 
   private reload(): void {
     this.loadPrincingRecords(this.paginatorDataSource, this.searchTerm);
+  }
+
+  formatQuoteId(quoteId: any): string {
+    return String(quoteId).padStart(2, '0');
   }
 
   onSearch(event: Event): void {

@@ -10,6 +10,8 @@ export interface IPromotionalFlyer {
 
 export interface IPromotionalFlyerView {
   id: number;
+  idIntegral: number;
+  brancheId: number;
   name: string;
   createdAt?: string | null;
   updatedAt?: string | null;

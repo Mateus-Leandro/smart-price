@@ -30,7 +30,7 @@ export class PromotionalFlyerRepository {
       .from('promotional_flyers')
       .select(
         `
-        id, name, finished, created_at, updated_at, 
+        id, id_integral, branche_id, name, finished, created_at, updated_at, 
         promotional_flyer_products(count)
       `,
         { count: 'exact' },
@@ -48,6 +48,8 @@ export class PromotionalFlyerRepository {
 
         const mappedData: IPromotionalFlyerView[] = (data || []).map((item: any) => ({
           id: item.id,
+          idIntegral: item.id_integral,
+          brancheId: item.branche_id,
           name: item.name,
           finished: item.finished,
           createdAt: item.created_at,
