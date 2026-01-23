@@ -15,6 +15,7 @@ O projeto tem o objetivo de consolidar informações externas para auxiliar na p
 ![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
 ![Deno](https://img.shields.io/badge/Deno-white?style=for-the-badge&logo=deno&logoColor=black)
+![Vercel](https://img.shields.io/badge/vercel-%23000000.svg?style=for-the-badge&logo=vercel&logoColor=white)
 
 ## 📦 Dependências e Pré-requisitos
 
@@ -22,6 +23,7 @@ O projeto tem o objetivo de consolidar informações externas para auxiliar na p
 - ⚡ [Supabase CLI](https://supabase.com/docs/guides/local-development/cli/getting-started?queryGroups=platform&platform=npm) (Interface de linha de comando)
 - 🟢 [NodeJS](https://nodejs.org/en/download/current) (Ambiente de execução)
 - 🦕 [Deno](https://deno.com/) (Runtime para Edge Functions/Backend)
+- ▲ [Vercel](https://vercel.com/) (Hospedagem e Deployment)
 
 ## ⚙️ Configuração de Ambiente
 
