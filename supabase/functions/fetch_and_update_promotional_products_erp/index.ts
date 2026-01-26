@@ -41,11 +41,10 @@ serve(async (req) => {
 
     let query = supabase
       .from('promotional_flyer_products')
-      .select('id, promotional_flyer_id, product_id, sale_price')
+      .select('id, promotional_flyer_id, product_id, sale_price, loyalty_price')
       .eq('company_id', company_id)
-      .not('sale_price', 'is', null)
-      .gt('sale_price', 0)
-      .eq('send_to_erp', true);
+      .eq('send_to_erp', true)
+      .or('sale_price.gt.0,loyalty_price.gt.0');
 
     if (promotional_flyer_id) {
       query = query.eq('promotional_flyer_id', promotional_flyer_id);
