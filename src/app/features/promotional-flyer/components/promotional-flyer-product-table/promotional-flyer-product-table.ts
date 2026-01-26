@@ -310,14 +310,16 @@ export class PromotionalFlyerProductTable {
   }
 
   isPriceInvalid(index: number): boolean {
-    const value = this.rows.at(index).controls.salePrice.value;
+    const { salePrice, loyaltyPrice } = this.rows.at(index).getRawValue();
 
-    if (!value) return true;
+    const isValid = (val: any) => {
+      if (!val) return false;
+      const cleanValue = String(val).replace('R$ ', '').replace(/\./g, '').replace(',', '.');
+      const numeric = parseFloat(cleanValue);
+      return !isNaN(numeric) && numeric > 0;
+    };
 
-    const cleanValue = value.replace('R$ ', '').replace(/\./g, '').replace(',', '.');
-    const numericPrice = parseFloat(cleanValue);
-
-    return isNaN(numericPrice) || numericPrice <= 0;
+    return !isValid(salePrice) && !isValid(loyaltyPrice);
   }
 
   toggleRow(row: IPromotionalFlyerProductsView): void {
