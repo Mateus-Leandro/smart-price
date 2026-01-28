@@ -40,12 +40,17 @@ import { NotificationService } from 'src/app/core/services/notification.service'
 import { MatTooltip } from '@angular/material/tooltip';
 import { ProductPriceType } from '../../../../core/enums/product.enum';
 import { IPromotionalFlyerProductsView } from 'src/app/core/models/promotional-flyer.model';
+import { CompetitorService } from 'src/app/features/competitor/services/competitor.service';
+import { ICompetitor } from 'src/app/core/models/competitor';
+import { CompetitorPriceFlyerProductService } from 'src/app/features/competitor-price-flyer-product/competitor-price-flyer-product.service';
+import { AuthService } from 'src/app/features/auth/services/auth.service';
 
 type FlyerRowForm = FormGroup<{
   salePrice: FormControl<string | null>;
   shippingPrice: FormControl<string | null>;
   loyaltyPrice: FormControl<string | null>;
   productId: FormControl<number>;
+  competitorPrices: FormArray<FormControl<string | null>>;
 }>;
 
 @Component({
@@ -89,6 +94,8 @@ export class PromotionalFlyerProductTable {
   loading = inject(LoadingService).loading;
   flyerId = 0;
   sendingProductId?: number | null;
+  competitorList: ICompetitor[] = [];
+  companyId!: number;
 
   sortEvent!: Sort;
 
@@ -128,6 +135,9 @@ export class PromotionalFlyerProductTable {
     private route: ActivatedRoute,
     private fb: FormBuilder,
     private notificationService: NotificationService,
+    private competitorService: CompetitorService,
+    private competitorPriceFlyerProductService: CompetitorPriceFlyerProductService,
+    private authService: AuthService,
   ) {}
 
   ngOnInit(): void {
@@ -145,8 +155,15 @@ export class PromotionalFlyerProductTable {
     });
   }
 
-  ngAfterViewInit(): void {
-    this.dataSource.sort = this.sort;
+  ngAfterViewInit() {
+    this.authService.getCompanyIdFromLoggedUser().subscribe({
+      next: (companyId) => {
+        this.companyId = companyId;
+      },
+      error: (err) => {
+        this.notificationService.showError(`Erro ao carregar companyId: ${err.message || err}`);
+      },
+    });
   }
 
   loadProductsFromPromotionalFlyer(
@@ -184,7 +201,25 @@ export class PromotionalFlyerProductTable {
   }
 
   private reload(): void {
-    this.loadProductsFromPromotionalFlyer(this.flyerId, this.paginatorDataSource, this.searchTerm);
+    this.competitorService
+      .loadCompetitors({
+        pageIndex: 0,
+        pageSize: 999,
+        records: { data: [], count: 0 },
+      })
+      .subscribe({
+        next: (competitors) => {
+          this.competitorList = competitors.data;
+          this.loadProductsFromPromotionalFlyer(
+            this.flyerId,
+            this.paginatorDataSource,
+            this.searchTerm,
+          );
+        },
+        error: (err) => {
+          this.notificationService.showError(`Erro ao buscar concorrentes: ${err.message || err}`);
+        },
+      });
   }
 
   get rows(): FormArray<FlyerRowForm> {
@@ -193,8 +228,20 @@ export class PromotionalFlyerProductTable {
 
   private buildForm(data: IPromotionalFlyerProductsView[]): void {
     const rowsArray = this.fb.array<FlyerRowForm>(
-      data.map((item) =>
-        this.fb.group({
+      data.map((item) => {
+        const competitorControls = this.competitorList.map((competitor) => {
+          const priceEntry = item.competitorPrices?.find(
+            (cp: any) => cp.competitor?.id === competitor.id,
+          );
+
+          const formattedPrice = priceEntry?.price
+            ? priceEntry.price.toFixed(2).replace('.', ',')
+            : '0,00';
+
+          return this.fb.control<string | null>(formattedPrice);
+        });
+
+        return this.fb.group({
           productId: this.fb.control<number>(item.product.id, { nonNullable: true }),
           salePrice: this.fb.control<string | null>(
             item.salePrice != null ? item.salePrice.toFixed(2).replace('.', ',') : '0,00',
@@ -205,8 +252,9 @@ export class PromotionalFlyerProductTable {
           loyaltyPrice: this.fb.control<string | null>(
             item.loyaltyPrice != null ? item.loyaltyPrice.toFixed(2).replace('.', ',') : '0,00',
           ),
-        }),
-      ),
+          competitorPrices: this.fb.array(competitorControls),
+        }) as FlyerRowForm;
+      }),
     );
 
     this.form.setControl('rows', rowsArray);
@@ -251,6 +299,7 @@ export class PromotionalFlyerProductTable {
     productId: number,
     control: FormControl<string | null>,
     columnName: string,
+    competitorId?: number,
   ): Promise<void> {
     const value = control.value;
 
@@ -274,22 +323,62 @@ export class PromotionalFlyerProductTable {
       const formatted = numericPrice.toFixed(2).replace('.', ',');
       control.setValue(formatted, { emitEvent: false });
 
-      this.promotionalFlyerService
-        .updateProductPrice(this.flyerId, productId, numericPrice, columnName)
-        .subscribe({
-          error: (err) => {
-            this.notificationService.showError(
-              `Erro ao atualizar preço. Item: ${productId} | Erro: ${err.message || err}`,
-            );
-          },
-        });
+      if (columnName.toLocaleLowerCase() !== 'competitor_price') {
+        this.promotionalFlyerService
+          .updateProductPrice(this.flyerId, productId, numericPrice, columnName)
+          .subscribe({
+            error: (err) => {
+              this.notificationService.showError(
+                `Erro ao atualizar preço. Item: ${productId} | Erro: ${err.message || err}`,
+              );
+            },
+          });
+      } else {
+        if (!competitorId) return;
+
+        if (numericPrice > 0) {
+          this.competitorPriceFlyerProductService
+            .upsertCompetitorPriceFlyerProduct({
+              productId: productId,
+              price: numericPrice,
+              competitorId: competitorId,
+              companyId: this.companyId,
+              promotionalFlyerId: this.flyerId,
+            })
+            .subscribe({
+              error: (err) => {
+                this.notificationService.showError(
+                  `Erro ao atualizar preço do concorrente. Item: ${productId} | Erro: ${
+                    err.message || err
+                  }`,
+                );
+              },
+            });
+        } else {
+          this.competitorPriceFlyerProductService
+            .deleteCompetitorPriceFlyerProduct({
+              productId: productId,
+              competitorId: competitorId,
+              companyId: this.companyId,
+              promotionalFlyerId: this.flyerId,
+            })
+            .subscribe({
+              error: (err) => {
+                this.notificationService.showError(
+                  `Erro ao deletar preço do concorrente. Item: ${productId} | Erro: ${
+                    err.message || err
+                  }`,
+                );
+              },
+            });
+        }
+      }
     }
   }
 
-  onFocus(index: number, inputs: ElementRef<HTMLInputElement>[]) {
-    const current = inputs[index];
-    if (current) {
-      current.nativeElement.select();
+  onFocus(input: HTMLInputElement) {
+    if (input) {
+      input.select();
     }
   }
 

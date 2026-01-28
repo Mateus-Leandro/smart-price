@@ -19,6 +19,14 @@ export interface IPromotionalFlyerView {
   totalProducts: number;
 }
 
+export interface IPromotionalFlyerCompetitorPrices {
+  price: number;
+  competitor: {
+    id: number;
+    name: string;
+  };
+}
+
 export interface IPromotionalFlyerProductsView {
   salePrice?: number;
   loyaltyPrice?: number;
@@ -36,4 +44,5 @@ export interface IPromotionalFlyerProductsView {
     id: number;
     name: string;
   };
+  competitorPrices: IPromotionalFlyerCompetitorPrices[];
 }

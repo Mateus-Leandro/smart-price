@@ -71,7 +71,7 @@
                 'shipping_price'
               )
             "
-            (focus)="onFocus(i, shippingPriceInputs.toArray())"
+            (focus)="onFocus(shippingPriceInput)"
             (focusin)="
               shippingPriceInput.setAttribute(
                 'initial-shipping-price',
@@ -129,7 +129,7 @@
                 'sale_price'
               )
             "
-            (focus)="onFocus(i, salePriceInputs.toArray())"
+            (focus)="onFocus(salePriceInput)"
             (focusin)="
               salePriceInput.setAttribute(
                 'initial-sale-price',
@@ -182,7 +182,7 @@
                 'loyalty_price'
               )
             "
-            (focus)="onFocus(i, loyaltyPriceInputs.toArray())"
+            (focus)="onFocus(loyaltyPriceInput)"
             (focusin)="
               loyaltyPriceInput.setAttribute(
                 'initial-loyalty-price',
@@ -227,16 +227,60 @@
       </ng-container>
 
       <ng-container matColumnDef="expandedDetail">
-        <td mat-cell *matCellDef="let element" [attr.colspan]="columnsToDisplay.length">
+        <td
+          mat-cell
+          *matCellDef="let element; let i = dataIndex"
+          [attr.colspan]="columnsToDisplay.length"
+        >
           <div class="element-detail-wrapper" [class.is-expanded]="element == expandedElement">
             <div class="element-detail-content">
               <div class="expanded-detail-content" fxLayout="column">
                 <div fxLayout="column" fxLayoutGap="5px">
                   <span class="label">Preço dos concorrentes</span>
-                  <div fxLayout="row" fxLayoutGap="10px">
-                    <span></span>
-                    <span></span>
-                  </div>
+
+                  @if (rows.at(i); as currentRow) {
+                    <div fxLayout="row" fxLayoutAlign="space-between" [formGroup]="currentRow">
+                      @for (competitor of competitorList; track competitor.id; let j = $index) {
+                        <div fxLayout="column" formArrayName="competitorPrices">
+                          <input
+                            matInput
+                            #competitorInput
+                            class="only-line margin-field"
+                            type="text"
+                            [formControlName]="j"
+                            (focusin)="
+                              competitorInput.setAttribute(
+                                'initial-competitor-price',
+                                currentRow
+                                  .get('competitorPrices')
+                                  ?.get(j.toString())
+                                  ?.value?.toString() || '0,00'
+                              )
+                            "
+                            (focus)="onFocus(competitorInput)"
+                            (blur)="
+                              onPriceBlur(
+                                competitorInput.getAttribute('initial-competitor-price') || '0',
+                                element.product.id,
+                                rows.at(i).controls.competitorPrices.at(j),
+                                'competitor_price',
+                                competitor.id
+                              )
+                            "
+                            mask="separator.2"
+                            thousandSeparator="."
+                            decimalMarker=","
+                            prefix="R$ "
+                            [dropSpecialCharacters]="false"
+                            [showMaskTyped]="false"
+                            [allowNegativeNumbers]="false"
+                            style="width: 65px"
+                          />
+                          <p class="branch-name">{{ competitor.name }}</p>
+                        </div>
+                      }
+                    </div>
+                  }
                 </div>
               </div>
             </div>
