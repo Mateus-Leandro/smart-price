@@ -244,12 +244,12 @@
                         <div fxLayout="column" formArrayName="competitorPrices">
                           <input
                             matInput
-                            #competitorInput
+                            #competitorPriceInput
                             class="only-line margin-field"
                             type="text"
                             [formControlName]="j"
                             (focusin)="
-                              competitorInput.setAttribute(
+                              competitorPriceInput.setAttribute(
                                 'initial-competitor-price',
                                 currentRow
                                   .get('competitorPrices')
@@ -257,10 +257,11 @@
                                   ?.value?.toString() || '0,00'
                               )
                             "
-                            (focus)="onFocus(competitorInput)"
+                            (focus)="onFocus(competitorPriceInput)"
                             (blur)="
                               onPriceBlur(
-                                competitorInput.getAttribute('initial-competitor-price') || '0',
+                                competitorPriceInput.getAttribute('initial-competitor-price') ||
+                                  '0',
                                 element.product.id,
                                 rows.at(i).controls.competitorPrices.at(j),
                                 'competitor_price',
@@ -268,13 +269,17 @@
                               )
                             "
                             mask="separator.2"
+                            maxlength="10"
+                            (keyup.enter)="
+                              onEnterInRow(i, j, competitorPriceInputs.toArray(), competitorList)
+                            "
                             thousandSeparator="."
                             decimalMarker=","
                             prefix="R$ "
                             [dropSpecialCharacters]="false"
                             [showMaskTyped]="false"
                             [allowNegativeNumbers]="false"
-                            style="width: 65px"
+                            style="width: 80px"
                           />
                           <p class="branch-name">{{ competitor.name }}</p>
                         </div>

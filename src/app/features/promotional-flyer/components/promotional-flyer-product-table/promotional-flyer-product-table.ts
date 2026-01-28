@@ -86,6 +86,9 @@ export class PromotionalFlyerProductTable {
   @ViewChildren('shippingPriceInput')
   shippingPriceInputs!: QueryList<ElementRef<HTMLInputElement>>;
 
+  @ViewChildren('competitorPriceInput')
+  competitorPriceInputs!: QueryList<ElementRef<HTMLInputElement>>;
+
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   readonly ProductPriceType = ProductPriceType;
@@ -273,6 +276,51 @@ export class PromotionalFlyerProductTable {
     } else if (this.paginator) {
       this.paginator.nextPage();
       this.focusFirstInputAfterLoad();
+    }
+  }
+
+  onEnterInRow(
+    lineIndex: number,
+    colIndex: number,
+    inputsArray: ElementRef<HTMLInputElement>[],
+    elementList: any[],
+  ): void {
+    const totalCols = elementList.length;
+    const globalIndex = lineIndex * totalCols + colIndex;
+
+    inputsArray[globalIndex]?.nativeElement.blur();
+
+    const isLastInRow = colIndex === totalCols - 1;
+
+    if (!isLastInRow) {
+      const nextGlobalIndex = globalIndex + 1;
+      setTimeout(() => inputsArray[nextGlobalIndex]?.nativeElement.focus());
+    } else {
+      const nextRowIndex = lineIndex + 1;
+      const nextRowData = this.dataSource.data[nextRowIndex];
+
+      if (nextRowData) {
+        this.expandedElement = nextRowData;
+
+        setTimeout(() => {
+          const nextRowFirstCompIndex = nextRowIndex * totalCols;
+          const nextInput = inputsArray[nextRowFirstCompIndex];
+
+          if (nextInput) {
+            nextInput.nativeElement.focus();
+            nextInput.nativeElement.select();
+
+            nextInput.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }, 150);
+      } else {
+        if (this.paginator?.hasNextPage()) {
+          this.paginator.nextPage();
+          this.expandedElement = null;
+        } else {
+          this.expandedElement = null;
+        }
+      }
     }
   }
 
