@@ -75,17 +75,34 @@ export class PromotionalFlyerRepository {
       .from('promotional_flyer_products')
       .select(
         `
-        sale_price,
-        loyalty_price, 
-        shipping_price,
-        quote_cost,
-        current_cost_price, 
-        current_sale_price,
-        current_loyalty_price,
-        erp_import_date,
-        product:products!inner (id, name),
-        supplier:suppliers!inner (id, name)
-      `,
+    sale_price,
+    loyalty_price,
+    shipping_price,
+    quote_cost,
+    current_cost_price,
+    current_sale_price,
+    current_loyalty_price,
+    erp_import_date,
+
+    product:products!inner (
+      id,
+      name
+    ),
+
+    supplier:suppliers!inner (
+      id,
+      name
+    ),
+
+    competitorPrices:competitor_price_flyer_products (
+      price,
+
+      competitor:competitors (
+        id,
+        name
+      )
+    )
+    `,
         { count: 'exact' },
       )
       .eq('promotional_flyer_id', flyerId)
@@ -111,6 +128,7 @@ export class PromotionalFlyerRepository {
           erpImportDate: item.erp_import_date,
           product: { id: item?.product?.id, name: item?.product?.name },
           supplier: { id: item?.supplier?.id, name: item?.supplier?.name },
+          competitorPrices: item?.competitorPrices,
         })) as IPromotionalFlyerProductsView[];
 
         return { data: mappedData, count: count ?? 0 };
