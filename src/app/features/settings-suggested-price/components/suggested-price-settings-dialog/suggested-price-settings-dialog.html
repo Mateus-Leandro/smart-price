@@ -7,13 +7,15 @@
 <div mat-dialog-title fxLayout="row" fxLayoutAlign="start start">
   <div fxLayout="column">
     <span> Configurações para sugestão de preço</span>
-    <span class="subtitle"> Ajuste os percentuais para cada faixa de margem. </span>
+    <span class="subtitle">
+      Ajuste os percentuais e a % de redução no preço sugerido em relação ao preço do concorrente.
+    </span>
   </div>
 </div>
 
 <form [formGroup]="suggestedPriceSettingsFormGroup" (ngSubmit)="submit()">
   <mat-dialog-content>
-    <div fxLayout="column" fxLayoutGap="10px">
+    <div fxLayout="column" fxLayoutGap="15px">
       <div fxLayout="row" fxLayoutGap="10px">
         <mat-form-field appearance="outline" style="width: 200px">
           <mat-label>Margem de</mat-label>
@@ -65,15 +67,91 @@
             <mat-error>Margem maior que 100</mat-error>
           }
         </mat-form-field>
+
+        <mat-form-field appearance="outline" style="width: 200px">
+          <mat-label>% de redução</mat-label>
+
+          <input
+            matInput
+            formControlName="discounPercent"
+            mask="separator.2"
+            maxlength="8"
+            suffix=" %"
+            decimalMarker=","
+            [dropSpecialCharacters]="true"
+          />
+          @if (discounPercent.touched && discounPercent.hasError('required')) {
+            <mat-error>Campo obrigatório</mat-error>
+          }
+
+          @if (discounPercent.touched && discounPercent.hasError('min')) {
+            <mat-error>Porcentagem menor que 0</mat-error>
+          }
+
+          @if (discounPercent.touched && discounPercent.hasError('max')) {
+            <mat-error>Porcentagem maior que 100</mat-error>
+          }
+        </mat-form-field>
+      </div>
+      <table
+        mat-table
+        [dataSource]="dataSource"
+        matSort
+        class="default-table zebra-simple"
+        style="width: 100%"
+      >
+        <ng-container matColumnDef="margin_min">
+          <th mat-header-cell *matHeaderCellDef>Margem de</th>
+          <td mat-cell *matCellDef="let element">{{ `${element.marginMin}%` }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="margin_max">
+          <th mat-header-cell *matHeaderCellDef>Margem até</th>
+          <td mat-cell *matCellDef="let element">{{ `${element.marginMax}%` }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="discount_percent">
+          <th mat-header-cell *matHeaderCellDef>% de redução do preço</th>
+          <td mat-cell *matCellDef="let element">{{ `${element.discountPercent}%` }}</td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+        <tr
+          mat-row
+          *matRowDef="let row; columns: columnsToDisplay"
+          style="cursor: pointer"
+          (click)="editSetting(row)"
+        ></tr>
+      </table>
+      <div fxLayout="row" fxLayoutGap="5px" style="color: var(--error-color)">
+        <mat-icon style="font-size: 18px; width: 18px; height: 18px">warning</mat-icon>
+        <span style="font-weight: bold">Margem < 7%: </span>
+        <span style="font-weight: 500"
+          >Produtos com margem abaixo de 7% exigem análise manual obrigatória</span
+        >
+      </div>
+      <div fxLayout="row" fxLayoutGap="5px" style="color: var(--info-color)" class="full-width">
+        <mat-icon style="font-size: 18px; width: 30px; height: 18px">info</mat-icon>
+        <span style="font-weight: bold"> Sugestão: </span>
+        <span style="font-weight: 500"
+          >A sugestão de preços é calculada automaticamente baseada na margem sobre o custo atual e
+          nos preços dos concorrentes, aplicando o percentual de desconto configurado acima.</span
+        >
       </div>
     </div>
   </mat-dialog-content>
 
   <mat-dialog-actions align="end">
     <div fxLayout="row" fxLayoutGap="8px">
-      <app-button text="Cancelar" type="button" bgColor="var(--cancel-color)" (click)="cancel()" />
       <app-button
-        text="Salvar"
+        [text]="editingSettingId() ? 'Cancelar edição' : 'Cancelar'"
+        type="button"
+        bgColor="var(--cancel-color)"
+        (click)="cancel()"
+      />
+
+      <app-button
+        [text]="editingSettingId() ? 'Salvar edição' : 'Salvar'"
         type="submit"
         [disabled]="suggestedPriceSettingsFormGroup.invalid"
       />
