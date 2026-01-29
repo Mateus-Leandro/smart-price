@@ -120,6 +120,7 @@
           mat-row
           *matRowDef="let row; columns: columnsToDisplay"
           style="cursor: pointer"
+          [class.selected-row]="editingSettingId() === row.id"
           (click)="editSetting(row)"
         ></tr>
       </table>
