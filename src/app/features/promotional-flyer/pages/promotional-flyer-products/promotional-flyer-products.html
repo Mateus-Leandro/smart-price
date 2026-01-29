@@ -1,16 +1,25 @@
 <div>
   <mat-card class="mat-card">
     <mat-card-header>
-      <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
-        <app-icon-button
-          icon="arrow_back"
-          tooltipText="Voltar para a lista de encartes"
-          (click)="goBack()"
-        ></app-icon-button>
-        <div fxLayout="column">
-          <mat-card-title>Produtos do Encarte {{ id }}</mat-card-title>
-          <mat-card-subtitle>Realize a manutenção dos preços de vendas dos itens</mat-card-subtitle>
+      <div fxLayout="row" fxLayoutAlign="space-between" class="full-width">
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+          <app-icon-button
+            icon="arrow_back"
+            tooltipText="Voltar para a lista de encartes"
+            (click)="goBack()"
+          ></app-icon-button>
+          <div fxLayout="column">
+            <mat-card-title>Produtos do Encarte {{ id }}</mat-card-title>
+            <mat-card-subtitle
+              >Realize a manutenção dos preços de vendas dos itens</mat-card-subtitle
+            >
+          </div>
         </div>
+        <app-button
+          icon="settings"
+          text="Regras de Precificação"
+          (click)="openSettingsSuggestedPriceDialog()"
+        />
       </div>
     </mat-card-header>
     <app-promotional-flyer-product-table />
