@@ -1,0 +1,82 @@
+@if (loading()) {
+  <div class="spinner-overlay">
+    <app-spinner />
+  </div>
+}
+
+<div mat-dialog-title fxLayout="row" fxLayoutAlign="start start">
+  <div fxLayout="column">
+    <span> Configurações para sugestão de preço</span>
+    <span class="subtitle"> Ajuste os percentuais para cada faixa de margem. </span>
+  </div>
+</div>
+
+<form [formGroup]="suggestedPriceSettingsFormGroup" (ngSubmit)="submit()">
+  <mat-dialog-content>
+    <div fxLayout="column" fxLayoutGap="10px">
+      <div fxLayout="row" fxLayoutGap="10px">
+        <mat-form-field appearance="outline" style="width: 200px">
+          <mat-label>Margem de</mat-label>
+
+          <input
+            matInput
+            formControlName="marginMin"
+            mask="separator.2"
+            maxlength="8"
+            suffix=" %"
+            decimalMarker=","
+            [dropSpecialCharacters]="true"
+            style="width: 75px"
+          />
+          @if (marginMin.touched && marginMin.hasError('required')) {
+            <mat-error>Campo obrigatório</mat-error>
+          }
+
+          @if (marginMin.touched && marginMin.hasError('min')) {
+            <mat-error>Margem menor que 0</mat-error>
+          }
+
+          @if (marginMin.touched && marginMin.hasError('max')) {
+            <mat-error>Margem maior que 100</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" style="width: 200px">
+          <mat-label>Margem ate</mat-label>
+
+          <input
+            matInput
+            formControlName="marginMax"
+            mask="separator.2"
+            maxlength="8"
+            suffix=" %"
+            decimalMarker=","
+            [dropSpecialCharacters]="true"
+          />
+          @if (marginMax.touched && marginMax.hasError('required')) {
+            <mat-error>Campo obrigatório</mat-error>
+          }
+
+          @if (marginMax.touched && marginMax.hasError('min')) {
+            <mat-error>Margem menor que 0</mat-error>
+          }
+
+          @if (marginMax.touched && marginMax.hasError('max')) {
+            <mat-error>Margem maior que 100</mat-error>
+          }
+        </mat-form-field>
+      </div>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <div fxLayout="row" fxLayoutGap="8px">
+      <app-button text="Cancelar" type="button" bgColor="var(--cancel-color)" (click)="cancel()" />
+      <app-button
+        text="Salvar"
+        type="submit"
+        [disabled]="suggestedPriceSettingsFormGroup.invalid"
+      />
+    </div>
+  </mat-dialog-actions>
+</form>
