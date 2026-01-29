@@ -21,6 +21,7 @@ import { SuggestedPriceSettingService } from '../../services/suggested-price-set
 import { AuthService } from 'src/app/features/auth/services/auth.service';
 import { ISuggestedPriceSettingUpsert } from 'src/app/core/models/suggested-price-setting.model';
 import { MatIconModule } from '@angular/material/icon';
+import { IconButton } from 'src/app/shared/components/icon-button/icon-button';
 
 @Component({
   selector: 'app-settings-suggested-price-dialog',
@@ -36,6 +37,7 @@ import { MatIconModule } from '@angular/material/icon';
     NgxMaskDirective,
     MatTableModule,
     MatIconModule,
+    IconButton,
   ],
   templateUrl: './suggested-price-settings-dialog.html',
   styleUrl: '../../../../global/styles/_tables.scss',
@@ -142,6 +144,23 @@ export class SuggestedPriceSettingsDialog {
     this.marginMin.setValue(row.marginMin);
     this.marginMax.setValue(row.marginMax);
     this.discounPercent.setValue(row.discountPercent);
+  }
+
+  deleteSuggestedPriceSettings() {
+    if (!this.editingSettingId()) return;
+
+    this.suggestedPriceSettingService
+      .deleteSuggestedPriceSettings(this.editingSettingId()!)
+      .subscribe({
+        next: () => {
+          this.reload();
+          this.buildFormGroup();
+          this.notificationService.showSuccess(`Configuração removido com sucesso`);
+        },
+        error: (err) => {
+          this.notificationService.showError(`Erro ao remover configuração: ${err.message || err}`);
+        },
+      });
   }
 
   get marginMin() {
