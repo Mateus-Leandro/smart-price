@@ -163,3 +163,7 @@ table {
   width: 15px;
   text-align: center;
 }
+
+.selected-row td {
+  font-weight: bold !important;
+}

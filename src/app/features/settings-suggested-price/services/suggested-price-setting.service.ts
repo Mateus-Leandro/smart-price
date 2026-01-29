@@ -15,4 +15,8 @@ export class SuggestedPriceSettingService {
   upsertSuggestedPriceSettings(settings: ISuggestedPriceSettingUpsert) {
     return this.repository.upsertSuggestedPriceSettings(settings);
   }
+
+  deleteSuggestedPriceSettings(settingId: string) {
+    return this.repository.deleteSuggestedPriceSettings(settingId);
+  }
 }

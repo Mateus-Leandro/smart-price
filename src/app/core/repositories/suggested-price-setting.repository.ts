@@ -63,4 +63,12 @@ export class SuggestedPriceSettingsRepository {
       finalize(() => this.loadingService.hide()),
     );
   }
+
+  deleteSuggestedPriceSettings(settingId: string) {
+    return from(this.supabase.from('suggested_price_settings').delete().eq('id', settingId)).pipe(
+      map(({ error }) => {
+        if (error) throw error;
+      }),
+    );
+  }
 }

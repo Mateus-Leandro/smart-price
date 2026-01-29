@@ -120,6 +120,7 @@
           mat-row
           *matRowDef="let row; columns: columnsToDisplay"
           style="cursor: pointer"
+          [class.selected-row]="editingSettingId() === row.id"
           (click)="editSetting(row)"
         ></tr>
       </table>
@@ -141,20 +142,28 @@
     </div>
   </mat-dialog-content>
 
-  <mat-dialog-actions align="end">
-    <div fxLayout="row" fxLayoutGap="8px">
-      <app-button
-        [text]="editingSettingId() ? 'Cancelar edição' : 'Cancelar'"
-        type="button"
-        bgColor="var(--cancel-color)"
-        (click)="cancel()"
-      />
+  <mat-dialog-actions>
+    <div fxLayout="row" fxLayoutGap="8px" class="full-width" fxLayoutAlign="space-between">
+      <app-icon-button
+        icon="delete"
+        [disabled]="!editingSettingId()"
+        tooltipText="Excluir configuração"
+        (click)="deleteSuggestedPriceSettings()"
+      ></app-icon-button>
+      <div fxLayout="row" fxLayoutGap="10px">
+        <app-button
+          [text]="editingSettingId() ? 'Cancelar edição' : 'Cancelar'"
+          type="button"
+          bgColor="var(--cancel-color)"
+          (click)="cancel()"
+        />
 
-      <app-button
-        [text]="editingSettingId() ? 'Salvar edição' : 'Salvar'"
-        type="submit"
-        [disabled]="suggestedPriceSettingsFormGroup.invalid"
-      />
+        <app-button
+          [text]="editingSettingId() ? 'Salvar edição' : 'Salvar'"
+          type="submit"
+          [disabled]="suggestedPriceSettingsFormGroup.invalid"
+        />
+      </div>
     </div>
   </mat-dialog-actions>
 </form>
