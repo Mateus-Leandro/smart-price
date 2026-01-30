@@ -84,9 +84,17 @@ export class PromotionalFlyerRepository {
     current_loyalty_price,
     erp_import_date,
 
+    promotionalFlyer:promotional_flyers!inner (
+     branche_id
+    ),
+
     product:products!inner (
       id,
-      name
+      name,
+      productMarginBranches:product_margin_branches (
+      margin,
+      branche_id
+      )
     ),
 
     supplier:suppliers!inner (
@@ -117,19 +125,30 @@ export class PromotionalFlyerRepository {
       map(({ data, count, error }) => {
         if (error) throw error;
 
-        const mappedData: IPromotionalFlyerProductsView[] = (data || []).map((item: any) => ({
-          salePrice: item.sale_price,
-          loyaltyPrice: item.loyalty_price,
-          shippingPrice: item.shipping_price,
-          quoteCost: item.quote_cost,
-          currentCostPrice: item.current_cost_price,
-          currentSalePrice: item.current_sale_price,
-          currentLoyaltyPrice: item.current_loyalty_price,
-          erpImportDate: item.erp_import_date,
-          product: { id: item?.product?.id, name: item?.product?.name },
-          supplier: { id: item?.supplier?.id, name: item?.supplier?.name },
-          competitorPrices: item?.competitorPrices,
-        })) as IPromotionalFlyerProductsView[];
+        const mappedData: IPromotionalFlyerProductsView[] = (data || []).map((item: any) => {
+          const targetBranchId = item.promotionalFlyer?.branche_id;
+          const correctMargin = item.product?.productMarginBranches?.find(
+            (m: any) => m.branche_id === targetBranchId,
+          );
+
+          return {
+            salePrice: item.sale_price,
+            loyaltyPrice: item.loyalty_price,
+            shippingPrice: item.shipping_price,
+            quoteCost: item.quote_cost,
+            currentCostPrice: item.current_cost_price,
+            currentSalePrice: item.current_sale_price,
+            currentLoyaltyPrice: item.current_loyalty_price,
+            erpImportDate: item.erp_import_date,
+            product: {
+              id: item?.product?.id,
+              name: item?.product?.name,
+              margin: correctMargin?.margin,
+            },
+            supplier: { id: item?.supplier?.id, name: item?.supplier?.name },
+            competitorPrices: item?.competitorPrices,
+          };
+        }) as IPromotionalFlyerProductsView[];
 
         return { data: mappedData, count: count ?? 0 };
       }),
