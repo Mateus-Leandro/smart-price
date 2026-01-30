@@ -64,7 +64,7 @@ export class SuggestedPriceSettingsDialog {
     this.suggestedPriceSettingsFormGroup = this.fb.group({
       marginMin: [
         '',
-        [Validators.required, Validators.maxLength(3), Validators.max(100), Validators.min(0)],
+        [Validators.required, Validators.maxLength(3), Validators.max(100), Validators.min(7)],
       ],
       marginMax: [
         '',
