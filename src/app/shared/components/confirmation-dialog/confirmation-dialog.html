@@ -1,0 +1,24 @@
+<h2 mat-dialog-title>{{ data.titleText }}</h2>
+<mat-dialog-content>
+  <p>{{ data.messageText }}</p>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <div fxLayout="row" fxLayoutGap="10px">
+    <app-button
+      text="{{ data.cancelText }}"
+      type="button"
+      bgColor="var(--ripple-color)"
+      textColor="var(--font-secondary)"
+      [mat-dialog-close]="false"
+    />
+
+    <app-button
+      text="{{ data.confirmationText }}"
+      type="button"
+      bgColor="var(--cancel-color)"
+      [mat-dialog-close]="true"
+      cdkFocusInitial
+    />
+  </div>
+</mat-dialog-actions>

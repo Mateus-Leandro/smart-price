@@ -8,7 +8,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { NgxMaskDirective } from 'ngx-mask';
@@ -22,6 +22,7 @@ import { AuthService } from 'src/app/features/auth/services/auth.service';
 import { ISuggestedPriceSettingUpsert } from 'src/app/core/models/suggested-price-setting.model';
 import { MatIconModule } from '@angular/material/icon';
 import { IconButton } from 'src/app/shared/components/icon-button/icon-button';
+import { ConfirmationDialog } from 'src/app/shared/components/confirmation-dialog/confirmation-dialog';
 
 @Component({
   selector: 'app-settings-suggested-price-dialog',
@@ -56,6 +57,7 @@ export class SuggestedPriceSettingsDialog {
     private notificationService: NotificationService,
     private suggestedPriceSettingService: SuggestedPriceSettingService,
     private authService: AuthService,
+    private dialog: MatDialog,
   ) {
     this.buildFormGroup();
   }
@@ -149,17 +151,39 @@ export class SuggestedPriceSettingsDialog {
   deleteSuggestedPriceSettings() {
     if (!this.editingSettingId()) return;
 
-    this.suggestedPriceSettingService
-      .deleteSuggestedPriceSettings(this.editingSettingId()!)
-      .subscribe({
-        next: () => {
-          this.reload();
-          this.buildFormGroup();
-          this.notificationService.showSuccess(`Configuração removido com sucesso`);
+    this.dialog
+      .open(ConfirmationDialog, {
+        width: '400px',
+        disableClose: true,
+        autoFocus: true,
+        data: {
+          titleText: 'Excluir Configuração',
+          messageText: 'Tem certeza que deseja apagar os dados? Esta ação é irreversível.',
+          confirmationText: 'Excluir configuração',
+          cancelText: 'Não',
         },
-        error: (err) => {
-          this.notificationService.showError(`Erro ao remover configuração: ${err.message || err}`);
-        },
+      })
+      .afterClosed()
+      .subscribe((confirmation) => {
+        if (confirmation) {
+          this.suggestedPriceSettingService
+            .deleteSuggestedPriceSettings(this.editingSettingId()!)
+            .subscribe({
+              next: () => {
+                this.reload();
+                this.buildFormGroup();
+                this.notificationService.showSuccess(`Configuração removido com sucesso`);
+              },
+              error: (err) => {
+                this.notificationService.showError(
+                  `Erro ao remover configuração: ${err.message || err}`,
+                );
+              },
+            });
+        }
+
+        this.editingSettingId.set(null);
+        this.buildFormGroup();
       });
   }
 
