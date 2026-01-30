@@ -108,6 +108,7 @@ export class PromotionalFlyerProductTable {
     'expand',
     'id',
     'name',
+    'margin',
     'shipping_price',
     'quote_cost',
     'current_cost_price',

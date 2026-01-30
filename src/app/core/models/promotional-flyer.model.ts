@@ -39,6 +39,7 @@ export interface IPromotionalFlyerProductsView {
   product: {
     id: number;
     name: string;
+    margin?: number;
   };
   supplier: {
     id: number;
