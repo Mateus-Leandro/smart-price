@@ -28,7 +28,7 @@ import {
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { debounceTime } from 'rxjs/internal/operators/debounceTime';
 import { distinctUntilChanged } from 'rxjs/internal/operators/distinctUntilChanged';
-import { Subject } from 'rxjs';
+import { merge, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { NgxMaskDirective } from 'ngx-mask';
 import { CommonModule } from '@angular/common';
 import { PromotionalFlyerService } from '../../services/promotional-flyer.service';
@@ -44,13 +44,23 @@ import { CompetitorService } from 'src/app/features/competitor/services/competit
 import { ICompetitor } from 'src/app/core/models/competitor';
 import { CompetitorPriceFlyerProductService } from 'src/app/features/competitor-price-flyer-product/competitor-price-flyer-product.service';
 import { AuthService } from 'src/app/features/auth/services/auth.service';
+import { transformToNumberValue } from 'src/app/shared/functions/utils';
+import { SuggestedPriceSettingService } from 'src/app/features/settings-suggested-price/services/suggested-price-setting.service';
+import { ISuggestedPriceSettingView } from 'src/app/core/models/suggested-price-setting.model';
+import { MatDivider } from '@angular/material/divider';
 
 type FlyerRowForm = FormGroup<{
+  actualSalePrice: FormControl<string | null>;
   salePrice: FormControl<string | null>;
   shippingPrice: FormControl<string | null>;
+  actualLoyaltyPrice: FormControl<string | null>;
   loyaltyPrice: FormControl<string | null>;
   productId: FormControl<number>;
+  productMargin: FormControl<number>;
+  quoteCost: FormControl<number>;
   competitorPrices: FormArray<FormControl<string | null>>;
+  suggestedSalePrice: FormControl<string | null>;
+  suggestedLoyaltyPrice: FormControl<string | null>;
 }>;
 
 @Component({
@@ -70,9 +80,11 @@ type FlyerRowForm = FormGroup<{
     NgxMaskDirective,
     IconButton,
     MatTooltip,
+    MatDivider,
   ],
   templateUrl: './promotional-flyer-product-table.html',
-  styleUrl: '../../../../global/styles/_tables.scss',
+
+  styleUrls: ['../../../../global/styles/_tables.scss', './promotional-flyer-product-table.scss'],
 })
 export class PromotionalFlyerProductTable {
   @ViewChild(MatSort) sort!: MatSort;
@@ -92,12 +104,14 @@ export class PromotionalFlyerProductTable {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   readonly ProductPriceType = ProductPriceType;
+  private destroy$ = new Subject<void>();
 
   searchTerm = '';
   loading = inject(LoadingService).loading;
   flyerId = 0;
   sendingProductId?: number | null;
   competitorList: ICompetitor[] = [];
+  suggestedPriceSettingsList: ISuggestedPriceSettingView[] = [];
   companyId!: number;
 
   sortEvent!: Sort;
@@ -142,21 +156,57 @@ export class PromotionalFlyerProductTable {
     private competitorService: CompetitorService,
     private competitorPriceFlyerProductService: CompetitorPriceFlyerProductService,
     private authService: AuthService,
+    private suggestedPriceSettings: SuggestedPriceSettingService,
   ) {}
 
   ngOnInit(): void {
     this.flyerId = Number(this.route.snapshot.paramMap.get('id'));
-    this.reload();
-
-    this.search$.pipe(debounceTime(300), distinctUntilChanged()).subscribe((value) => {
-      this.searchTerm = value;
-      this.paginatorDataSource.pageIndex = 0;
-      this.reload();
-    });
 
     this.form = this.fb.group({
       rows: this.fb.array([]),
     });
+
+    this.setupSearchListener();
+    this.loadData();
+  }
+
+  private setupSearchListener(): void {
+    this.search$
+      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
+      .subscribe((value) => {
+        this.searchTerm = value;
+        this.paginatorDataSource.pageIndex = 0;
+        if (this.companyId) {
+          this.reload();
+        }
+      });
+  }
+
+  private loadData(): void {
+    this.authService
+      .getCompanyIdFromLoggedUser()
+      .pipe(
+        tap((companyId) => (this.companyId = companyId)),
+        switchMap((companyId) => this.suggestedPriceSettings.loadSuggestedPriceSettings(companyId)),
+        takeUntil(this.destroy$),
+      )
+      .subscribe({
+        next: (suggestedPriceSettings) => {
+          this.suggestedPriceSettingsList = suggestedPriceSettings;
+          this.reload();
+        },
+        error: (err) => {
+          console.error(err);
+          this.notificationService.showError(
+            `Erro ao carregar configurações: ${err.message || err}`,
+          );
+        },
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   ngAfterViewInit() {
@@ -245,8 +295,13 @@ export class PromotionalFlyerProductTable {
           return this.fb.control<string | null>(formattedPrice);
         });
 
-        return this.fb.group({
+        const rowForm = this.fb.group({
           productId: this.fb.control<number>(item.product.id, { nonNullable: true }),
+          actualSalePrice: this.fb.control<string | null>(
+            item.currentSalePrice != null
+              ? item.currentSalePrice.toFixed(2).replace('.', ',')
+              : '0,00',
+          ),
           salePrice: this.fb.control<string | null>(
             item.salePrice != null ? item.salePrice.toFixed(2).replace('.', ',') : '0,00',
           ),
@@ -256,8 +311,23 @@ export class PromotionalFlyerProductTable {
           loyaltyPrice: this.fb.control<string | null>(
             item.loyaltyPrice != null ? item.loyaltyPrice.toFixed(2).replace('.', ',') : '0,00',
           ),
+          actualLoyaltyPrice: this.fb.control<string | null>(
+            item.currentLoyaltyPrice != null
+              ? item.currentLoyaltyPrice.toFixed(2).replace('.', ',')
+              : '0,00',
+          ),
           competitorPrices: this.fb.array(competitorControls),
+          productMargin: this.fb.control<number>(item.product?.margin ?? 0),
+          quoteCost: this.fb.control<number>(item.quoteCost ?? 0),
+
+          suggestedSalePrice: this.fb.control<string | null>(null),
+          suggestedLoyaltyPrice: this.fb.control<string | null>('0,00'),
         }) as FlyerRowForm;
+
+        this.calculateSuggestedPrice(rowForm);
+        this.setObservables(rowForm);
+
+        return rowForm;
       }),
     );
 
@@ -357,14 +427,8 @@ export class PromotionalFlyerProductTable {
       return;
     }
 
-    let cleanPriceValue = value.replace('R$ ', '').replace(/\./g, '').replace(',', '.');
-    let cleanInitialPriceValue = initialPrice
-      .replace('R$ ', '')
-      .replace(/\./g, '')
-      .replace(',', '.');
-
-    const numericPrice = parseFloat(cleanPriceValue);
-    const numericInitialPrice = parseFloat(cleanInitialPriceValue);
+    const numericPrice = transformToNumberValue(value);
+    const numericInitialPrice = transformToNumberValue(initialPrice);
 
     if (numericPrice === numericInitialPrice) return;
 
@@ -462,5 +526,75 @@ export class PromotionalFlyerProductTable {
 
   toggleRow(row: IPromotionalFlyerProductsView): void {
     this.expandedElement = this.expandedElement === row ? null : row;
+  }
+
+  calculateSuggestedPrice(flyerRow: FlyerRowForm) {
+    const {
+      shippingPrice,
+      productMargin,
+      competitorPrices,
+      quoteCost,
+      suggestedSalePrice,
+      suggestedLoyaltyPrice,
+    } = flyerRow.controls;
+
+    const productMarginValue = transformToNumberValue(productMargin.value ?? 0);
+    const shippingPriceValue = transformToNumberValue(shippingPrice.value ?? 0);
+    const quoteCostValue = transformToNumberValue(quoteCost.value ?? 0);
+
+    const finalCost = shippingPriceValue + quoteCostValue;
+    const competitorPriceValues = competitorPrices.value.map((value) => {
+      return transformToNumberValue(value ?? '0');
+    });
+
+    const pricesOnly = competitorPriceValues.filter((price) => price > 0);
+    const lowestCompetitorPrice = pricesOnly.length > 0 ? Math.min(...pricesOnly) : 0;
+
+    let competitorMargin = 0;
+    if (lowestCompetitorPrice > 0) {
+      competitorMargin = ((lowestCompetitorPrice - finalCost) / lowestCompetitorPrice) * 100;
+    }
+
+    let calculatedSuggestedSalePrice = null;
+    let calculatedSuggestedLoyaltyPrice = null;
+
+    let formattedSuggestedSalePrice = null;
+    let formattedSuggestedLoyaltyPrice = null;
+
+    let marginRule: ISuggestedPriceSettingView | undefined;
+    if (competitorMargin < productMarginValue) {
+      marginRule = this.suggestedPriceSettingsList.find(
+        (marginSetting) =>
+          productMarginValue >= marginSetting.marginMin &&
+          productMarginValue <= marginSetting.marginMax,
+      );
+
+      if (marginRule) {
+        calculatedSuggestedSalePrice =
+          lowestCompetitorPrice * (1 - marginRule.discountPercent / 100);
+      }
+    }
+
+    if (calculatedSuggestedSalePrice) {
+      calculatedSuggestedLoyaltyPrice = calculatedSuggestedSalePrice * 0.85;
+      formattedSuggestedSalePrice = calculatedSuggestedSalePrice.toFixed(2).replace('.', ',');
+      formattedSuggestedLoyaltyPrice = calculatedSuggestedLoyaltyPrice.toFixed(2).replace('.', ',');
+    }
+
+    suggestedSalePrice.setValue(formattedSuggestedSalePrice, { emitEvent: false });
+    suggestedLoyaltyPrice.setValue(formattedSuggestedLoyaltyPrice, { emitEvent: false });
+  }
+
+  private setObservables(rowForm: FlyerRowForm) {
+    merge(
+      rowForm.controls.competitorPrices.valueChanges,
+      rowForm.controls.shippingPrice.valueChanges,
+      rowForm.controls.productMargin.valueChanges,
+      rowForm.controls.quoteCost.valueChanges,
+    )
+      .pipe(debounceTime(300))
+      .subscribe(() => {
+        this.calculateSuggestedPrice(rowForm);
+      });
   }
 }
