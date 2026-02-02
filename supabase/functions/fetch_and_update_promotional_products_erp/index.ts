@@ -41,7 +41,7 @@ serve(async (req) => {
 
     let query = supabase
       .from('promotional_flyer_products')
-      .select('id, promotional_flyer_id, product_id, sale_price, loyalty_price')
+      .select('promotional_flyer_id, product_id, sale_price, loyalty_price')
       .eq('company_id', company_id)
       .eq('send_to_erp', true)
       .or('sale_price.gt.0,loyalty_price.gt.0');
@@ -57,17 +57,17 @@ serve(async (req) => {
     }
 
     if (!data || data.length === 0) {
-      return sucess([]);
+      return success([]);
     }
 
-    const ids = data.map((r) => r.id);
+    const ids = data.map((r) => r.product_id);
     const { error: updError } = await supabase
       .from('promotional_flyer_products')
       .update({
         send_to_erp: false,
         erp_import_date: new Date().toISOString(),
       })
-      .in('id', ids)
+      .in('product_id', ids)
       .eq('company_id', company_id);
 
     if (updError) {
@@ -76,6 +76,7 @@ serve(async (req) => {
 
     return success(data);
   } catch (error) {
-    return fail('Internal Server Error', 500);
+    console.error(error);
+    return fail(error instanceof Error ? error.message : 'Internal Server Error', 500);
   }
 });
