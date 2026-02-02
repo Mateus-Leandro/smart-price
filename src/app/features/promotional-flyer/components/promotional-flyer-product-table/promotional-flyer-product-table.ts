@@ -420,11 +420,11 @@ export class PromotionalFlyerProductTable {
     columnName: string,
     competitorId?: number,
   ): Promise<void> {
-    const value = control.value;
+    let value = control.value;
 
     if (!value) {
       control.setValue('0,00', { emitEvent: false });
-      return;
+      value = '0,00';
     }
 
     const numericPrice = transformToNumberValue(value);
