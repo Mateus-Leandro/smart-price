@@ -1,0 +1,42 @@
+@use './../../../../global/colors.scss' as *;
+
+.suggested-prices {
+  font-size: 11px;
+  font-weight: bolder;
+}
+
+.sale-price-cell {
+  color: $sale-price-color !important;
+  border-bottom-color: $sale-price-color !important;
+}
+
+.loyalty-price-cell {
+  color: $loyalty-price-color !important;
+  border-bottom-color: $loyalty-price-color !important;
+}
+
+input.only-line.sale-price-cell {
+  color: $sale-price-color !important;
+  border-bottom-color: $sale-price-color !important;
+}
+
+input.only-line.loyalty-price-cell {
+  color: $loyalty-price-color !important;
+  border-bottom-color: $loyalty-price-color !important;
+}
+
+tr.mat-mdc-row:hover .sale-price-cell,
+tr.mat-mdc-row:hover .loyalty-price-cell,
+tr.mat-row:hover .sale-price-cell,
+tr.mat-row:hover .loyalty-price-cell {
+  color: #ffffff !important;
+  border-bottom-color: #ffffff !important;
+}
+
+tr.mat-mdc-row:hover .sale-price-cell input,
+tr.mat-mdc-row:hover .loyalty-price-cell input,
+tr.mat-row:hover .sale-price-cell input,
+tr.mat-row:hover .loyalty-price-cell input {
+  color: #ffffff !important;
+  border-bottom-color: #ffffff !important;
+}

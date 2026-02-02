@@ -53,12 +53,12 @@
   tr.mat-row:hover {
     cursor: pointer;
     background-color: $primary !important;
-    color: $secondary;
+    color: $secondary !important;
 
     .only-line {
-      color: $font-primary;
+      color: $font-primary !important;
       border-bottom-color: $font-primary;
-      caret-color: $font-primary;
+      caret-color: $font-primary !important;
     }
 
     .icon-button-table {
