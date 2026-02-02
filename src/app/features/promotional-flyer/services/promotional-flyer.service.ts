@@ -31,4 +31,8 @@ export class PromotionalFlyerService {
   sendPricesToErp(flyerId: number, productId?: number) {
     return this.repository.sendPricesToErp(flyerId, productId);
   }
+
+  applySuggestedPrices(flyerId: number) {
+    return this.repository.applySuggestedPrices(flyerId);
+  }
 }

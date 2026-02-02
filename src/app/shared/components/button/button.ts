@@ -4,14 +4,23 @@ import { MatIcon } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Spinner } from '../spinner/spinner';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-button',
-  imports: [MatButtonModule, MatIcon, CommonModule, MatProgressSpinnerModule, Spinner],
+  imports: [
+    MatButtonModule,
+    MatIcon,
+    CommonModule,
+    MatProgressSpinnerModule,
+    Spinner,
+    MatTooltipModule,
+  ],
   templateUrl: './button.html',
 })
 export class Button {
   @Input() text?: string;
+  @Input() tooltipText: string = '';
   @Input() icon?: string;
   @Input() bgColor?: string = 'var(--primary)';
   @Input() textColor: string = 'var(--font-primary)';

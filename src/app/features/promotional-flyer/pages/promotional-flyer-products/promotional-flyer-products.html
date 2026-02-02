@@ -15,11 +15,21 @@
             >
           </div>
         </div>
-        <app-button
-          icon="settings"
-          text="Regras de Precificação"
-          (click)="openSettingsSuggestedPriceDialog()"
-        />
+        <div fxLayout="row" fxLayoutGap="5px">
+          <app-button
+            tooltipText="Mover preço sugerido para preço de venda e preço fidelidade"
+            bgColor="var(--font-primary)"
+            textColor="var(--primary)"
+            icon="currency_exchange"
+            text="Utilizar preço sugerido"
+            (click)="aplySuggestedPrice()"
+          />
+          <app-button
+            icon="settings"
+            text="Regras de Precificação"
+            (click)="openSettingsSuggestedPriceDialog()"
+          />
+        </div>
       </div>
     </mat-card-header>
     <app-promotional-flyer-product-table />

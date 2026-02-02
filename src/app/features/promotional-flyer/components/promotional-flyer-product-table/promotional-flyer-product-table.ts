@@ -254,7 +254,7 @@ export class PromotionalFlyerProductTable {
     this.search$.next(value);
   }
 
-  private reload(): void {
+  reload(): void {
     this.competitorService
       .loadCompetitors({
         pageIndex: 0,
