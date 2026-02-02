@@ -9,6 +9,7 @@ export interface DialogData {
   messageText: string;
   cancelText?: string;
   confirmationText?: string;
+  confirmationColor?: string;
 }
 
 @Component({
@@ -22,5 +23,6 @@ export class ConfirmationDialog {
     this.data.titleText ??= 'Atenção';
     this.data.cancelText ??= 'Cancelar';
     this.data.confirmationText ??= 'Confirmar';
+    this.data.confirmationColor ??= 'var(--cancel-color)';
   }
 }

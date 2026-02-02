@@ -200,4 +200,14 @@ export class PromotionalFlyerRepository {
       }),
     );
   }
+
+  applySuggestedPrices(flyerId: number) {
+    this.loadingService.show();
+    return from(this.supabase.rpc('apply_suggested_prices', { p_flyer_id: flyerId })).pipe(
+      map(({ error }) => {
+        if (error) throw error;
+      }),
+      finalize(() => this.loadingService.hide()),
+    );
+  }
 }
