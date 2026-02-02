@@ -55,7 +55,7 @@
         <td mat-cell *matCellDef="let element">
           <div fxLayout="column" fxLayoutGap="2px">
             {{ element.averageCostQuote | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
-            <span class="suggested-prices"> Fornecedores: {{ element?.quantitySuppliers }} </span>
+            <span class="details-rows"> Fornecedores: {{ element?.quantitySuppliers }} </span>
           </div>
         </td>
       </ng-container>
@@ -156,10 +156,11 @@
               (click)="$event.stopPropagation()"
             />
             @if (rows.at(i).controls.suggestedSalePrice.value) {
-              <div fxLayout="row" fxLayoutGap="5px">
-                <span class="suggested-prices">{{
-                  `Preço Sugerido R$ ${rows.at(i).controls.suggestedSalePrice.value}`
-                }}</span>
+              <div fxLayout="column">
+                <span class="details-rows">{{ 'Preço Sugerido:' }} </span>
+                <span class="details-rows">
+                  {{ `R$ ${rows.at(i).controls.suggestedSalePrice.value}` }}
+                </span>
               </div>
             }
           </div>
@@ -214,10 +215,11 @@
               (click)="$event.stopPropagation()"
             />
             @if (rows.at(i).controls.suggestedLoyaltyPrice.value) {
-              <div fxLayout="row" fxLayoutGap="5px">
-                <span class="suggested-prices">{{
-                  `Preço Sugerido R$ ${rows.at(i).controls.suggestedLoyaltyPrice.value}`
-                }}</span>
+              <div fxLayout="column">
+                <span class="details-rows">{{ `Preço Sugerido:` }}</span>
+                <span class="details-rows">
+                  {{ `R$ ${rows.at(i).controls.suggestedLoyaltyPrice.value}` }}
+                </span>
               </div>
             }
           </div>
