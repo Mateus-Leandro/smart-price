@@ -33,6 +33,7 @@ export interface IPromotionalFlyerProductsView {
   shippingPrice?: number;
   quoteCost?: number;
   averageCostQuote?: number;
+  quantity_suppliers?: number;
   currentSalePrice?: number;
   currentLoyaltyPrice?: number;
   erpImportDate?: string;
