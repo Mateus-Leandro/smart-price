@@ -125,7 +125,7 @@ export class PromotionalFlyerProductTable {
     'margin',
     'shipping_price',
     'quote_cost',
-    'current_cost_price',
+    'average_cost_quote',
     'current_sale_price',
     'sale_price',
     'current_loyalty_price',

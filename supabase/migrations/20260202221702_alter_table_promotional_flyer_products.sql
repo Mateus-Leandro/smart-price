@@ -1,0 +1,2 @@
+ALTER TABLE public.promotional_flyer_products 
+RENAME COLUMN current_cost_price TO average_cost_quote;

@@ -50,10 +50,10 @@
         <td mat-cell *matCellDef="let element">{{ `${element?.product?.margin ?? 0}%` }}</td>
       </ng-container>
 
-      <ng-container matColumnDef="current_cost_price">
+      <ng-container matColumnDef="average_cost_quote">
         <th mat-header-cell *matHeaderCellDef>Média de Custo</th>
         <td mat-cell *matCellDef="let element">
-          {{ element.currentCostPrice | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+          {{ element.averageCostQuote | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
         </td>
       </ng-container>
 
