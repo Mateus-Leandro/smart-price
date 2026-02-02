@@ -6,7 +6,7 @@ export interface IPromotionalFlyerProducts {
   salePrice?: number;
   sendToErp: boolean;
   quoteCost: number;
-  currentCostPrice: number;
+  averageCostQuote: number;
   currentSalePrice: number;
   currentLoyaltyPrice: number;
   quoteSupplierId: number;

@@ -32,7 +32,7 @@ export interface IPromotionalFlyerProductsView {
   loyaltyPrice?: number;
   shippingPrice?: number;
   quoteCost?: number;
-  currentCostPrice?: number;
+  averageCostQuote?: number;
   currentSalePrice?: number;
   currentLoyaltyPrice?: number;
   erpImportDate?: string;
