@@ -14,6 +14,9 @@ $success-color: #2e7d32;
 $warning-color: #ed6c02;
 $info-color: #0288d1;
 
+$sale-price-color: #ed6c02;
+$loyalty-price-color: #6800a5;
+
 $no-background-color: #00000000;
 $ripple-color: #fafafa1e;
 
@@ -34,6 +37,9 @@ $ripple-color: #fafafa1e;
   --sucess-color: #{$success-color};
   --warning-color: #{$warning-color};
   --info-color: #{$info-color};
+
+  --sale-price-color: #{$sale-price-color};
+  --loyalty-price-color: #{$loyalty-price-color};
 
   --no-background-color: #{$no-background-color};
   --ripple-color: #{$ripple-color};
