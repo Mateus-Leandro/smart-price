@@ -536,11 +536,13 @@ export class PromotionalFlyerProductTable {
       quoteCost,
       suggestedSalePrice,
       suggestedLoyaltyPrice,
+      loyaltyPrice,
     } = flyerRow.controls;
 
     const productMarginValue = transformToNumberValue(productMargin.value ?? 0);
     const shippingPriceValue = transformToNumberValue(shippingPrice.value ?? 0);
     const quoteCostValue = transformToNumberValue(quoteCost.value ?? 0);
+    const loyaltyPriceValue = transformToNumberValue(loyaltyPrice.value ?? 0);
 
     const finalCost = shippingPriceValue + quoteCostValue;
     const competitorPriceValues = competitorPrices.value.map((value) => {
@@ -556,7 +558,7 @@ export class PromotionalFlyerProductTable {
     }
 
     let calculatedSuggestedSalePrice = 0;
-    let calculatedSuggestedLoyaltyPrice = 0;
+    let calculatedSuggestedLoyaltyPrice = null;
 
     let formattedSuggestedSalePrice = null;
     let formattedSuggestedLoyaltyPrice = null;
@@ -568,10 +570,11 @@ export class PromotionalFlyerProductTable {
     }
 
     if (lowestCompetitorPrice < calculatedSuggestedSalePrice) {
+      const diffCompetitorMargin = (1 - finalCost / lowestCompetitorPrice) * 100;
       marginRule = this.suggestedPriceSettingsList.find(
         (marginSetting) =>
-          productMarginValue >= marginSetting.marginMin &&
-          productMarginValue <= marginSetting.marginMax,
+          diffCompetitorMargin >= marginSetting.marginMin &&
+          diffCompetitorMargin <= marginSetting.marginMax,
       );
 
       if (marginRule) {
@@ -581,9 +584,13 @@ export class PromotionalFlyerProductTable {
     }
 
     if (calculatedSuggestedSalePrice) {
-      calculatedSuggestedLoyaltyPrice = calculatedSuggestedSalePrice * 0.85;
+      if (loyaltyPriceValue) {
+        calculatedSuggestedLoyaltyPrice = calculatedSuggestedSalePrice * 0.85;
+        formattedSuggestedLoyaltyPrice = calculatedSuggestedLoyaltyPrice
+          .toFixed(2)
+          .replace('.', ',');
+      }
       formattedSuggestedSalePrice = calculatedSuggestedSalePrice.toFixed(2).replace('.', ',');
-      formattedSuggestedLoyaltyPrice = calculatedSuggestedLoyaltyPrice.toFixed(2).replace('.', ',');
     }
 
     suggestedSalePrice.setValue(formattedSuggestedSalePrice, { emitEvent: false });
