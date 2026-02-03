@@ -563,7 +563,7 @@ export class PromotionalFlyerProductTable {
 
     let marginRule: ISuggestedPriceSettingView | undefined;
 
-    if (competitorMargin < productMarginValue && lowestCompetitorPrice >= finalCost) {
+    if (competitorMargin < productMarginValue && lowestCompetitorPrice > finalCost) {
       marginRule = this.suggestedPriceSettingsList.find(
         (marginSetting) =>
           productMarginValue >= marginSetting.marginMin &&
