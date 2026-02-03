@@ -555,15 +555,19 @@ export class PromotionalFlyerProductTable {
       competitorMargin = ((lowestCompetitorPrice - finalCost) / lowestCompetitorPrice) * 100;
     }
 
-    let calculatedSuggestedSalePrice = null;
-    let calculatedSuggestedLoyaltyPrice = null;
+    let calculatedSuggestedSalePrice = 0;
+    let calculatedSuggestedLoyaltyPrice = 0;
 
     let formattedSuggestedSalePrice = null;
     let formattedSuggestedLoyaltyPrice = null;
 
     let marginRule: ISuggestedPriceSettingView | undefined;
 
-    if (competitorMargin < productMarginValue && lowestCompetitorPrice > finalCost) {
+    if (productMarginValue && lowestCompetitorPrice > finalCost) {
+      calculatedSuggestedSalePrice = finalCost * (1 + productMarginValue / 100);
+    }
+
+    if (lowestCompetitorPrice < calculatedSuggestedSalePrice) {
       marginRule = this.suggestedPriceSettingsList.find(
         (marginSetting) =>
           productMarginValue >= marginSetting.marginMin &&
