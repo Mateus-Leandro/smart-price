@@ -61,6 +61,8 @@ type FlyerRowForm = FormGroup<{
   competitorPrices: FormArray<FormControl<string | null>>;
   suggestedSalePrice: FormControl<string | null>;
   suggestedLoyaltyPrice: FormControl<string | null>;
+  suggestedSalePriceWithMargin: FormControl<number | null>;
+  warningPriceText: FormControl<string | null>;
 }>;
 
 @Component({
@@ -321,7 +323,9 @@ export class PromotionalFlyerProductTable {
           quoteCost: this.fb.control<number>(item.quoteCost ?? 0),
 
           suggestedSalePrice: this.fb.control<string | null>(null),
+          suggestedSalePriceWithMargin: this.fb.control<string | null>(null),
           suggestedLoyaltyPrice: this.fb.control<string | null>('0,00'),
+          warningPriceText: this.fb.control<string | null>(null),
         }) as FlyerRowForm;
 
         this.calculateSuggestedPrice(rowForm);
@@ -537,6 +541,8 @@ export class PromotionalFlyerProductTable {
       suggestedSalePrice,
       suggestedLoyaltyPrice,
       loyaltyPrice,
+      suggestedSalePriceWithMargin,
+      warningPriceText,
     } = flyerRow.controls;
 
     const productMarginValue = transformToNumberValue(productMargin.value ?? 0);
@@ -553,10 +559,6 @@ export class PromotionalFlyerProductTable {
     const lowestCompetitorPrice = pricesOnly.length > 0 ? Math.min(...pricesOnly) : 0;
 
     let competitorMargin = 0;
-    if (lowestCompetitorPrice > 0) {
-      competitorMargin = ((lowestCompetitorPrice - finalCost) / lowestCompetitorPrice) * 100;
-    }
-
     let calculatedSuggestedSalePrice = 0;
     let calculatedSuggestedLoyaltyPrice = null;
 
@@ -565,16 +567,22 @@ export class PromotionalFlyerProductTable {
 
     let marginRule: ISuggestedPriceSettingView | undefined;
 
+    warningPriceText.setValue(null);
+    if (lowestCompetitorPrice && lowestCompetitorPrice < finalCost) {
+      warningPriceText.setValue('Preço do concorrente menor que o custo.');
+    }
+
     if (productMarginValue && lowestCompetitorPrice > finalCost) {
       calculatedSuggestedSalePrice = finalCost * (1 + productMarginValue / 100);
+      suggestedSalePriceWithMargin.setValue(calculatedSuggestedSalePrice);
     }
 
     if (lowestCompetitorPrice < calculatedSuggestedSalePrice) {
-      const diffCompetitorMargin = (1 - finalCost / lowestCompetitorPrice) * 100;
+      const competitorMargin = (1 - finalCost / lowestCompetitorPrice) * 100;
       marginRule = this.suggestedPriceSettingsList.find(
         (marginSetting) =>
-          diffCompetitorMargin >= marginSetting.marginMin &&
-          diffCompetitorMargin <= marginSetting.marginMax,
+          competitorMargin >= marginSetting.marginMin &&
+          competitorMargin <= marginSetting.marginMax,
       );
 
       if (marginRule) {
