@@ -558,7 +558,6 @@ export class PromotionalFlyerProductTable {
     const pricesOnly = competitorPriceValues.filter((price) => price > 0);
     const lowestCompetitorPrice = pricesOnly.length > 0 ? Math.min(...pricesOnly) : 0;
 
-    let competitorMargin = 0;
     let calculatedSuggestedSalePrice = 0;
     let calculatedSuggestedLoyaltyPrice = null;
 
@@ -588,17 +587,29 @@ export class PromotionalFlyerProductTable {
       if (marginRule) {
         calculatedSuggestedSalePrice =
           lowestCompetitorPrice * (1 - marginRule.discountPercent / 100);
+      } else {
+        calculatedSuggestedSalePrice = 0;
+        if (competitorMargin < 7) {
+          warningPriceText.setValue('Margem do concorrente menor que 7%.');
+        }
       }
     }
 
     if (calculatedSuggestedSalePrice) {
+      const roundToTwo = (num: number) => {
+        return +(Math.round(Number(num + 'e+2')) + 'e-2');
+      };
+
       if (loyaltyPriceValue) {
         calculatedSuggestedLoyaltyPrice = calculatedSuggestedSalePrice * 0.85;
-        formattedSuggestedLoyaltyPrice = calculatedSuggestedLoyaltyPrice
+        formattedSuggestedLoyaltyPrice = roundToTwo(calculatedSuggestedLoyaltyPrice)
           .toFixed(2)
           .replace('.', ',');
       }
-      formattedSuggestedSalePrice = calculatedSuggestedSalePrice.toFixed(2).replace('.', ',');
+
+      formattedSuggestedSalePrice = roundToTwo(calculatedSuggestedSalePrice)
+        .toFixed(2)
+        .replace('.', ',');
     }
 
     suggestedSalePrice.setValue(formattedSuggestedSalePrice, { emitEvent: false });
