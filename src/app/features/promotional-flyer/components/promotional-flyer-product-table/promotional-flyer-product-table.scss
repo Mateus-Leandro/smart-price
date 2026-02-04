@@ -5,38 +5,41 @@
   font-weight: bolder;
 }
 
-.sale-price-cell {
-  color: $sale-price-color !important;
-  border-bottom-color: $sale-price-color !important;
-}
-
-.loyalty-price-cell {
-  color: $loyalty-price-color !important;
-  border-bottom-color: $loyalty-price-color !important;
-}
-
+.sale-price-cell,
 input.only-line.sale-price-cell {
   color: $sale-price-color !important;
   border-bottom-color: $sale-price-color !important;
 }
 
+.loyalty-price-cell,
 input.only-line.loyalty-price-cell {
   color: $loyalty-price-color !important;
   border-bottom-color: $loyalty-price-color !important;
 }
 
-tr.mat-mdc-row:hover .sale-price-cell,
-tr.mat-mdc-row:hover .loyalty-price-cell,
-tr.mat-row:hover .sale-price-cell,
-tr.mat-row:hover .loyalty-price-cell {
-  color: #ffffff !important;
-  border-bottom-color: #ffffff !important;
+.row-critical {
+  color: red !important;
+  .details-rows,
+  .only-line {
+    color: red !important;
+    border-bottom-color: red !important;
+  }
+
+  .icon-button-table {
+    ::ng-deep mat-icon {
+      color: red !important;
+    }
+  }
 }
 
-tr.mat-mdc-row:hover .sale-price-cell input,
-tr.mat-mdc-row:hover .loyalty-price-cell input,
-tr.mat-row:hover .sale-price-cell input,
-tr.mat-row:hover .loyalty-price-cell input {
-  color: #ffffff !important;
-  border-bottom-color: #ffffff !important;
+tr.mat-mdc-row:hover,
+tr.mat-row:hover {
+  span,
+  div,
+  mat-icon,
+  .only-line,
+  input.only-line {
+    color: #ffffff !important;
+    border-bottom-color: #ffffff !important;
+  }
 }

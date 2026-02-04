@@ -47,7 +47,21 @@
 
       <ng-container matColumnDef="margin">
         <th mat-header-cell *matHeaderCellDef>Margem</th>
-        <td mat-cell *matCellDef="let element">{{ `${element?.product?.margin ?? 0}%` }}</td>
+        <td mat-cell *matCellDef="let element; let i = dataIndex">
+          <div fxLayout="column" fxLayoutGap="2px">
+            <span>
+              {{ `${element?.product?.margin ?? 0}%` }}
+            </span>
+            @if (rows.at(i).controls.suggestedSalePriceWithMargin.value) {
+              <span class="details-rows sale-price-cell" matTooltip="Preço em relação a margem">
+                {{
+                  rows.at(i).controls.suggestedSalePriceWithMargin.value
+                    | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR'
+                }}
+              </span>
+            }
+          </div>
+        </td>
       </ng-container>
 
       <ng-container matColumnDef="average_cost_quote">
@@ -177,58 +191,64 @@
       <ng-container matColumnDef="loyalty_price">
         <th mat-header-cell *matHeaderCellDef>Novo Preço Fidelidade</th>
         <td mat-cell *matCellDef="let element; let i = dataIndex" class="loyalty-price-cell">
-          <div fxLayout="column" fxLayoutGap="2px">
-            <input
-              #loyaltyPriceInput
-              matInput
-              class="only-line loyalty-price-cell"
-              [formControl]="rows.at(i).controls.loyaltyPrice"
-              mask="separator.2"
-              thousandSeparator="."
-              decimalMarker=","
-              prefix="R$ "
-              (keyup.enter)="
-                onEnter(
-                  this.loyaltyPriceInputs.toArray()[i],
-                  this.shippingPriceInputs.toArray()[i + 1]
-                )
-              "
-              (blur)="
-                onPriceBlur(
-                  loyaltyPriceInput.getAttribute('initial-loyalty-price') || '0',
-                  element.product.id,
-                  rows.at(i).controls.loyaltyPrice,
-                  'loyalty_price'
-                )
-              "
-              (focus)="onFocus(loyaltyPriceInput)"
-              (focusin)="
-                loyaltyPriceInput.setAttribute(
-                  'initial-loyalty-price',
-                  rows.at(i).controls.loyaltyPrice.value?.toString() || '0,00'
-                )
-              "
-              [dropSpecialCharacters]="true"
-              [showMaskTyped]="false"
-              [allowNegativeNumbers]="false"
-              style="width: 75px"
-              (click)="$event.stopPropagation()"
-            />
-            @if (rows.at(i).controls.suggestedLoyaltyPrice.value) {
-              <div fxLayout="column">
-                <span class="details-rows">{{ `Preço Sugerido:` }}</span>
-                <span class="details-rows">
-                  {{ `R$ ${rows.at(i).controls.suggestedLoyaltyPrice.value}` }}
-                </span>
-              </div>
-            }
-          </div>
+          @if (element.currentLoyaltyPrice) {
+            <div fxLayout="column" fxLayoutGap="2px">
+              <input
+                #loyaltyPriceInput
+                matInput
+                class="only-line loyalty-price-cell"
+                [formControl]="rows.at(i).controls.loyaltyPrice"
+                mask="separator.2"
+                thousandSeparator="."
+                decimalMarker=","
+                prefix="R$ "
+                (keyup.enter)="
+                  onEnter(
+                    this.loyaltyPriceInputs.toArray()[i],
+                    this.shippingPriceInputs.toArray()[i + 1]
+                  )
+                "
+                (blur)="
+                  onPriceBlur(
+                    loyaltyPriceInput.getAttribute('initial-loyalty-price') || '0',
+                    element.product.id,
+                    rows.at(i).controls.loyaltyPrice,
+                    'loyalty_price'
+                  )
+                "
+                (focus)="onFocus(loyaltyPriceInput)"
+                (focusin)="
+                  loyaltyPriceInput.setAttribute(
+                    'initial-loyalty-price',
+                    rows.at(i).controls.loyaltyPrice.value?.toString() || '0,00'
+                  )
+                "
+                [dropSpecialCharacters]="true"
+                [showMaskTyped]="false"
+                [allowNegativeNumbers]="false"
+                style="width: 75px"
+                (click)="$event.stopPropagation()"
+              />
+              @if (rows.at(i).controls.suggestedLoyaltyPrice.value) {
+                <div fxLayout="column">
+                  <span class="details-rows">{{ `Preço Sugerido:` }}</span>
+                  <span class="details-rows">
+                    {{ `R$ ${rows.at(i).controls.suggestedLoyaltyPrice.value}` }}
+                  </span>
+                </div>
+              }
+            </div>
+          }
         </td>
       </ng-container>
 
       <ng-container matColumnDef="erp_import_date">
         <th mat-header-cell *matHeaderCellDef>Observações</th>
-        <td mat-cell *matCellDef="let element"></td>
+        <td mat-cell *matCellDef="let element; let i = dataIndex">
+          <div>
+            <span style="font-weight: 500">{{ rows.at(i).controls.warningPriceText.value }}</span>
+          </div>
+        </td>
       </ng-container>
 
       <ng-container matColumnDef="send">
@@ -340,8 +360,9 @@
 
       <tr
         mat-row
-        *matRowDef="let element; columns: columnsToDisplay"
+        *matRowDef="let element; let i = dataIndex; columns: columnsToDisplay"
         [class.expanded-detail-content]="expandedElement === element"
+        [class.row-critical]="rows.at(i).controls.warningPriceText.value"
         (click)="toggleRow(element)"
       ></tr>
 
