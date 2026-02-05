@@ -31,6 +31,14 @@ input.only-line.loyalty-price-cell {
     }
   }
 }
+.mat-column-name {
+  min-width: 190px;
+  text-align: start;
+}
+
+.mat-column-shipping_price {
+    width: 70px;
+}
 
 tr.mat-mdc-row:hover,
 tr.mat-row:hover {
