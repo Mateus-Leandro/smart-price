@@ -132,7 +132,6 @@ export class PromotionalFlyerProductTable {
     'sale_price',
     'current_loyalty_price',
     'loyalty_price',
-    'erp_import_date',
     'send',
   ];
 
