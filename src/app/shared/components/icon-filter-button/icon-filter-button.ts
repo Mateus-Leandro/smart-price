@@ -14,6 +14,7 @@ export class IconFilterButton<T> {
   @Input() itemsOptions: IFilterOptions<T>[] = [];
   @Input() toolTipText: string = 'Filtro';
   @Input() showOptionAll: boolean = false;
+  @Input() showOptionEmpty: boolean = false;
   selectedFilter = model<T | null>(null);
   filterOptionsWithAll: { label: string; value: any }[] = [];
 
@@ -24,10 +25,17 @@ export class IconFilterButton<T> {
   });
 
   ngOnInit() {
+    this.filterOptionsWithAll = this.itemsOptions;
+
+    if (this.showOptionEmpty) {
+      this.filterOptionsWithAll = [
+        { label: 'Vazios', value: 'EMPTY' },
+        ...this.filterOptionsWithAll,
+      ];
+    }
+
     if (this.showOptionAll) {
-      this.filterOptionsWithAll = [{ label: 'Todos', value: null }, ...this.itemsOptions];
-    } else {
-      this.filterOptionsWithAll = this.itemsOptions;
+      this.filterOptionsWithAll = [{ label: 'Todos', value: null }, ...this.filterOptionsWithAll];
     }
   }
 
