@@ -34,13 +34,12 @@ export class SupplierMaintenance {
     this.supplierService.updateSupplier(updateSupplier).subscribe({
       next: () => {
         this.notificationService.showSuccess('Fornecedor salvo com sucesso!');
+        this.returnToSuppliers();
       },
       error: (err) => {
         this.notificationService.showError(`Erro ao atualizar fornecedor: ${err.message || err}`);
       },
     });
-
-    this.returnToSuppliers();
   }
 
   returnToSuppliers() {

@@ -19,7 +19,7 @@ export class SupplierRepository {
 
   getSuppliers(
     paginator: IDefaultPaginatorDataSource<ISupplierView>,
-    deliveryType: null | SupplierDeliveryTypeEnum,
+    deliveryType: null | SupplierDeliveryTypeEnum | 'EMPTY',
     search?: string,
   ): Observable<{ data: ISupplierView[]; count: number }> {
     const fromIdx = paginator.pageIndex * paginator.pageSize;
@@ -45,7 +45,11 @@ export class SupplierRepository {
     }
 
     if (deliveryType) {
-      query = query.eq('delivery_type', deliveryType);
+      if (deliveryType === 'EMPTY') {
+        query = query.is('delivery_type', null);
+      } else {
+        query = query.eq('delivery_type', deliveryType);
+      }
     }
 
     this.loadingService.show();
