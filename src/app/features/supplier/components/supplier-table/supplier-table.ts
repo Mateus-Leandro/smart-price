@@ -85,7 +85,7 @@ export class SupplierTable {
 
   loadSuppliers(
     paginator: IDefaultPaginatorDataSource<ISupplierView>,
-    deliveryType: null | SupplierDeliveryTypeEnum,
+    deliveryType: null | SupplierDeliveryTypeEnum | 'EMPTY',
     search?: string,
   ) {
     this.supplierService.getSuppliers(paginator, deliveryType, search).subscribe({

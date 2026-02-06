@@ -12,7 +12,7 @@ export class SupplierService {
 
   getSuppliers(
     paginator: IDefaultPaginatorDataSource<ISupplierView>,
-    deliveryType: null | SupplierDeliveryTypeEnum,
+    deliveryType: null | SupplierDeliveryTypeEnum | 'EMPTY',
     search?: string,
   ) {
     return this.repository.getSuppliers(paginator, deliveryType, search);

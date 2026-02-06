@@ -1,6 +1,7 @@
 <mat-form-field appearance="outline" style="width: 100%">
   <mat-label>Tipo de Entrega</mat-label>
   <mat-select [(value)]="selectedValue">
+    <mat-option [value]="null" />
     @for (delivery of SupplierDeliveryTypeList; track delivery.value) {
       <mat-option [value]="delivery.value">
         {{ delivery.label }}
