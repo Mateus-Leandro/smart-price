@@ -353,7 +353,6 @@ export class PromotionalFlyerProductTable {
       setTimeout(() => nextElement.nativeElement.focus());
     } else if (this.paginator) {
       this.paginator.nextPage();
-      this.focusFirstInputAfterLoad();
     }
   }
 
@@ -400,24 +399,6 @@ export class PromotionalFlyerProductTable {
         }
       }
     }
-  }
-
-  private focusFirstInputAfterLoad(): void {
-    const interval = setInterval(() => {
-      if (!this.loading()) {
-        clearInterval(interval);
-
-        setTimeout(() => {
-          const list = this.shippingPriceInputs;
-          if (list.first) {
-            list.first.nativeElement.focus();
-            list.first.nativeElement.select();
-          }
-        }, 100);
-      }
-    }, 50);
-
-    setTimeout(() => clearInterval(interval), 5000);
   }
 
   async onPriceBlur(
