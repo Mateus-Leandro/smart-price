@@ -580,7 +580,9 @@ export class PromotionalFlyerProductTable {
       const loyaltyPriceValue = transformToNumberValue(actualLoyaltyPrice.value ?? 0);
 
       if (loyaltyPriceValue) {
-        suggestedSalePrice.setValue(roundToTwo(calculatedSuggestedPrice), { emitEvent: false });
+        suggestedSalePrice.setValue(roundToTwo(saleAfterDiscountPercent * 1.15), {
+          emitEvent: false,
+        });
         suggestedLoyaltyPrice.setValue(roundToTwo(saleAfterDiscountPercent), {
           emitEvent: false,
         });
