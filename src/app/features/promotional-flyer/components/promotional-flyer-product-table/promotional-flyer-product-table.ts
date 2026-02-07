@@ -44,7 +44,7 @@ import { CompetitorService } from 'src/app/features/competitor/services/competit
 import { ICompetitor } from 'src/app/core/models/competitor';
 import { CompetitorPriceFlyerProductService } from 'src/app/features/competitor-price-flyer-product/competitor-price-flyer-product.service';
 import { AuthService } from 'src/app/features/auth/services/auth.service';
-import { transformToNumberValue } from 'src/app/shared/functions/utils';
+import { roundToTwo, transformToNumberValue } from 'src/app/shared/functions/utils';
 import { SuggestedPriceSettingService } from 'src/app/features/settings-suggested-price/services/suggested-price-setting.service';
 import { ISuggestedPriceSettingView } from 'src/app/core/models/suggested-price-setting.model';
 import { MatDivider } from '@angular/material/divider';
@@ -539,80 +539,69 @@ export class PromotionalFlyerProductTable {
       quoteCost,
       suggestedSalePrice,
       suggestedLoyaltyPrice,
-      loyaltyPrice,
+      actualLoyaltyPrice,
       suggestedSalePriceWithMargin,
       warningPriceText,
     } = flyerRow.controls;
+    suggestedSalePrice.setValue(null, { emitEvent: false });
+    suggestedLoyaltyPrice.setValue(null, { emitEvent: false });
+    warningPriceText.setValue(null);
 
     const productMarginValue = transformToNumberValue(productMargin.value ?? 0);
-    const shippingPriceValue = transformToNumberValue(shippingPrice.value ?? 0);
-    const quoteCostValue = transformToNumberValue(quoteCost.value ?? 0);
-    const loyaltyPriceValue = transformToNumberValue(loyaltyPrice.value ?? 0);
+    if (!productMarginValue) return;
 
-    const finalCost = shippingPriceValue + quoteCostValue;
+    const finalCost =
+      transformToNumberValue(shippingPrice.value ?? 0) +
+      transformToNumberValue(quoteCost.value ?? 0);
+
+    const calculatedSuggestedPrice = finalCost * (1 + productMarginValue / 100);
+    suggestedSalePriceWithMargin.setValue(calculatedSuggestedPrice, { emitEvent: false });
+
     const competitorPriceValues = competitorPrices.value.map((value) => {
       return transformToNumberValue(value ?? '0');
     });
-
     const pricesOnly = competitorPriceValues.filter((price) => price > 0);
     const lowestCompetitorPrice = pricesOnly.length > 0 ? Math.min(...pricesOnly) : 0;
 
-    let calculatedSuggestedSalePrice = 0;
-    let calculatedSuggestedLoyaltyPrice = null;
-
-    let formattedSuggestedSalePrice = null;
-    let formattedSuggestedLoyaltyPrice = null;
-
-    let marginRule: ISuggestedPriceSettingView | undefined;
-
-    warningPriceText.setValue(null);
-    if (lowestCompetitorPrice && lowestCompetitorPrice < finalCost) {
-      warningPriceText.setValue('Preço do concorrente menor que o custo.');
+    if (!lowestCompetitorPrice) {
+      warningPriceText.setValue('Não informado preço dos concorrentes.');
+      return;
     }
 
-    if (productMarginValue && lowestCompetitorPrice > finalCost) {
-      calculatedSuggestedSalePrice = finalCost * (1 + productMarginValue / 100);
-      suggestedSalePriceWithMargin.setValue(calculatedSuggestedSalePrice);
+    if (finalCost >= lowestCompetitorPrice) {
+      warningPriceText.setValue('Preço do concorrente menor ou igual ao custo.');
+      return;
     }
 
-    if (lowestCompetitorPrice < calculatedSuggestedSalePrice) {
+    if (lowestCompetitorPrice < calculatedSuggestedPrice) {
       const competitorMargin = (1 - finalCost / lowestCompetitorPrice) * 100;
-      marginRule = this.suggestedPriceSettingsList.find(
+      const marginRule = this.suggestedPriceSettingsList.find(
         (marginSetting) =>
           competitorMargin >= marginSetting.marginMin &&
           competitorMargin <= marginSetting.marginMax,
       );
 
-      if (marginRule) {
-        calculatedSuggestedSalePrice =
-          lowestCompetitorPrice * (1 - marginRule.discountPercent / 100);
-      } else {
-        calculatedSuggestedSalePrice = 0;
+      if (!marginRule) {
         if (competitorMargin < 7) {
           warningPriceText.setValue('Margem do concorrente menor que 7%.');
         }
+        return;
       }
-    }
 
-    if (calculatedSuggestedSalePrice) {
-      const roundToTwo = (num: number) => {
-        return +(Math.round(Number(num + 'e+2')) + 'e-2');
-      };
+      const saleAfterDiscountPercent =
+        lowestCompetitorPrice * (1 - marginRule.discountPercent / 100);
+
+      const loyaltyPriceValue = transformToNumberValue(actualLoyaltyPrice.value ?? 0);
 
       if (loyaltyPriceValue) {
-        calculatedSuggestedLoyaltyPrice = calculatedSuggestedSalePrice * 0.85;
-        formattedSuggestedLoyaltyPrice = roundToTwo(calculatedSuggestedLoyaltyPrice)
-          .toFixed(2)
-          .replace('.', ',');
+        suggestedSalePrice.setValue(roundToTwo(calculatedSuggestedPrice), { emitEvent: false });
+        suggestedLoyaltyPrice.setValue(roundToTwo(saleAfterDiscountPercent), {
+          emitEvent: false,
+        });
+      } else {
+        suggestedSalePrice.setValue(roundToTwo(saleAfterDiscountPercent), { emitEvent: false });
       }
-
-      formattedSuggestedSalePrice = roundToTwo(calculatedSuggestedSalePrice)
-        .toFixed(2)
-        .replace('.', ',');
     }
-
-    suggestedSalePrice.setValue(formattedSuggestedSalePrice, { emitEvent: false });
-    suggestedLoyaltyPrice.setValue(formattedSuggestedLoyaltyPrice, { emitEvent: false });
   }
 
   private setObservables(rowForm: FlyerRowForm) {
@@ -622,7 +611,7 @@ export class PromotionalFlyerProductTable {
       rowForm.controls.productMargin.valueChanges,
       rowForm.controls.quoteCost.valueChanges,
     )
-      .pipe(debounceTime(300))
+      .pipe(debounceTime(400))
       .subscribe(() => {
         this.calculateSuggestedPrice(rowForm);
       });
