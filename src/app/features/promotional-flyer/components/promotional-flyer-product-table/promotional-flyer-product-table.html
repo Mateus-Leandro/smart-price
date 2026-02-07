@@ -46,7 +46,10 @@
               {{ `${element?.product?.margin ?? 0}%` }}
             </span>
             @if (rows.at(i).controls.suggestedSalePriceWithMargin.value) {
-              <span class="details-rows sale-price-cell" matTooltip="Preço em relação a margem">
+              <span
+                class="details-rows sale-price-cell"
+                [matTooltip]="`Preço com a margem de ${element?.product?.margin}%`"
+              >
                 {{
                   rows.at(i).controls.suggestedSalePriceWithMargin.value
                     | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR'
@@ -116,13 +119,23 @@
 
       <ng-container matColumnDef="quote_cost">
         <th mat-header-cell *matHeaderCellDef>Pr.Cotação</th>
-        <td mat-cell *matCellDef="let element">
+        <td mat-cell *matCellDef="let element; let i = dataIndex">
           <div
             fxLayout="column"
             [matTooltip]="`${element?.supplier?.id} - ${element?.supplier?.name}`"
           >
-            {{ element.quoteCost | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+            <span> {{ element.quoteCost | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</span>
           </div>
+          @if (getShippingPrice(i)) {
+            <div matTooltip="Pr.Cotação + frete">
+              <span style="font-weight: bold">
+                {{
+                  getFinalCost(i, element.quoteCost)
+                    | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR'
+                }}</span
+              >
+            </div>
+          }
         </td>
       </ng-container>
 
