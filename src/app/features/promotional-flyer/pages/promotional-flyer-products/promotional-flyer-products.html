@@ -14,13 +14,16 @@
             (click)="goBack()"
           ></app-icon-button>
           <div fxLayout="column">
-            <mat-card-title
-              >Produtos da cotação {{ flyerInfo.idIntegral }} - Loja:
-              {{ getFormatedStore() }}</mat-card-title
-            >
-            <mat-card-subtitle
-              >Ajuste o preço de venda e o preço fidelidade dos itens desejados.</mat-card-subtitle
-            >
+            @if (flyerInfo) {
+              <mat-card-title>
+                Produtos da cotação {{ flyerInfo.idIntegral }} - Loja:
+                {{ flyerInfo.brancheId.toString().padStart(2, '0') }}
+              </mat-card-title>
+            }
+
+            <mat-card-subtitle>
+              Ajuste o preço de venda e o preço fidelidade dos itens desejados.
+            </mat-card-subtitle>
           </div>
         </div>
         <div fxLayout="row" fxLayoutGap="5px">

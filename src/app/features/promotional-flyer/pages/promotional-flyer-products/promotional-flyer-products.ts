@@ -115,8 +115,4 @@ export class PromotionalFlyerProducts {
       },
     });
   }
-
-  getFormatedStore() {
-    return String(this.flyerInfo.brancheId).padStart(2, '0');
-  }
 }
