@@ -341,17 +341,18 @@ export class PromotionalFlyerProductTable {
     this.form.setControl('rows', rowsArray);
   }
 
-  onEnter(
-    currentElement: ElementRef<HTMLInputElement>,
-    nextElement: ElementRef<HTMLInputElement>,
+  onEnterNext(
+    queryList: QueryList<ElementRef<HTMLInputElement>>,
+    currentInput: HTMLInputElement,
   ): void {
-    if (currentElement) {
-      currentElement.nativeElement.blur();
-    }
+    const inputs = queryList.toArray();
+    const currentIndex = inputs.findIndex((input) => input.nativeElement === currentInput);
 
-    if (nextElement) {
-      setTimeout(() => nextElement.nativeElement.focus());
-    } else if (this.paginator) {
+    if (currentIndex !== -1 && currentIndex < inputs.length - 1) {
+      const nextField = inputs[currentIndex + 1].nativeElement;
+      nextField.focus();
+      setTimeout(() => nextField.select());
+    } else if (this.paginator?.hasNextPage()) {
       this.paginator.nextPage();
     }
   }
