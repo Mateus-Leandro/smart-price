@@ -12,8 +12,12 @@ import {
 export class PromotionalFlyerService {
   constructor(private repository: PromotionalFlyerRepository) {}
 
-  loadFlyers(paginator: IDefaultPaginatorDataSource<IPromotionalFlyerView>, search?: string) {
-    return this.repository.getFlyers(paginator, search);
+  loadFlyers(
+    paginator: IDefaultPaginatorDataSource<IPromotionalFlyerView>,
+    search?: string,
+    flyerId?: number,
+  ) {
+    return this.repository.getFlyers(paginator, search, flyerId);
   }
 
   loadProducts(

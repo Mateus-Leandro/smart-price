@@ -22,6 +22,7 @@ export class PromotionalFlyerRepository {
   getFlyers(
     paginator: IDefaultPaginatorDataSource<IPromotionalFlyerView>,
     search?: string,
+    flyerId?: number,
   ): Observable<{ data: IPromotionalFlyerView[]; count: number }> {
     const fromIdx = paginator.pageIndex * paginator.pageSize;
     const toIdx = fromIdx + paginator.pageSize - 1;
@@ -39,6 +40,10 @@ export class PromotionalFlyerRepository {
 
     if (search) {
       query = query.ilike('name', `%${search}%`);
+    }
+
+    if (flyerId) {
+      query = query.eq('id', flyerId);
     }
 
     this.loadingService.show();

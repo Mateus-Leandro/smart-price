@@ -52,8 +52,8 @@ export class MainLayout {
     },
     {
       router: '/promotional_flyer',
-      textNav: 'Precificação',
-      icon: 'attach_money',
+      textNav: 'Cotações',
+      icon: 'query_stats',
     },
     {
       router: '/products',

@@ -39,7 +39,10 @@ import { LoadingService } from 'src/app/core/services/loading.service';
 import { NotificationService } from 'src/app/core/services/notification.service';
 import { MatTooltip } from '@angular/material/tooltip';
 import { ProductPriceType } from '../../../../core/enums/product.enum';
-import { IPromotionalFlyerProductsView } from 'src/app/core/models/promotional-flyer.model';
+import {
+  IPromotionalFlyerProductsView,
+  IPromotionalFlyerView,
+} from 'src/app/core/models/promotional-flyer.model';
 import { CompetitorService } from 'src/app/features/competitor/services/competitor.service';
 import { ICompetitor } from 'src/app/core/models/competitor';
 import { CompetitorPriceFlyerProductService } from 'src/app/features/competitor-price-flyer-product/competitor-price-flyer-product.service';
@@ -111,6 +114,7 @@ export class PromotionalFlyerProductTable {
   searchTerm = '';
   loading = inject(LoadingService).loading;
   flyerId = 0;
+  flyerInfo!: IPromotionalFlyerView;
   sendingProductId?: number | null;
   competitorList: ICompetitor[] = [];
   suggestedPriceSettingsList: ISuggestedPriceSettingView[] = [];
