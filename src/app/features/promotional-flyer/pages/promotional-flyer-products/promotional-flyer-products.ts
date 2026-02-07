@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, inject, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle } from '@angular/material/card';
 import { PromotionalFlyerProductTable } from '../../components/promotional-flyer-product-table/promotional-flyer-product-table';
@@ -10,6 +10,9 @@ import { SuggestedPriceSettingsDialog } from 'src/app/features/settings-suggeste
 import { ConfirmationDialog } from 'src/app/shared/components/confirmation-dialog/confirmation-dialog';
 import { NotificationService } from 'src/app/core/services/notification.service';
 import { PromotionalFlyerService } from '../../services/promotional-flyer.service';
+import { IPromotionalFlyerView } from 'src/app/core/models/promotional-flyer.model';
+import { Spinner } from 'src/app/shared/components/spinner/spinner';
+import { LoadingService } from 'src/app/core/services/loading.service';
 
 @Component({
   selector: 'app-promotional-flyer-products',
@@ -22,12 +25,16 @@ import { PromotionalFlyerService } from '../../services/promotional-flyer.servic
     IconButton,
     FlexLayoutModule,
     Button,
+    Spinner,
   ],
   templateUrl: './promotional-flyer-products.html',
   styleUrl: './promotional-flyer-products.scss',
 })
 export class PromotionalFlyerProducts {
+  loading = inject(LoadingService).loading;
   id: number = 0;
+  flyerInfo!: IPromotionalFlyerView;
+
   @ViewChild(PromotionalFlyerProductTable)
   flyerTable!: PromotionalFlyerProductTable;
 
@@ -41,6 +48,7 @@ export class PromotionalFlyerProducts {
 
   ngOnInit() {
     this.id = Number(this?.route?.snapshot?.paramMap?.get('id'));
+    this.loadFlyerInfo();
   }
 
   goBack() {
@@ -86,5 +94,29 @@ export class PromotionalFlyerProducts {
           });
         }
       });
+  }
+
+  private loadFlyerInfo() {
+    const paginatorFlyer = {
+      pageIndex: 0,
+      pageSize: 1,
+      records: {
+        count: 0,
+        data: [],
+      },
+    };
+
+    this.promotionalFlyerService.loadFlyers(paginatorFlyer, '', this.id).subscribe({
+      next: (flyer) => {
+        this.flyerInfo = flyer.data[0];
+      },
+      error: (err) => {
+        this.notificationService.showError(`Erro ao buscar informações do encarte: ${err}`);
+      },
+    });
+  }
+
+  getFormatedStore() {
+    return String(this.flyerInfo.brancheId).padStart(2, '0');
   }
 }

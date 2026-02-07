@@ -50,7 +50,6 @@ export class PromotionalFlyerTable {
   sendingFlyerId?: number | null;
 
   columnsToDisplay = [
-    'id',
     'id_quote',
     'name',
     'branche_id',

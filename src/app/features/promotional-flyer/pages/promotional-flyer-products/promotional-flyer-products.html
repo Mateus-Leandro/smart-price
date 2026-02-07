@@ -1,4 +1,9 @@
 <div>
+  @if (loading()) {
+    <div class="spinner-overlay">
+      <app-spinner />
+    </div>
+  }
   <mat-card class="mat-card">
     <mat-card-header>
       <div fxLayout="row" fxLayoutAlign="space-between" class="full-width">
@@ -9,9 +14,12 @@
             (click)="goBack()"
           ></app-icon-button>
           <div fxLayout="column">
-            <mat-card-title>Produtos do Encarte {{ id }}</mat-card-title>
+            <mat-card-title
+              >Produtos da cotação {{ flyerInfo.idIntegral }} - Loja:
+              {{ getFormatedStore() }}</mat-card-title
+            >
             <mat-card-subtitle
-              >Realize a manutenção dos preços de vendas dos itens</mat-card-subtitle
+              >Ajuste o preço de venda e o preço fidelidade dos itens desejados.</mat-card-subtitle
             >
           </div>
         </div>
