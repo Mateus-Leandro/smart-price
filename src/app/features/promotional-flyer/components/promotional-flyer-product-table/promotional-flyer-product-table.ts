@@ -616,4 +616,13 @@ export class PromotionalFlyerProductTable {
         this.calculateSuggestedPrice(rowForm);
       });
   }
+
+  getFinalCost(index: number, quoteCost: number): number {
+    const shipping = transformToNumberValue(this.rows.at(index).get('shippingPrice')?.value || 0);
+    return quoteCost + shipping;
+  }
+
+  getShippingPrice(index: number) {
+    return transformToNumberValue(this.rows.at(index).get('shippingPrice')?.value || 0);
+  }
 }
