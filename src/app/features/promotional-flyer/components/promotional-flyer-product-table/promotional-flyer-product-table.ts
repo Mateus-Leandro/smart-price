@@ -540,8 +540,8 @@ export class PromotionalFlyerProductTable {
       transformToNumberValue(shippingPrice.value ?? 0) +
       transformToNumberValue(quoteCost.value ?? 0);
 
-    const calculatedSuggestedPrice = finalCost * (1 + productMarginValue / 100);
-    suggestedSalePriceWithMargin.setValue(calculatedSuggestedPrice, { emitEvent: false });
+    const suggestedPrice = finalCost * (1 + productMarginValue / 100);
+    suggestedSalePriceWithMargin.setValue(suggestedPrice, { emitEvent: false });
 
     const competitorPriceValues = competitorPrices.value.map((value) => {
       return transformToNumberValue(value ?? '0');
@@ -559,36 +559,36 @@ export class PromotionalFlyerProductTable {
       return;
     }
 
-    if (lowestCompetitorPrice < calculatedSuggestedPrice) {
-      const competitorMargin = (1 - finalCost / lowestCompetitorPrice) * 100;
-      const marginRule = this.suggestedPriceSettingsList.find(
-        (marginSetting) =>
-          competitorMargin >= marginSetting.marginMin &&
-          competitorMargin <= marginSetting.marginMax,
-      );
+    const competitorMargin = (1 - finalCost / lowestCompetitorPrice) * 100;
+    const marginRule = this.suggestedPriceSettingsList.find(
+      (marginSetting) =>
+        competitorMargin >= marginSetting.marginMin && competitorMargin <= marginSetting.marginMax,
+    );
 
-      if (!marginRule) {
-        if (competitorMargin < 7) {
-          warningPriceText.setValue('Margem do concorrente menor que 7%.');
-        }
-        return;
-      }
+    if (competitorMargin < 7) {
+      warningPriceText.setValue('Margem do concorrente menor que 7%.');
+    }
 
-      const saleAfterDiscountPercent =
+    let suggestedPriceAfterDiscountPercent = suggestedPrice;
+
+    if (lowestCompetitorPrice < suggestedPrice && marginRule) {
+      suggestedPriceAfterDiscountPercent =
         lowestCompetitorPrice * (1 - marginRule.discountPercent / 100);
+    }
 
-      const loyaltyPriceValue = transformToNumberValue(actualLoyaltyPrice.value ?? 0);
+    const loyaltyPriceValue = transformToNumberValue(actualLoyaltyPrice.value ?? 0);
 
-      if (loyaltyPriceValue) {
-        suggestedSalePrice.setValue(roundToTwo(saleAfterDiscountPercent * 1.15), {
-          emitEvent: false,
-        });
-        suggestedLoyaltyPrice.setValue(roundToTwo(saleAfterDiscountPercent), {
-          emitEvent: false,
-        });
-      } else {
-        suggestedSalePrice.setValue(roundToTwo(saleAfterDiscountPercent), { emitEvent: false });
-      }
+    if (loyaltyPriceValue) {
+      suggestedSalePrice.setValue(roundToTwo(suggestedPriceAfterDiscountPercent * 1.15), {
+        emitEvent: false,
+      });
+      suggestedLoyaltyPrice.setValue(roundToTwo(suggestedPriceAfterDiscountPercent), {
+        emitEvent: false,
+      });
+    } else {
+      suggestedSalePrice.setValue(roundToTwo(suggestedPriceAfterDiscountPercent), {
+        emitEvent: false,
+      });
     }
   }
 
