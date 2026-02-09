@@ -81,37 +81,39 @@
       <ng-container matColumnDef="shipping_price">
         <th mat-header-cell *matHeaderCellDef>Frete</th>
         <td mat-cell *matCellDef="let element; let i = dataIndex">
-          <input
-            #shippingPriceInput
-            matInput
-            class="only-line"
-            [formControl]="rows.at(i).controls.shippingPrice"
-            (keyup.enter)="onEnterNext(shippingPriceInputs, shippingPriceInput)"
-            (blur)="
-              onPriceBlur(
-                shippingPriceInput.getAttribute('initial-shipping-price') || '0',
-                element.product.id,
-                rows.at(i).controls.shippingPrice,
-                'shipping_price'
-              )
-            "
-            (focus)="onFocus(shippingPriceInput)"
-            (focusin)="
-              shippingPriceInput.setAttribute(
-                'initial-shipping-price',
-                rows.at(i).controls.shippingPrice.value?.toString() || '0'
-              )
-            "
-            mask="separator.2"
-            thousandSeparator="."
-            decimalMarker=","
-            prefix="R$ "
-            [dropSpecialCharacters]="true"
-            [showMaskTyped]="false"
-            [allowNegativeNumbers]="false"
-            style="width: 65px"
-            (click)="$event.stopPropagation()"
-          />
+          @if (element?.supplier.deliveryType === SupplierDeliveryTypeEnum.BH) {
+            <input
+              #shippingPriceInput
+              matInput
+              class="only-line"
+              [formControl]="rows.at(i).controls.shippingPrice"
+              (keyup.enter)="onEnterNext(shippingPriceInputs, shippingPriceInput)"
+              (blur)="
+                onPriceBlur(
+                  shippingPriceInput.getAttribute('initial-shipping-price') || '0',
+                  element.product.id,
+                  rows.at(i).controls.shippingPrice,
+                  'shipping_price'
+                )
+              "
+              (focus)="onFocus(shippingPriceInput)"
+              (focusin)="
+                shippingPriceInput.setAttribute(
+                  'initial-shipping-price',
+                  rows.at(i).controls.shippingPrice.value?.toString() || '0'
+                )
+              "
+              mask="separator.2"
+              thousandSeparator="."
+              decimalMarker=","
+              prefix="R$ "
+              [dropSpecialCharacters]="true"
+              [showMaskTyped]="false"
+              [allowNegativeNumbers]="false"
+              style="width: 65px"
+              (click)="$event.stopPropagation()"
+            />
+          }
         </td>
       </ng-container>
 
