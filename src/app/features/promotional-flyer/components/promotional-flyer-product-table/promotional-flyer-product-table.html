@@ -300,7 +300,17 @@
                   @if (rows.at(i); as currentRow) {
                     <div fxLayout="row" fxLayoutAlign="space-between" [formGroup]="currentRow">
                       @for (competitor of competitorList; track competitor.id; let j = $index) {
-                        <div fxLayout="column" formArrayName="competitorPrices" fxLayoutGap="1">
+                        <div
+                          fxLayout="column"
+                          formArrayName="competitorPrices"
+                          fxLayoutGap="1"
+                          [class.row-critical]="
+                            isLowestPrice(
+                              i,
+                              rows.at(i).get('competitorPrices')?.get(j.toString())?.value
+                            )
+                          "
+                        >
                           <p>{{ competitor.name }}</p>
                           <input
                             matInput

@@ -615,4 +615,20 @@ export class PromotionalFlyerProductTable {
   getShippingPrice(index: number) {
     return transformToNumberValue(this.rows.at(index).get('shippingPrice')?.value || 0);
   }
+
+  isLowestPrice(rowIndex: number, currentPrice: string | null): boolean {
+    const row = this.rows.at(rowIndex);
+    if (!row || !currentPrice) return false;
+
+    const priceValues = row.controls.competitorPrices.value
+      .map((v) => transformToNumberValue(v ?? '0'))
+      .filter((v) => v > 0);
+
+    if (priceValues.length === 0) return false;
+
+    const minPrice = Math.min(...priceValues);
+    const currentNumeric = transformToNumberValue(currentPrice);
+
+    return currentNumeric === minPrice && currentNumeric > 0;
+  }
 }
