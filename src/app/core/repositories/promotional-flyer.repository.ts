@@ -105,7 +105,8 @@ export class PromotionalFlyerRepository {
 
     supplier:suppliers!inner (
       id,
-      name
+      name,
+      delivery_type
     ),
 
     competitorPrices:competitor_price_flyer_products (
@@ -152,7 +153,11 @@ export class PromotionalFlyerRepository {
               name: item?.product?.name,
               margin: correctMargin?.margin,
             },
-            supplier: { id: item?.supplier?.id, name: item?.supplier?.name },
+            supplier: {
+              id: item?.supplier?.id,
+              name: item?.supplier?.name,
+              deliveryType: item?.supplier.delivery_type,
+            },
             competitorPrices: item?.competitorPrices,
           };
         }) as IPromotionalFlyerProductsView[];

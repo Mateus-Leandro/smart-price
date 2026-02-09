@@ -51,6 +51,7 @@ import { roundToTwo, transformToNumberValue } from 'src/app/shared/functions/uti
 import { SuggestedPriceSettingService } from 'src/app/features/settings-suggested-price/services/suggested-price-setting.service';
 import { ISuggestedPriceSettingView } from 'src/app/core/models/suggested-price-setting.model';
 import { MatDivider } from '@angular/material/divider';
+import { SupplierDeliveryTypeEnum } from 'src/app/core/enums/supplier.enum';
 
 type FlyerRowForm = FormGroup<{
   actualSalePrice: FormControl<string | null>;
@@ -109,6 +110,7 @@ export class PromotionalFlyerProductTable {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   readonly ProductPriceType = ProductPriceType;
+  readonly SupplierDeliveryTypeEnum = SupplierDeliveryTypeEnum;
   private destroy$ = new Subject<void>();
 
   searchTerm = '';
