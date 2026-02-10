@@ -1,24 +1,18 @@
 export interface ICompetitorPriceFlyerProduct {
+  integralFlyerId: number;
   productId: number;
-  price: number;
-  companyId: number;
   competitorId: number;
-  promotionalFlyerId: number;
+  companyId: number;
+  price: number;
   createdAt: string;
   updatedAt: string;
 }
-
-export interface IUpsertCompetitorPriceFlyerProduct {
-  productId: number;
-  price: number;
-  companyId: number;
-  competitorId: number;
-  promotionalFlyerId: number;
-}
-
 export interface IDeleteCompetitorPriceFlyerProduct {
+  integralFlyerId: number;
   productId: number;
-  companyId: number;
   competitorId: number;
-  promotionalFlyerId: number;
+  companyId: number;
+}
+export interface IUpsertCompetitorPriceFlyerProduct extends IDeleteCompetitorPriceFlyerProduct {
+  price: number;
 }
