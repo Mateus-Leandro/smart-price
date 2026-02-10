@@ -22,10 +22,11 @@ export class PromotionalFlyerService {
 
   loadProducts(
     flyerId: number,
+    idIntegral: number,
     paginator: IDefaultPaginatorDataSource<IPromotionalFlyerProductsView>,
     search?: string,
   ) {
-    return this.repository.getProducts(flyerId, paginator, search);
+    return this.repository.getProducts(flyerId, idIntegral, paginator, search);
   }
 
   updateProductPrice(flyerId: number, productId: number, price: number, columnName: string) {

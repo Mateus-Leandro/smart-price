@@ -1,9 +1,13 @@
 import {
   ChangeDetectorRef,
   Component,
+  effect,
   ElementRef,
   inject,
+  input,
+  Input,
   QueryList,
+  SimpleChanges,
   ViewChild,
   ViewChildren,
 } from '@angular/core';
@@ -109,14 +113,15 @@ export class PromotionalFlyerProductTable {
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
+  flyerInfo = input.required<IPromotionalFlyerView>();
+  flyerId = input.required<number>();
+
   readonly ProductPriceType = ProductPriceType;
   readonly SupplierDeliveryTypeEnum = SupplierDeliveryTypeEnum;
   private destroy$ = new Subject<void>();
 
   searchTerm = '';
   loading = inject(LoadingService).loading;
-  flyerId = 0;
-  flyerInfo!: IPromotionalFlyerView;
   sendingProductId?: number | null;
   competitorList: ICompetitor[] = [];
   suggestedPriceSettingsList: ISuggestedPriceSettingView[] = [];
@@ -164,35 +169,21 @@ export class PromotionalFlyerProductTable {
     private competitorPriceFlyerProductService: CompetitorPriceFlyerProductService,
     private authService: AuthService,
     private suggestedPriceSettings: SuggestedPriceSettingService,
-  ) {}
+  ) {
+    effect(() => {
+      const info = this.flyerInfo();
+      if (info && info.idIntegral) {
+        this.loadData();
+      }
+    });
+  }
 
   ngOnInit(): void {
-    this.flyerId = Number(this.route.snapshot.paramMap.get('id'));
-
     this.form = this.fb.group({
       rows: this.fb.array([]),
     });
 
     this.setupSearchListener();
-    this.promotionalFlyerService
-      .loadFlyers({
-        pageIndex: 0,
-        pageSize: 10,
-        records: {
-          count: 0,
-          data: [],
-        },
-      })
-      .subscribe({
-        next: (flyer) => {
-          this.flyerInfo = flyer.data[0];
-        },
-        error: (err) => {
-          this.notificationService.showError(
-            `Erro ao buscar informações da cotação: ${err.message || err}`,
-          );
-        },
-      });
     this.loadData();
   }
 
@@ -248,24 +239,27 @@ export class PromotionalFlyerProductTable {
 
   loadProductsFromPromotionalFlyer(
     flyerId: number,
+    idIntegral: number,
     paginatorDataSource: IDefaultPaginatorDataSource<IPromotionalFlyerProductsView>,
     search?: string,
   ): void {
-    this.promotionalFlyerService.loadProducts(flyerId, paginatorDataSource, search).subscribe({
-      next: (response) => {
-        this.paginatorDataSource.records = response;
-        this.dataSource.data = response.data;
+    this.promotionalFlyerService
+      .loadProducts(flyerId, idIntegral, paginatorDataSource, search)
+      .subscribe({
+        next: (response) => {
+          this.paginatorDataSource.records = response;
+          this.dataSource.data = response.data;
 
-        this.buildForm(this.dataSource.data);
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        this.notificationService.showError(
-          `Erro ao buscar produtos do encarte ${flyerId}: ${err.message || err}`,
-        );
-        this.cdr.detectChanges();
-      },
-    });
+          this.buildForm(this.dataSource.data);
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          this.notificationService.showError(
+            `Erro ao buscar produtos do encarte ${flyerId}: ${err.message || err}`,
+          );
+          this.cdr.detectChanges();
+        },
+      });
   }
 
   onPageChange(event: PageEvent): void {
@@ -291,7 +285,8 @@ export class PromotionalFlyerProductTable {
         next: (competitors) => {
           this.competitorList = competitors.data;
           this.loadProductsFromPromotionalFlyer(
-            this.flyerId,
+            this.flyerId(),
+            this.flyerInfo().idIntegral,
             this.paginatorDataSource,
             this.searchTerm,
           );
@@ -448,7 +443,7 @@ export class PromotionalFlyerProductTable {
 
       if (columnName.toLocaleLowerCase() !== 'competitor_price') {
         this.promotionalFlyerService
-          .updateProductPrice(this.flyerId, productId, numericPrice, columnName)
+          .updateProductPrice(this.flyerId(), productId, numericPrice, columnName)
           .subscribe({
             error: (err) => {
               this.notificationService.showError(
@@ -466,7 +461,7 @@ export class PromotionalFlyerProductTable {
               price: numericPrice,
               competitorId: competitorId,
               companyId: this.companyId,
-              integralFlyerId: this.flyerInfo.idIntegral,
+              integralFlyerId: this.flyerInfo().idIntegral,
             })
             .subscribe({
               error: (err) => {
@@ -483,7 +478,7 @@ export class PromotionalFlyerProductTable {
               productId: productId,
               competitorId: competitorId,
               companyId: this.companyId,
-              integralFlyerId: this.flyerInfo.idIntegral,
+              integralFlyerId: this.flyerInfo().idIntegral,
             })
             .subscribe({
               error: (err) => {
@@ -508,7 +503,7 @@ export class PromotionalFlyerProductTable {
   sendPrices(productId: number) {
     this.sendingProductId = productId;
 
-    this.promotionalFlyerService.sendPricesToErp(this.flyerId, productId).subscribe({
+    this.promotionalFlyerService.sendPricesToErp(this.flyerId(), productId).subscribe({
       error: (err) => {
         this.notificationService.showError(
           `Erro ao marcar preço para ser enviado ao ERP. Produto: ${productId} | Erro: ${err.message || err}`,
