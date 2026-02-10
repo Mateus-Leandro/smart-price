@@ -1,4 +1,4 @@
-import { Component, inject, ViewChild } from '@angular/core';
+import { Component, inject, signal, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle } from '@angular/material/card';
 import { PromotionalFlyerProductTable } from '../../components/promotional-flyer-product-table/promotional-flyer-product-table';
@@ -32,8 +32,8 @@ import { LoadingService } from 'src/app/core/services/loading.service';
 })
 export class PromotionalFlyerProducts {
   loading = inject(LoadingService).loading;
-  id: number = 0;
-  flyerInfo!: IPromotionalFlyerView;
+  flyerInfo = signal<IPromotionalFlyerView | undefined>(undefined);
+  id = signal<number>(0);
 
   @ViewChild(PromotionalFlyerProductTable)
   flyerTable!: PromotionalFlyerProductTable;
@@ -47,7 +47,8 @@ export class PromotionalFlyerProducts {
   ) {}
 
   ngOnInit() {
-    this.id = Number(this?.route?.snapshot?.paramMap?.get('id'));
+    const routeId = Number(this.route.snapshot.paramMap.get('id'));
+    this.id.set(routeId);
     this.loadFlyerInfo();
   }
 
@@ -81,7 +82,7 @@ export class PromotionalFlyerProducts {
       .afterClosed()
       .subscribe((confirmation) => {
         if (confirmation) {
-          this.promotionalFlyerService.applySuggestedPrices(this.id).subscribe({
+          this.promotionalFlyerService.applySuggestedPrices(this.id()).subscribe({
             next: () => {
               this.flyerTable.reload();
               this.notificationService.showSuccess(`Preços atualizados com sucesso!`);
@@ -106,9 +107,9 @@ export class PromotionalFlyerProducts {
       },
     };
 
-    this.promotionalFlyerService.loadFlyers(paginatorFlyer, '', this.id).subscribe({
+    this.promotionalFlyerService.loadFlyers(paginatorFlyer, '', this.id()).subscribe({
       next: (flyer) => {
-        this.flyerInfo = flyer.data[0];
+        this.flyerInfo.set(flyer.data[0]);
       },
       error: (err) => {
         this.notificationService.showError(`Erro ao buscar informações do encarte: ${err}`);

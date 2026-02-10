@@ -70,6 +70,7 @@ export class PromotionalFlyerRepository {
 
   getProducts(
     flyerId: number,
+    idIntegral: number,
     paginator: IDefaultPaginatorDataSource<IPromotionalFlyerProductsView>,
     search?: string,
   ): Observable<{ data: IPromotionalFlyerProductsView[]; count: number }> {
@@ -80,47 +81,50 @@ export class PromotionalFlyerRepository {
       .from('promotional_flyer_products')
       .select(
         `
-    sale_price,
-    loyalty_price,
-    shipping_price,
-    quote_cost,
-    average_cost_quote,
-    quantity_suppliers,
-    current_sale_price,
-    current_loyalty_price,
-    erp_import_date,
+      sale_price,
+      loyalty_price,
+      shipping_price,
+      quote_cost,
+      average_cost_quote,
+      quantity_suppliers,
+      current_sale_price,
+      current_loyalty_price,
+      erp_import_date,
 
-    promotionalFlyer:promotional_flyers!inner (
-      branche_id
-    ),
-
-    product:products!inner (
-      id,
-      name,
-
-      productMarginBranches:product_margin_branches (
-        margin,
-        branche_id
+      promotionalFlyer:promotional_flyers!inner (
+        branche_id,
+        id_integral
       ),
 
-      competitorPrices:competitor_price_flyer_products (
-        price,
-        competitor:competitors (
-          id,
-          name
-        )
-      )
-    ),
+      product:products!inner (
+        id,
+        name,
 
-    supplier:suppliers!inner (
-      id,
-      name,
-      delivery_type
-    )
-    `,
+        productMarginBranches:product_margin_branches (
+          margin,
+          branche_id
+        ),
+
+        competitorPrices:competitor_price_flyer_products (
+          price,
+          integral_flyer_id,
+          competitor:competitors (
+            id,
+            name
+          )
+        )
+      ),
+
+      supplier:suppliers!inner (
+        id,
+        name,
+        delivery_type
+      )
+      `,
         { count: 'exact' },
       )
       .eq('promotional_flyer_id', flyerId)
+      .eq('product.competitorPrices.integral_flyer_id', idIntegral)
       .order('product(name)', { ascending: true });
 
     if (search) {
@@ -156,9 +160,9 @@ export class PromotionalFlyerRepository {
             supplier: {
               id: item?.supplier?.id,
               name: item?.supplier?.name,
-              deliveryType: item?.supplier.delivery_type,
+              deliveryType: item?.supplier?.delivery_type,
             },
-            competitorPrices: item?.product.competitorPrices,
+            competitorPrices: item?.product?.competitorPrices || [],
           };
         }) as IPromotionalFlyerProductsView[];
 

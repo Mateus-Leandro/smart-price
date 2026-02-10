@@ -14,10 +14,10 @@
             (click)="goBack()"
           ></app-icon-button>
           <div fxLayout="column">
-            @if (flyerInfo) {
+            @if (flyerInfo()) {
               <mat-card-title>
-                Produtos da cotação {{ flyerInfo.idIntegral }} - Loja:
-                {{ flyerInfo.brancheId.toString().padStart(2, '0') }}
+                Produtos da cotação {{ flyerInfo()?.idIntegral }} - Loja:
+                {{ flyerInfo()?.brancheId?.toString()?.padStart(2, '0') }}
               </mat-card-title>
             }
 
@@ -43,6 +43,11 @@
         </div>
       </div>
     </mat-card-header>
-    <app-promotional-flyer-product-table />
+    @if (flyerInfo(); as info) {
+      <app-promotional-flyer-product-table [flyerId]="id()" [flyerInfo]="info">
+      </app-promotional-flyer-product-table>
+    } @else {
+      <app-spinner></app-spinner>
+    }
   </mat-card>
 </div>
