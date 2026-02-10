@@ -103,7 +103,7 @@ export class PromotionalFlyerRepository {
         branche_id
       ),
 
-      competitorPrices:competitor_price_quotation_master (
+      competitorPrices:competitor_price_flyer_products (
         price,
         competitor:competitors (
           id,

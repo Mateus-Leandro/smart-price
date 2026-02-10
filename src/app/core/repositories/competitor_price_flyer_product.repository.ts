@@ -19,7 +19,7 @@ export class CompetitorPriceFlyerProductRepository {
   ) {
     return from(
       this.supabase
-        .from('competitor_price_quotation_master')
+        .from('competitor_price_flyer_products')
         .upsert(
           {
             integral_flyer_id: competitorPriceFlyerProduct.integralFlyerId,
@@ -47,7 +47,7 @@ export class CompetitorPriceFlyerProductRepository {
   ) {
     return from(
       this.supabase
-        .from('competitor_price_quotation_master')
+        .from('competitor_price_flyer_products')
         .delete()
         .eq('integral_flyer_id', deleteCompetitorPriceFlyerProduct.integralFlyerId)
         .eq('product_id', deleteCompetitorPriceFlyerProduct.productId)
