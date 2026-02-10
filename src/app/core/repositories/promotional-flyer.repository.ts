@@ -91,15 +91,24 @@ export class PromotionalFlyerRepository {
     erp_import_date,
 
     promotionalFlyer:promotional_flyers!inner (
-     branche_id
+      branche_id
     ),
 
     product:products!inner (
       id,
       name,
+
       productMarginBranches:product_margin_branches (
-      margin,
-      branche_id
+        margin,
+        branche_id
+      ),
+
+      competitorPrices:competitor_price_quotation_master (
+        price,
+        competitor:competitors (
+          id,
+          name
+        )
       )
     ),
 
@@ -107,15 +116,6 @@ export class PromotionalFlyerRepository {
       id,
       name,
       delivery_type
-    ),
-
-    competitorPrices:competitor_price_flyer_products (
-      price,
-
-      competitor:competitors (
-        id,
-        name
-      )
     )
     `,
         { count: 'exact' },
@@ -158,7 +158,7 @@ export class PromotionalFlyerRepository {
               name: item?.supplier?.name,
               deliveryType: item?.supplier.delivery_type,
             },
-            competitorPrices: item?.competitorPrices,
+            competitorPrices: item?.product.competitorPrices,
           };
         }) as IPromotionalFlyerProductsView[];
 

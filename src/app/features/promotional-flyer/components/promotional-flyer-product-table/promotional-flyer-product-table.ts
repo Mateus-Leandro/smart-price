@@ -174,6 +174,25 @@ export class PromotionalFlyerProductTable {
     });
 
     this.setupSearchListener();
+    this.promotionalFlyerService
+      .loadFlyers({
+        pageIndex: 0,
+        pageSize: 10,
+        records: {
+          count: 0,
+          data: [],
+        },
+      })
+      .subscribe({
+        next: (flyer) => {
+          this.flyerInfo = flyer.data[0];
+        },
+        error: (err) => {
+          this.notificationService.showError(
+            `Erro ao buscar informações da cotação: ${err.message || err}`,
+          );
+        },
+      });
     this.loadData();
   }
 
@@ -447,7 +466,7 @@ export class PromotionalFlyerProductTable {
               price: numericPrice,
               competitorId: competitorId,
               companyId: this.companyId,
-              promotionalFlyerId: this.flyerId,
+              integralFlyerId: this.flyerInfo.idIntegral,
             })
             .subscribe({
               error: (err) => {
@@ -464,7 +483,7 @@ export class PromotionalFlyerProductTable {
               productId: productId,
               competitorId: competitorId,
               companyId: this.companyId,
-              promotionalFlyerId: this.flyerId,
+              integralFlyerId: this.flyerInfo.idIntegral,
             })
             .subscribe({
               error: (err) => {

@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { SupabaseService } from 'src/app/shared/services/supabase.service';
-import { LoadingService } from '../services/loading.service';
 import { from, map } from 'rxjs';
 import {
   IDeleteCompetitorPriceFlyerProduct,
@@ -11,10 +10,7 @@ import {
 @Injectable({ providedIn: 'root' })
 export class CompetitorPriceFlyerProductRepository {
   private supabase: SupabaseClient;
-  constructor(
-    private supabaseService: SupabaseService,
-    private loadingService: LoadingService,
-  ) {
+  constructor(private supabaseService: SupabaseService) {
     this.supabase = this.supabaseService.supabase;
   }
 
@@ -23,17 +19,17 @@ export class CompetitorPriceFlyerProductRepository {
   ) {
     return from(
       this.supabase
-        .from('competitor_price_flyer_products')
+        .from('competitor_price_quotation_master')
         .upsert(
           {
-            company_id: competitorPriceFlyerProduct.companyId,
+            integral_flyer_id: competitorPriceFlyerProduct.integralFlyerId,
             product_id: competitorPriceFlyerProduct.productId,
-            promotional_flyer_id: competitorPriceFlyerProduct.promotionalFlyerId,
             competitor_id: competitorPriceFlyerProduct.competitorId,
+            company_id: competitorPriceFlyerProduct.companyId,
             price: competitorPriceFlyerProduct.price,
           },
           {
-            onConflict: 'product_id, company_id, competitor_id',
+            onConflict: 'integral_flyer_id, product_id, competitor_id, company_id',
           },
         )
         .select()
@@ -51,12 +47,12 @@ export class CompetitorPriceFlyerProductRepository {
   ) {
     return from(
       this.supabase
-        .from('competitor_price_flyer_products')
+        .from('competitor_price_quotation_master')
         .delete()
+        .eq('integral_flyer_id', deleteCompetitorPriceFlyerProduct.integralFlyerId)
         .eq('product_id', deleteCompetitorPriceFlyerProduct.productId)
         .eq('competitor_id', deleteCompetitorPriceFlyerProduct.competitorId)
-        .eq('company_id', deleteCompetitorPriceFlyerProduct.companyId)
-        .eq('promotional_flyer_id', deleteCompetitorPriceFlyerProduct.promotionalFlyerId),
+        .eq('company_id', deleteCompetitorPriceFlyerProduct.companyId),
     ).pipe(
       map(({ data, error }) => {
         if (error) throw error;
