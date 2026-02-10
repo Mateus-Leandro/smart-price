@@ -351,6 +351,13 @@
                             [allowNegativeNumbers]="false"
                             style="width: 80px"
                           />
+                          <span
+                            class="details-rows"
+                            matTooltip="Margem do concorrente em relação ao custo (Pr. cotação + Frete)."
+                            >{{
+                              `Margem do concorrente: ${competitorMargin(i, rows.at(i).get('competitorPrices')?.get(j.toString())?.value)}`
+                            }}</span
+                          >
                         </div>
                       }
                     </div>

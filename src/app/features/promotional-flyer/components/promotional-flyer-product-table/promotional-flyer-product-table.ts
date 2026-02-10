@@ -650,4 +650,22 @@ export class PromotionalFlyerProductTable {
 
     return currentNumeric === minPrice && currentNumeric > 0;
   }
+
+  competitorMargin(rowIndex: number, competitorPrice: string | null) {
+    if (!competitorPrice) return '0,00%';
+
+    const row = this.rows.at(rowIndex);
+    const quoteCost = row.controls.quoteCost.value || 0;
+    const shippingPrice = transformToNumberValue(row?.controls?.shippingPrice?.value || 0);
+
+    const finalCost = quoteCost + shippingPrice;
+    const competitorPriceValue = transformToNumberValue(competitorPrice);
+
+    if (competitorPriceValue === 0 || isNaN(competitorPriceValue)) {
+      return '0,00%';
+    }
+
+    const margin = (1 - finalCost / competitorPriceValue) * 100;
+    return `${margin.toFixed(2).replace('.', ',')}%`;
+  }
 }
