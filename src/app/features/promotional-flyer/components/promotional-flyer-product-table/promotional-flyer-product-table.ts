@@ -71,6 +71,8 @@ type FlyerRowForm = FormGroup<{
   suggestedLoyaltyPrice: FormControl<string | null>;
   suggestedSalePriceWithMargin: FormControl<number | null>;
   warningPriceText: FormControl<string | null>;
+  saleMarginRuleText: FormControl<string | null>;
+  loyaltyMarginRuleText: FormControl<string | null>;
 }>;
 
 @Component({
@@ -345,6 +347,8 @@ export class PromotionalFlyerProductTable {
           suggestedSalePriceWithMargin: this.fb.control<string | null>(null),
           suggestedLoyaltyPrice: this.fb.control<string | null>('0,00'),
           warningPriceText: this.fb.control<string | null>(null),
+          saleMarginRuleText: this.fb.control<string | null>(null),
+          loyaltyMarginRuleText: this.fb.control<string | null>(null),
         }) as FlyerRowForm;
 
         this.calculateSuggestedPrice(rowForm);
@@ -544,6 +548,8 @@ export class PromotionalFlyerProductTable {
       actualLoyaltyPrice,
       suggestedSalePriceWithMargin,
       warningPriceText,
+      saleMarginRuleText,
+      loyaltyMarginRuleText,
     } = flyerRow.controls;
     suggestedSalePrice.setValue(null, { emitEvent: false });
     suggestedLoyaltyPrice.setValue(null, { emitEvent: false });
@@ -601,10 +607,24 @@ export class PromotionalFlyerProductTable {
       suggestedLoyaltyPrice.setValue(roundToTwo(suggestedPriceAfterDiscountPercent), {
         emitEvent: false,
       });
+
+      if (marginRule) {
+        loyaltyMarginRuleText.setValue(
+          `-${marginRule.discountPercent}% em relação ao menor preço dos concorrentes.`,
+        );
+      }
+
+      saleMarginRuleText.setValue(`+15% em relação ao preço fidelidade sugerido.`);
     } else {
       suggestedSalePrice.setValue(roundToTwo(suggestedPriceAfterDiscountPercent), {
         emitEvent: false,
       });
+
+      if (marginRule) {
+        saleMarginRuleText.setValue(
+          `-${marginRule.discountPercent}% em relação ao menor preço dos concorrentes.`,
+        );
+      }
     }
   }
 
@@ -662,5 +682,12 @@ export class PromotionalFlyerProductTable {
 
     const margin = (1 - finalCost / competitorPriceValue) * 100;
     return `${margin.toFixed(2).replace('.', ',')}%`;
+  }
+
+  marginRuleText(rowIndex: number) {
+    const row = this.rows.at(rowIndex);
+    const saleMarginRuleText = row.controls.saleMarginRuleText.value;
+    const loyaltyMarginRuleText = row.controls.loyaltyMarginRuleText.value;
+    return { saleMarginRuleText, loyaltyMarginRuleText };
   }
 }
