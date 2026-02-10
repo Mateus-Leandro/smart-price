@@ -298,66 +298,121 @@
                   </div>
 
                   @if (rows.at(i); as currentRow) {
-                    <div fxLayout="row" fxLayoutAlign="space-between" [formGroup]="currentRow">
-                      @for (competitor of competitorList; track competitor.id; let j = $index) {
-                        <div
-                          fxLayout="column"
-                          formArrayName="competitorPrices"
-                          fxLayoutGap="1"
-                          [class.row-critical]="
-                            isLowestPrice(
-                              i,
-                              rows.at(i).get('competitorPrices')?.get(j.toString())?.value
-                            )
-                          "
-                        >
-                          <p>{{ competitor.name }}</p>
-                          <input
-                            matInput
-                            #competitorPriceInput
-                            class="only-line"
-                            type="text"
-                            [formControlName]="j"
-                            (focusin)="
-                              competitorPriceInput.setAttribute(
-                                'initial-competitor-price',
-                                currentRow
-                                  .get('competitorPrices')
-                                  ?.get(j.toString())
-                                  ?.value?.toString() || '0,00'
+                    <div fxLayout="column" fxLayoutGap="15px">
+                      <div fxLayout="row" fxLayoutAlign="space-between" [formGroup]="currentRow">
+                        @for (competitor of competitorList; track competitor.id; let j = $index) {
+                          <div
+                            fxLayout="column"
+                            formArrayName="competitorPrices"
+                            fxLayoutGap="1"
+                            [class.row-critical]="
+                              isLowestPrice(
+                                i,
+                                rows.at(i).get('competitorPrices')?.get(j.toString())?.value
                               )
                             "
-                            (focus)="onFocus(competitorPriceInput)"
-                            (blur)="
-                              onPriceBlur(
-                                competitorPriceInput.getAttribute('initial-competitor-price') ||
-                                  '0',
-                                element.product.id,
-                                rows.at(i).controls.competitorPrices.at(j),
-                                'competitor_price',
-                                competitor.id
-                              )
-                            "
-                            mask="separator.2"
-                            maxlength="10"
-                            (keyup.enter)="
-                              onEnterInRow(i, j, competitorPriceInputs.toArray(), competitorList)
-                            "
-                            thousandSeparator="."
-                            decimalMarker=","
-                            prefix="R$ "
-                            [dropSpecialCharacters]="true"
-                            [showMaskTyped]="false"
-                            [allowNegativeNumbers]="false"
-                            style="width: 80px"
-                          />
-                          <span
-                            class="details-rows"
-                            matTooltip="Margem do concorrente em relação ao custo (Pr. cotação + Frete)."
-                            >{{
-                              `Margem do concorrente: ${competitorMargin(i, rows.at(i).get('competitorPrices')?.get(j.toString())?.value)}`
-                            }}</span
                           >
+                            <p>{{ competitor.name }}</p>
+                            <input
+                              matInput
+                              #competitorPriceInput
+                              class="only-line"
+                              type="text"
+                              [formControlName]="j"
+                              (focusin)="
+                                competitorPriceInput.setAttribute(
+                                  'initial-competitor-price',
+                                  currentRow
+                                    .get('competitorPrices')
+                                    ?.get(j.toString())
+                                    ?.value?.toString() || '0,00'
+                                )
+                              "
+                              (focus)="onFocus(competitorPriceInput)"
+                              (blur)="
+                                onPriceBlur(
+                                  competitorPriceInput.getAttribute('initial-competitor-price') ||
+                                    '0',
+                                  element.product.id,
+                                  rows.at(i).controls.competitorPrices.at(j),
+                                  'competitor_price',
+                                  competitor.id
+                                )
+                              "
+                              mask="separator.2"
+                              maxlength="10"
+                              (keyup.enter)="
+                                onEnterInRow(i, j, competitorPriceInputs.toArray(), competitorList)
+                              "
+                              thousandSeparator="."
+                              decimalMarker=","
+                              prefix="R$ "
+                              [dropSpecialCharacters]="true"
+                              [showMaskTyped]="false"
+                              [allowNegativeNumbers]="false"
+                              style="width: 80px"
+                            />
+                            <span
+                              class="details-rows"
+                              matTooltip="Margem do concorrente em relação ao custo (Pr. cotação + Frete)."
+                              >{{
+                                `Margem do concorrente: ${competitorMargin(i, rows.at(i).get('competitorPrices')?.get(j.toString())?.value)}`
+                              }}</span
+                            >
+                          </div>
+                        }
+                      </div>
+
+                      @if (
+                        marginRuleText(i).loyaltyMarginRuleText ||
+                        marginRuleText(i).saleMarginRuleText
+                      ) {
+                        <mat-divider />
+                        <div fxLayout="column">
+                          <div
+                            fxLayout="row"
+                            fxLayoutGap="5px"
+                            style="color: var(--font-secondary); padding-bottom: 10px"
+                          >
+                            <span style="font-weight: 500">{{
+                              'Regra usada na sugestão de preços'
+                            }}</span>
+                          </div>
+
+                          @if (marginRuleText(i).loyaltyMarginRuleText) {
+                            <div
+                              fxLayout="row"
+                              fxLayoutGap="5px"
+                              style="color: var(--loyalty-price-color)"
+                            >
+                              <mat-icon style="font-size: 18px; width: 18px; height: 18px"
+                                >info</mat-icon
+                              >
+                              <span class="mat-caption" style="font-weight: 500">{{
+                                'Preço Fidelidade: '
+                              }}</span>
+                              <span class="mat-caption">{{
+                                marginRuleText(i).loyaltyMarginRuleText
+                              }}</span>
+                            </div>
+                          }
+                          @if (marginRuleText(i).saleMarginRuleText) {
+                            <div
+                              fxLayout="row"
+                              fxLayoutGap="5px"
+                              style="color: var(--sale-price-color)"
+                            >
+                              <mat-icon style="font-size: 18px; width: 18px; height: 18px"
+                                >info</mat-icon
+                              >
+                              <span class="mat-caption" style="font-weight: 500">{{
+                                'Preço de venda: '
+                              }}</span>
+                              <span class="mat-caption">{{
+                                marginRuleText(i).saleMarginRuleText
+                              }}</span>
+                            </div>
+                          }
                         </div>
                       }
                     </div>
