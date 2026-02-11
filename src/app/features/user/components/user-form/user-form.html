@@ -60,5 +60,65 @@
         }
       </mat-form-field>
     </div>
+
+    <div fxLayout="row" fxLayoutGap="10px">
+      <app-icon-button
+        icon="lock"
+        tooltipText="Alterar Senha"
+        (click)="openChangePassDialog()"
+        [disabled]="!canChangePassword || !userFormGroup.getRawValue().id"
+      />
+      <app-icon-button
+        icon="mail_lock"
+        tooltipText="Enviar email para recuperação de senha"
+        (click)="openForgoutPassDialog()"
+        [disabled]="!userFormGroup.getRawValue().id"
+      />
+    </div>
+
+    <mat-divider />
+    <div fxLayout="column">
+      <b style="font-weight: 500; padding: 25px 0 15px">Permissões</b>
+
+      <app-checkbox formControlName="isAdmin" checkboxText="Usuário administrador" />
+
+      <div fxLayout="column" style="padding-left: 10px">
+        <b style="font-weight: 500; padding: 25px 0 5px">Cotações</b>
+        <div fxLayout="row" fxLayoutGap="20px">
+          <app-checkbox
+            formControlName="allowEditCompetitorPrices"
+            checkboxText="Permitir alterar preços dos concorrentes"
+          />
+          <app-checkbox
+            formControlName="allowEditPrices"
+            checkboxText="Permitir alterar preços de venda e fidelidade"
+          />
+          <app-checkbox
+            formControlName="allowSendToErp"
+            checkboxText="Permitir enviar item para o ERP"
+          />
+        </div>
+      </div>
+
+      <div fxLayout="column" style="padding-left: 10px">
+        <b style="font-weight: 500; padding: 25px 0 5px">Fornecedor</b>
+        <div fxLayout="row" fxLayoutGap="20px">
+          <app-checkbox
+            formControlName="allowEditShippingType"
+            checkboxText="Permitir alterar tipo do frete do fornecedor"
+          />
+        </div>
+      </div>
+
+      <div fxLayout="column" style="padding-left: 10px">
+        <b style="font-weight: 500; padding: 25px 0 5px">Produtos</b>
+        <div fxLayout="row" fxLayoutGap="20px">
+          <app-checkbox
+            formControlName="allowEditProductMargin"
+            checkboxText="Permitir alterar margem do produto"
+          />
+        </div>
+      </div>
+    </div>
   </div>
 </form>

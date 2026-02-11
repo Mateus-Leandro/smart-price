@@ -16,12 +16,11 @@ import { LoadingService } from 'src/app/core/services/loading.service';
 import { AuthService } from 'src/app/features/auth/services/auth.service';
 import { Router } from '@angular/router';
 import { UserService } from '../../services/user.service';
-import { IconButton } from 'src/app/shared/components/icon-button/icon-button';
 import { MatDialog } from '@angular/material/dialog';
-import { UserPasswordChangeDialog } from '../../components/user-password-change-dialog/user-password-change-dialog';
 import { User } from '@supabase/supabase-js';
-import { ForgotPasswordDialog } from 'src/app/features/auth/components/forgot-password-dialog/forgot-password-dialog';
 import { NotificationService } from 'src/app/core/services/notification.service';
+import { IUserPermission } from 'src/app/core/models/user-permission.model';
+import { UserPermissionService } from 'src/app/features/user-permission/user-permission.service';
 
 @Component({
   selector: 'app-register-user',
@@ -36,7 +35,6 @@ import { NotificationService } from 'src/app/core/services/notification.service'
     Button,
     Spinner,
     MatCardSubtitle,
-    IconButton,
   ],
   templateUrl: './register-user.html',
 })
@@ -48,7 +46,7 @@ export class RegisterUser {
     private router: Router,
     private authService: AuthService,
     private userService: UserService,
-    private dialog: MatDialog,
+    private userPermissionService: UserPermissionService,
     private notificationService: NotificationService,
   ) {}
 
@@ -87,8 +85,8 @@ export class RegisterUser {
         })
         .subscribe({
           next: () => {
+            this.upsertUserPermissions(userForm);
             this.notificationService.showSuccess(`Usuário atualizado com sucesso!`);
-            this.returnToUsers();
           },
           error: (err) => {
             this.notificationService.showError(`Erro ao atualizar usuário: ${err.message || err}`);
@@ -110,8 +108,10 @@ export class RegisterUser {
           },
         })
         .subscribe({
-          next: () => {
-            this.returnToUsers();
+          next: (data) => {
+            const userId = data.user.id;
+            userForm.controls['id'].setValue(userId);
+            this.upsertUserPermissions(userForm);
             this.notificationService.showSuccess(`Usuário criado com sucesso`);
           },
           error: (err) => {
@@ -121,30 +121,31 @@ export class RegisterUser {
     }
   }
 
-  openChangePassDialog() {
-    this.dialog.open(UserPasswordChangeDialog, {
-      minWidth: '600px',
-      disableClose: false,
-      autoFocus: true,
-      data: this.userFormRef?.userFormGroup?.getRawValue()?.email,
-    });
-  }
+  upsertUserPermissions(userForm: FormGroup) {
+    const userPermissions: IUserPermission = {
+      userId: userForm?.getRawValue()?.id,
+      isAdmin: userForm?.value?.isAdmin,
+      allowEditPrices: userForm?.getRawValue()?.allowEditPrices,
+      allowEditCompetitorPrices: userForm?.getRawValue()?.allowEditCompetitorPrices,
+      allowEditShippingValue: userForm?.getRawValue()?.allowEditShippingValue,
+      allowEditProductMargin: userForm?.getRawValue()?.allowEditProductMargin,
+      allowEditShippingType: userForm?.getRawValue()?.allowEditShippingType,
+      allowSendToErp: userForm?.getRawValue()?.allowSendToErp,
+    };
 
-  openForgoutPassDialog() {
-    this.dialog.open(ForgotPasswordDialog, {
-      minWidth: '600px',
-      disableClose: false,
-      autoFocus: true,
-      data: this.userFormRef?.userFormGroup?.getRawValue()?.email,
+    this.userPermissionService.upsertPermissions(userPermissions).subscribe({
+      next: () => {
+        this.returnToUsers();
+      },
+      error: (err) => {
+        this.notificationService.showError(
+          `Erro ao atualizar permissões do usuário usuário: ${err.message || err}`,
+        );
+      },
     });
   }
 
   returnToUsers() {
     this.router.navigate(['/users']);
-  }
-
-  get canChangePassword(): boolean {
-    const formId = this.userFormRef?.userFormGroup?.getRawValue()?.id;
-    return !!(this.loggedUserInfo && formId === this.loggedUserInfo.id);
   }
 }
