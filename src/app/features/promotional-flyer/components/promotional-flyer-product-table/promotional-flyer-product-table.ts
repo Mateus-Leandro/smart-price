@@ -587,8 +587,20 @@ export class PromotionalFlyerProductTable {
         competitorMargin >= marginSetting.marginMin && competitorMargin <= marginSetting.marginMax,
     );
 
+    const loyaltyPriceValue = transformToNumberValue(actualLoyaltyPrice.value ?? 0);
+
     if (competitorMargin < 7) {
       warningPriceText.setValue('Margem do concorrente menor que 7%.');
+
+      if (loyaltyPriceValue) {
+        loyaltyMarginRuleText.setValue(
+          `${productMarginValue}% em relação ao custo final(Pr.Cotação + Frete).`,
+        );
+      } else {
+        saleMarginRuleText.setValue(
+          `${productMarginValue}% em relação ao custo final(Pr.Cotação + Frete).`,
+        );
+      }
     }
 
     let suggestedPriceAfterDiscountPercent = suggestedPrice;
@@ -597,8 +609,6 @@ export class PromotionalFlyerProductTable {
       suggestedPriceAfterDiscountPercent =
         lowestCompetitorPrice * (1 - marginRule.discountPercent / 100);
     }
-
-    const loyaltyPriceValue = transformToNumberValue(actualLoyaltyPrice.value ?? 0);
 
     if (loyaltyPriceValue) {
       suggestedSalePrice.setValue(roundToTwo(suggestedPriceAfterDiscountPercent * 1.15), {
