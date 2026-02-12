@@ -15,6 +15,9 @@ import { IDefaultPaginatorDataSource } from 'src/app/core/models/query.model';
 import { LoadingService } from 'src/app/core/services/loading.service';
 import { NotificationService } from 'src/app/core/services/notification.service';
 import { IPromotionalFlyerView } from 'src/app/core/models/promotional-flyer.model';
+import { IUserPermission } from 'src/app/core/models/user-permission.model';
+import { UserPermissionService } from 'src/app/features/user-permission/user-permission.service';
+import { AuthService } from 'src/app/features/auth/services/auth.service';
 
 @Component({
   selector: 'app-promotional-flyer-table',
@@ -38,6 +41,8 @@ export class PromotionalFlyerTable {
   loading = inject(LoadingService).loading;
   searchTerm = '';
   dataSource = new MatTableDataSource<IPromotionalFlyerView>([]);
+  userPermissions: IUserPermission | null = null;
+
   paginatorDataSource: IDefaultPaginatorDataSource<IPromotionalFlyerView> = {
     pageIndex: 0,
     pageSize: 10,
@@ -64,9 +69,29 @@ export class PromotionalFlyerTable {
     private cdr: ChangeDetectorRef,
     private router: Router,
     private notificationService: NotificationService,
+    private authService: AuthService,
+    private userPermissionService: UserPermissionService,
   ) {}
 
   ngOnInit(): void {
+    this.authService.getUser().subscribe({
+      next: (user) => {
+        this.userPermissionService.getPermissions(user.id).subscribe({
+          next: (permissions) => {
+            this.userPermissions = permissions;
+          },
+          error: (err) => {
+            this.notificationService.showError(
+              `Erro ao buscar permissões do usuário: ${err.message || err}`,
+            );
+          },
+        });
+      },
+      error: (err) => {
+        this.notificationService.showError(`Erro ao buscar usuário: ${err.message || err}`);
+      },
+    });
+
     this.reload();
 
     this.search$.pipe(debounceTime(300), distinctUntilChanged()).subscribe((value) => {

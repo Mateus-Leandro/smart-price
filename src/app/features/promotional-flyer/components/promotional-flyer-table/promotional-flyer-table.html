@@ -52,15 +52,17 @@
       <ng-container matColumnDef="send">
         <th mat-header-cell *matHeaderCellDef></th>
         <td mat-cell *matCellDef="let element" (click)="$event.stopPropagation()">
-          @if (sendingFlyerId != element.idIntegral) {
-            <app-icon-button
-              icon="send"
-              class="icon-button-table"
-              tooltipText="Enviar preços para o ERP"
-              (click)="sendPrices(element.id)"
-            ></app-icon-button>
-          } @else {
-            <app-spinner [diameter]="30"></app-spinner>
+          @if (userPermissions?.allowSendToErp) {
+            @if (sendingFlyerId != element.idIntegral) {
+              <app-icon-button
+                icon="send"
+                class="icon-button-table"
+                tooltipText="Enviar preços para o ERP"
+                (click)="sendPrices(element.id)"
+              ></app-icon-button>
+            } @else {
+              <app-spinner [diameter]="30"></app-spinner>
+            }
           }
         </td>
       </ng-container>

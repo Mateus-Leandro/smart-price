@@ -10,6 +10,9 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 import { SupplierDeliverySelect } from '../supplier-delivery-select/supplier-delivery-select';
 import { SupplierDeliveryTypeEnum } from '../../../../core/enums/supplier.enum';
 import { MatIconModule } from '@angular/material/icon';
+import { AuthService } from 'src/app/features/auth/services/auth.service';
+import { UserPermissionService } from 'src/app/features/user-permission/user-permission.service';
+import { IUserPermission } from 'src/app/core/models/user-permission.model';
 
 @Component({
   selector: 'app-supplier-form',
@@ -29,6 +32,7 @@ export class SupplierForm {
   loading = inject(LoadingService).loading;
   supplierFormGroup: FormGroup;
   supplierId: number | null = null;
+  userPermissions: IUserPermission | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -36,6 +40,8 @@ export class SupplierForm {
     private supplierService: SupplierService,
     private router: Router,
     private notificationService: NotificationService,
+    private authService: AuthService,
+    private userPermissionService: UserPermissionService,
   ) {
     this.supplierFormGroup = this.fb.group({
       id: [''],
@@ -48,6 +54,24 @@ export class SupplierForm {
     const routerId = Number(this?.route?.snapshot?.paramMap?.get('id'));
 
     if (routerId) {
+      this.authService.getUser().subscribe({
+        next: (user) => {
+          this.userPermissionService.getPermissions(user.id).subscribe({
+            next: (permissions) => {
+              this.userPermissions = permissions;
+            },
+            error: (err) => {
+              this.notificationService.showError(
+                `Erro ao buscar permissões do usuário: ${err.message || err}`,
+              );
+            },
+          });
+        },
+        error: (err) => {
+          this.notificationService.showError(`Erro ao buscar usuário: ${err.message || err}`);
+        },
+      });
+
       this.supplierService.getSupplierInfoById(routerId).subscribe({
         next: (supplier) => {
           if (!supplier) {

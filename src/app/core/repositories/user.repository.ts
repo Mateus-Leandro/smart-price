@@ -5,6 +5,7 @@ import { SupabaseService } from 'src/app/shared/services/supabase.service';
 import { IDefaultPaginatorDataSource } from '../models/query.model';
 import { LoadingService } from '../services/loading.service';
 import { IUserView } from '../models/user.model';
+import { IUpdateCredentials } from '../models/auth.model';
 
 @Injectable({ providedIn: 'root' })
 export class UserRepository {
@@ -99,6 +100,21 @@ export class UserRepository {
 
         return data;
       }),
+    );
+  }
+
+  updateUserCredentials(data: IUpdateCredentials) {
+    this.loadingService.show();
+    return from(
+      this.supabase.functions.invoke('update-user-credentials', {
+        body: data,
+      }),
+    ).pipe(
+      map(({ data: response, error }) => {
+        if (error) throw error;
+        return response;
+      }),
+      finalize(() => this.loadingService.hide()),
     );
   }
 }

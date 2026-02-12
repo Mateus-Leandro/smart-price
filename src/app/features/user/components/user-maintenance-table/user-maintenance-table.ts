@@ -22,6 +22,9 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { IconButton } from 'src/app/shared/components/icon-button/icon-button';
 import { Router } from '@angular/router';
 import { NotificationService } from 'src/app/core/services/notification.service';
+import { AuthService } from 'src/app/features/auth/services/auth.service';
+import { IUserPermission } from 'src/app/core/models/user-permission.model';
+import { UserPermissionService } from 'src/app/features/user-permission/user-permission.service';
 
 @Component({
   selector: 'app-user-maintenance-table',
@@ -51,6 +54,7 @@ export class UserMaintenanceTable {
   columnsToDisplay = ['name', 'email', 'created_at', 'updated_at'];
   dataSource = new MatTableDataSource<IUserView>([]);
   searchTerm = '';
+  userPermissions: IUserPermission | null = null;
 
   paginatorDataSource: IDefaultPaginatorDataSource<IUserView> = {
     pageIndex: 0,
@@ -65,10 +69,29 @@ export class UserMaintenanceTable {
     private userService: UserService,
     private router: Router,
     private notificationService: NotificationService,
+    private authService: AuthService,
+    private userPermissionService: UserPermissionService,
   ) {}
 
   ngOnInit(): void {
-    this.reload();
+    this.authService.getUser().subscribe({
+      next: (user) => {
+        this.userPermissionService.getPermissions(user.id).subscribe({
+          next: (permissions) => {
+            this.userPermissions = permissions;
+            this.reload();
+          },
+          error: (err) => {
+            this.notificationService.showError(
+              `Erro ao buscar permissões do usuário: ${err.message || err}`,
+            );
+          },
+        });
+      },
+      error: (err) => {
+        this.notificationService.showError(`Erro ao buscar  usuário: ${err.message || err}`);
+      },
+    });
 
     this.search$.pipe(debounceTime(300), distinctUntilChanged()).subscribe((value) => {
       this.searchTerm = value;

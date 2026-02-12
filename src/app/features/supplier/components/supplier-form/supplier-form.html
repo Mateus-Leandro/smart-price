@@ -12,11 +12,12 @@
           <mat-label>ID</mat-label>
           <input type="number" matInput formControlName="id" />
         </mat-form-field>
-
-        <app-supplier-delivery-select
-          [(selectedValue)]="supplierFormGroup.controls['supplierDeliveryType'].value"
-          style="width: 100%"
-        />
+        @if (userPermissions?.allowEditShippingType) {
+          <app-supplier-delivery-select
+            [(selectedValue)]="supplierFormGroup.controls['supplierDeliveryType'].value"
+            style="width: 100%"
+          />
+        }
       </div>
 
       <div fxFlex>
@@ -26,6 +27,7 @@
         </mat-form-field>
       </div>
     </div>
+
     @if (supplierDeliveryType?.value === 'PAID') {
       <div fxLayout="row" fxLayoutGap="5px" style="color: var(--primary)">
         <mat-icon style="font-size: 18px; width: 18px; height: 18px">info</mat-icon>

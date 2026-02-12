@@ -74,51 +74,56 @@
             <div class="element-detail-content">
               <div class="expanded-detail-content" fxLayout="column">
                 <div fxLayout="column" fxLayoutGap="5px" fxLayoutAlign="start start">
-                  <b class="label">Margem por loja %</b>
+                  @if (userPermissions?.allowEditProductMargin) {
+                    <b class="label">Margem por loja %</b>
 
-                  <div fxLayout="row" fxLayoutAlign="space-between" class="full-width">
-                    @for (branche of companyBrancheList; track branche.id) {
-                      <div fxLayout="column">
-                        @let marginCtrl = getMarginControl(element.id, branche.id);
+                    <div fxLayout="row" fxLayoutAlign="space-between" class="full-width">
+                      @for (branche of companyBrancheList; track branche.id) {
+                        <div fxLayout="column">
+                          @let marginCtrl = getMarginControl(element.id, branche.id);
 
-                        @if (marginCtrl) {
-                          <input
-                            #marginInput
-                            style="width: 55px"
-                            class="only-line margin-field"
-                            matInput
-                            type="text"
-                            maxlength="7"
-                            (focus)="onFocus($event)"
-                            (keydown.enter)="
-                              marginCtrl.invalid ? null : focusNextInput($any($event))
-                            "
-                            (blur)="
-                              onMarginBlur(
-                                element,
-                                branche,
-                                marginCtrl,
-                                marginInput.getAttribute('data-initial')
-                              )
-                            "
-                            (focusin)="
-                              marginInput.setAttribute('data-initial', marginCtrl.value.toString())
-                            "
-                            mask="separator.2"
-                            suffix="%"
-                            decimalMarker=","
-                            [dropSpecialCharacters]="true"
-                            [formControl]="marginCtrl"
-                          />
+                          @if (marginCtrl) {
+                            <input
+                              #marginInput
+                              style="width: 55px"
+                              class="only-line margin-field"
+                              matInput
+                              type="text"
+                              maxlength="7"
+                              (focus)="onFocus($event)"
+                              (keydown.enter)="
+                                marginCtrl.invalid ? null : focusNextInput($any($event))
+                              "
+                              (blur)="
+                                onMarginBlur(
+                                  element,
+                                  branche,
+                                  marginCtrl,
+                                  marginInput.getAttribute('data-initial')
+                                )
+                              "
+                              (focusin)="
+                                marginInput.setAttribute(
+                                  'data-initial',
+                                  marginCtrl.value.toString()
+                                )
+                              "
+                              mask="separator.2"
+                              suffix="%"
+                              decimalMarker=","
+                              [dropSpecialCharacters]="true"
+                              [formControl]="marginCtrl"
+                            />
 
-                          @if (marginCtrl.invalid && marginCtrl.touched) {
-                            <mat-error> margem inválida</mat-error>
+                            @if (marginCtrl.invalid && marginCtrl.touched) {
+                              <mat-error> margem inválida</mat-error>
+                            }
                           }
-                        }
-                        <p class="branch-name">{{ branche.name }}</p>
-                      </div>
-                    }
-                  </div>
+                          <p class="branch-name">{{ branche.name }}</p>
+                        </div>
+                      }
+                    </div>
+                  }
                 </div>
               </div>
             </div>
