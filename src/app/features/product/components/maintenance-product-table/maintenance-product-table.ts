@@ -45,6 +45,8 @@ import { IFilterOptions } from 'src/app/shared/components/icon-filter-button/ico
 import { ICompanyBrancheView } from 'src/app/core/models/company-branche.model';
 import { IProductView } from 'src/app/core/models/product.model';
 import { MarginFilterEnum } from 'src/app/core/enums/product.enum';
+import { IUserPermission } from 'src/app/core/models/user-permission.model';
+import { UserPermissionService } from 'src/app/features/user-permission/user-permission.service';
 
 type BranchGroup = FormGroup<{
   brancheId: FormControl<number>;
@@ -95,6 +97,7 @@ export class MaintenanceProductTable implements OnInit {
   companyBrancheList: ICompanyBrancheView[] = [];
   marginFormGroup!: FormGroup;
   companyId!: number;
+  userPermissions: IUserPermission | null = null;
 
   selectedMarginFilterType = signal<MarginFilterEnum>(MarginFilterEnum.ALL);
 
@@ -125,6 +128,7 @@ export class MaintenanceProductTable implements OnInit {
     private productMarginBrancheService: ProductMarginBrancheService,
     private fb: FormBuilder,
     private notificationService: NotificationService,
+    private userPermissionService: UserPermissionService,
   ) {
     effect(() => {
       const filterValue = this.selectedMarginFilterType();
@@ -139,6 +143,25 @@ export class MaintenanceProductTable implements OnInit {
     this.marginFormGroup = this.fb.group({
       rows: this.fb.array([]),
     });
+
+    this.authService.getUser().subscribe({
+      next: (user) => {
+        this.userPermissionService.getPermissions(user.id).subscribe({
+          next: (permissions) => {
+            this.userPermissions = permissions;
+          },
+          error: (err) => {
+            this.notificationService.showError(
+              `Erro ao buscar permissões do usuário: ${err.message || err}`,
+            );
+          },
+        });
+      },
+      error: (err) => {
+        this.notificationService.showError(`Erro ao buscar usuário: ${err.message || err}`);
+      },
+    });
+
     this.companyBrancheService
       .loadCompanyBranches(this.companyBranchePaginatorDataSource)
       .subscribe({

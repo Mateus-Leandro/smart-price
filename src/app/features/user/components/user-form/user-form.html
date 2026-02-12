@@ -76,49 +76,61 @@
       />
     </div>
 
-    <mat-divider />
-    <div fxLayout="column">
-      <b style="font-weight: 500; padding: 25px 0 15px">Permissões</b>
+    @if (userPermissions?.isAdmin || !userPermissions) {
+      <mat-divider />
+      <div fxLayout="column">
+        <b style="font-weight: 500; padding: 25px 0 15px">Permissões</b>
 
-      <app-checkbox formControlName="isAdmin" checkboxText="Usuário administrador" />
+        <app-checkbox formControlName="isAdmin" checkboxText="Usuário administrador" />
 
-      <div fxLayout="column" style="padding-left: 10px">
-        <b style="font-weight: 500; padding: 25px 0 5px">Cotações</b>
-        <div fxLayout="row" fxLayoutGap="20px">
-          <app-checkbox
-            formControlName="allowEditCompetitorPrices"
-            checkboxText="Permitir alterar preços dos concorrentes"
-          />
-          <app-checkbox
-            formControlName="allowEditPrices"
-            checkboxText="Permitir alterar preços de venda e fidelidade"
-          />
-          <app-checkbox
-            formControlName="allowSendToErp"
-            checkboxText="Permitir enviar item para o ERP"
-          />
+        <div fxLayout="column" style="padding-left: 10px">
+          <b style="font-weight: 500; padding: 25px 0 5px">Cotações</b>
+          <div fxLayout="row" fxLayoutGap="20px">
+            <app-checkbox
+              formControlName="allowEditCompetitorPrices"
+              checkboxText="Permitir alterar preços dos concorrentes"
+            />
+            <app-checkbox
+              formControlName="allowEditPrices"
+              checkboxText="Permitir alterar preços de venda e fidelidade"
+            />
+            <app-checkbox
+              formControlName="allowSendToErp"
+              checkboxText="Permitir enviar item para o ERP"
+            />
+          </div>
+        </div>
+
+        <div fxLayout="column" style="padding-left: 10px">
+          <b style="font-weight: 500; padding: 25px 0 5px">Fornecedor</b>
+          <div fxLayout="row" fxLayoutGap="20px">
+            <app-checkbox
+              formControlName="allowEditShippingType"
+              checkboxText="Permitir alterar tipo do frete do fornecedor"
+            />
+          </div>
+        </div>
+
+        <div fxLayout="column" style="padding-left: 10px">
+          <b style="font-weight: 500; padding: 25px 0 5px">Produtos</b>
+          <div fxLayout="row" fxLayoutGap="20px">
+            <app-checkbox
+              formControlName="allowEditProductMargin"
+              checkboxText="Permitir alterar margem do produto"
+            />
+          </div>
         </div>
       </div>
 
-      <div fxLayout="column" style="padding-left: 10px">
-        <b style="font-weight: 500; padding: 25px 0 5px">Fornecedor</b>
-        <div fxLayout="row" fxLayoutGap="20px">
-          <app-checkbox
-            formControlName="allowEditShippingType"
-            checkboxText="Permitir alterar tipo do frete do fornecedor"
-          />
+      @if (!userFormGroup.getRawValue()?.isAdmin) {
+        <div fxLayout="row" fxLayoutGap="5px" style="color: var(--error-color); padding-top: 25px">
+          <mat-icon style="font-size: 18px; width: 18px; height: 18px">info</mat-icon>
+          <span class="mat-caption" style="font-weight: 500"
+            >Ao desmarcar a opção "Usuário administrador", o usuário não conseguirá alterar as
+            permissões acima e nem realizar o cadastro de novos usuários!</span
+          >
         </div>
-      </div>
-
-      <div fxLayout="column" style="padding-left: 10px">
-        <b style="font-weight: 500; padding: 25px 0 5px">Produtos</b>
-        <div fxLayout="row" fxLayoutGap="20px">
-          <app-checkbox
-            formControlName="allowEditProductMargin"
-            checkboxText="Permitir alterar margem do produto"
-          />
-        </div>
-      </div>
-    </div>
+      }
+    }
   </div>
 </form>

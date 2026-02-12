@@ -44,10 +44,12 @@ export class UserPermissionRepository {
 
   getUserPermissions(userId: string) {
     return from(
-      this.supabase.from('user_permissions').select('*').eq('user_id', userId).single(),
+      this.supabase.from('user_permissions').select('*').eq('user_id', userId).maybeSingle(),
     ).pipe(
       map(({ data, error }) => {
         if (error) throw error;
+
+        if (!data) return null;
 
         const mappedData: IUserPermission = {
           userId: userId,

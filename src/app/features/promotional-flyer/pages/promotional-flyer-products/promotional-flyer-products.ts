@@ -13,6 +13,9 @@ import { PromotionalFlyerService } from '../../services/promotional-flyer.servic
 import { IPromotionalFlyerView } from 'src/app/core/models/promotional-flyer.model';
 import { Spinner } from 'src/app/shared/components/spinner/spinner';
 import { LoadingService } from 'src/app/core/services/loading.service';
+import { IUserPermission } from 'src/app/core/models/user-permission.model';
+import { UserPermissionService } from 'src/app/features/user-permission/user-permission.service';
+import { AuthService } from 'src/app/features/auth/services/auth.service';
 
 @Component({
   selector: 'app-promotional-flyer-products',
@@ -31,6 +34,7 @@ import { LoadingService } from 'src/app/core/services/loading.service';
   styleUrl: './promotional-flyer-products.scss',
 })
 export class PromotionalFlyerProducts {
+  userPermissions: IUserPermission | null = null;
   loading = inject(LoadingService).loading;
   flyerInfo = signal<IPromotionalFlyerView | undefined>(undefined);
   id = signal<number>(0);
@@ -44,11 +48,32 @@ export class PromotionalFlyerProducts {
     private dialog: MatDialog,
     private notificationService: NotificationService,
     private promotionalFlyerService: PromotionalFlyerService,
+    private userPermissionService: UserPermissionService,
+    private authService: AuthService,
   ) {}
 
   ngOnInit() {
     const routeId = Number(this.route.snapshot.paramMap.get('id'));
     this.id.set(routeId);
+
+    this.authService.getUser().subscribe({
+      next: (user) => {
+        this.userPermissionService.getPermissions(user.id).subscribe({
+          next: (permissions) => {
+            this.userPermissions = permissions;
+          },
+          error: (err) => {
+            this.notificationService.showError(
+              `Erro ao buscar permissões do usuário: ${err.message || err}`,
+            );
+          },
+        });
+      },
+      error: (err) => {
+        this.notificationService.showError(`Erro ao buscar usuário: ${err.message || err}`);
+      },
+    });
+
     this.loadFlyerInfo();
   }
 

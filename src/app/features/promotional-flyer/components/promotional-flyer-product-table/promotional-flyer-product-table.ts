@@ -56,6 +56,8 @@ import { SuggestedPriceSettingService } from 'src/app/features/settings-suggeste
 import { ISuggestedPriceSettingView } from 'src/app/core/models/suggested-price-setting.model';
 import { MatDivider } from '@angular/material/divider';
 import { SupplierDeliveryTypeEnum } from 'src/app/core/enums/supplier.enum';
+import { IUserPermission } from 'src/app/core/models/user-permission.model';
+import { UserPermissionService } from 'src/app/features/user-permission/user-permission.service';
 
 type FlyerRowForm = FormGroup<{
   actualSalePrice: FormControl<string | null>;
@@ -128,6 +130,7 @@ export class PromotionalFlyerProductTable {
   competitorList: ICompetitor[] = [];
   suggestedPriceSettingsList: ISuggestedPriceSettingView[] = [];
   companyId!: number;
+  userPermissions: IUserPermission | null = null;
 
   sortEvent!: Sort;
 
@@ -164,13 +167,13 @@ export class PromotionalFlyerProductTable {
   constructor(
     private promotionalFlyerService: PromotionalFlyerService,
     private cdr: ChangeDetectorRef,
-    private route: ActivatedRoute,
     private fb: FormBuilder,
     private notificationService: NotificationService,
     private competitorService: CompetitorService,
     private competitorPriceFlyerProductService: CompetitorPriceFlyerProductService,
     private authService: AuthService,
     private suggestedPriceSettings: SuggestedPriceSettingService,
+    private userPermissionService: UserPermissionService,
   ) {
     effect(() => {
       const info = this.flyerInfo();
@@ -185,8 +188,24 @@ export class PromotionalFlyerProductTable {
       rows: this.fb.array([]),
     });
 
+    this.getUserPermissions();
     this.setupSearchListener();
     this.loadData();
+  }
+
+  private getUserPermissions() {
+    this.authService.getUser().subscribe({
+      next: (user) => {
+        this.userPermissionService.getPermissions(user.id).subscribe({
+          next: (permissions) => {
+            this.userPermissions = permissions;
+          },
+        });
+      },
+      error: (err) => {
+        this.notificationService.showError(`Erro ao buscar usuário logado: ${err.message || err}`);
+      },
+    });
   }
 
   private setupSearchListener(): void {

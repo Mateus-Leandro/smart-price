@@ -6,21 +6,23 @@
       </div>
     }
 
-    <div fxLayout="row" fxLayoutGap="15px" style="padding-top: 10px">
-      <app-icon-button
-        tooltipText="Criar Novo Usuário"
-        icon="add"
-        backgroundColor="var(--primary)"
-        iconColor="var(--font-primary)"
-        style="padding-top: 6px"
-        (click)="createrUser()"
-      ></app-icon-button>
-      <mat-form-field appearance="outline" class="full-width" style="margin-top: 10px">
-        <mat-label>Pesquisar usuário pelo nome</mat-label>
-        <input matInput type="search" (input)="onSearch($event)" />
-        <mat-icon matSuffix>search</mat-icon>
-      </mat-form-field>
-    </div>
+    @if (userPermissions?.isAdmin) {
+      <div fxLayout="row" fxLayoutGap="15px" style="padding-top: 10px">
+        <app-icon-button
+          tooltipText="Criar Novo Usuário"
+          icon="add"
+          backgroundColor="var(--primary)"
+          iconColor="var(--font-primary)"
+          style="padding-top: 6px"
+          (click)="createrUser()"
+        ></app-icon-button>
+        <mat-form-field appearance="outline" class="full-width" style="margin-top: 10px">
+          <mat-label>Pesquisar usuário pelo nome</mat-label>
+          <input matInput type="search" (input)="onSearch($event)" />
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+      </div>
+    }
 
     <table mat-table [dataSource]="dataSource" matSort class="default-table zebra-simple">
       <ng-container matColumnDef="name">

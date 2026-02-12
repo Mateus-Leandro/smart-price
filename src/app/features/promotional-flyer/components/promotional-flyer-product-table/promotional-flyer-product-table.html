@@ -41,40 +41,44 @@
       <ng-container matColumnDef="margin">
         <th mat-header-cell *matHeaderCellDef>Margem</th>
         <td mat-cell *matCellDef="let element; let i = dataIndex">
-          <div fxLayout="column" fxLayoutGap="2px">
-            <span>
-              {{ `${element?.product?.margin ?? 0}%` }}
-            </span>
-            @if (rows.at(i).controls.suggestedSalePriceWithMargin.value) {
-              <span
-                class="details-rows sale-price-cell"
-                [matTooltip]="`Preço com a margem de ${element?.product?.margin}%`"
-              >
-                {{
-                  rows.at(i).controls.suggestedSalePriceWithMargin.value
-                    | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR'
-                }}
+          @if (userPermissions?.allowEditPrices) {
+            <div fxLayout="column" fxLayoutGap="2px">
+              <span>
+                {{ `${element?.product?.margin ?? 0}%` }}
               </span>
-            }
-          </div>
+              @if (rows.at(i).controls.suggestedSalePriceWithMargin.value) {
+                <span
+                  class="details-rows sale-price-cell"
+                  [matTooltip]="`Preço com a margem de ${element?.product?.margin}%`"
+                >
+                  {{
+                    rows.at(i).controls.suggestedSalePriceWithMargin.value
+                      | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR'
+                  }}
+                </span>
+              }
+            </div>
+          }
         </td>
       </ng-container>
 
       <ng-container matColumnDef="average_cost_quote">
         <th mat-header-cell *matHeaderCellDef>Média de Custo</th>
         <td mat-cell *matCellDef="let element">
-          <div fxLayout="column" fxLayoutGap="2px">
-            {{ element.averageCostQuote | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
-            <div
-              fxLayoutAlign="row"
-              fxLayoutGap="5px"
-              fxLayoutAlign="start center"
-              matTooltip="Quantidade de fornecedores"
-            >
-              <mat-icon>local_shipping</mat-icon>
-              <span class="details-rows">{{ element?.quantitySuppliers }}</span>
+          @if (userPermissions?.allowEditPrices) {
+            <div fxLayout="column" fxLayoutGap="2px">
+              {{ element.averageCostQuote | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
+              <div
+                fxLayoutAlign="row"
+                fxLayoutGap="5px"
+                fxLayoutAlign="start center"
+                matTooltip="Quantidade de fornecedores"
+              >
+                <mat-icon>local_shipping</mat-icon>
+                <span class="details-rows">{{ element?.quantitySuppliers }}</span>
+              </div>
             </div>
-          </div>
+          }
         </td>
       </ng-container>
 
@@ -120,21 +124,23 @@
       <ng-container matColumnDef="quote_cost">
         <th mat-header-cell *matHeaderCellDef>Pr.Cotação</th>
         <td mat-cell *matCellDef="let element; let i = dataIndex">
-          <div
-            fxLayout="column"
-            [matTooltip]="`${element?.supplier?.id} - ${element?.supplier?.name}`"
-          >
-            <span> {{ element.quoteCost | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</span>
-          </div>
-          @if (getShippingPrice(i)) {
-            <div matTooltip="Pr.Cotação + frete">
-              <span style="font-weight: bold">
-                {{
-                  getFinalCost(i, element.quoteCost)
-                    | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR'
-                }}</span
-              >
+          @if (userPermissions?.allowEditPrices) {
+            <div
+              fxLayout="column"
+              [matTooltip]="`${element?.supplier?.id} - ${element?.supplier?.name}`"
+            >
+              <span> {{ element.quoteCost | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</span>
             </div>
+            @if (getShippingPrice(i)) {
+              <div matTooltip="Pr.Cotação + frete">
+                <span style="font-weight: bold">
+                  {{
+                    getFinalCost(i, element.quoteCost)
+                      | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR'
+                  }}</span
+                >
+              </div>
+            }
           }
         </td>
       </ng-container>
@@ -149,47 +155,49 @@
       <ng-container matColumnDef="sale_price">
         <th mat-header-cell *matHeaderCellDef>Novo Preço de Venda</th>
         <td mat-cell *matCellDef="let element; let i = dataIndex" class="sale-price-cell">
-          <div fxLayout="column" fxLayoutGap="2px">
-            <input
-              #salePriceInput
-              matInput
-              class="only-line sale-price-cell"
-              [formControl]="rows.at(i).controls.salePrice"
-              (keyup.enter)="onEnterNext(salePriceInputs, salePriceInput)"
-              (blur)="
-                onPriceBlur(
-                  salePriceInput.getAttribute('initial-sale-price') || '0',
-                  element.product.id,
-                  rows.at(i).controls.salePrice,
-                  'sale_price'
-                )
-              "
-              (focus)="onFocus(salePriceInput)"
-              (focusin)="
-                salePriceInput.setAttribute(
-                  'initial-sale-price',
-                  rows.at(i).controls.salePrice.value?.toString() || '0'
-                )
-              "
-              mask="separator.2"
-              thousandSeparator="."
-              decimalMarker=","
-              prefix="R$ "
-              [dropSpecialCharacters]="true"
-              [showMaskTyped]="false"
-              [allowNegativeNumbers]="false"
-              style="width: 75px"
-              (click)="$event.stopPropagation()"
-            />
-            @if (rows.at(i).controls.suggestedSalePrice.value) {
-              <div fxLayout="column">
-                <span class="details-rows">{{ 'Preço Sugerido:' }} </span>
-                <span class="details-rows">
-                  {{ `R$ ${rows.at(i).controls.suggestedSalePrice.value}` }}
-                </span>
-              </div>
-            }
-          </div>
+          @if (userPermissions?.allowEditPrices) {
+            <div fxLayout="column" fxLayoutGap="2px">
+              <input
+                #salePriceInput
+                matInput
+                class="only-line sale-price-cell"
+                [formControl]="rows.at(i).controls.salePrice"
+                (keyup.enter)="onEnterNext(salePriceInputs, salePriceInput)"
+                (blur)="
+                  onPriceBlur(
+                    salePriceInput.getAttribute('initial-sale-price') || '0',
+                    element.product.id,
+                    rows.at(i).controls.salePrice,
+                    'sale_price'
+                  )
+                "
+                (focus)="onFocus(salePriceInput)"
+                (focusin)="
+                  salePriceInput.setAttribute(
+                    'initial-sale-price',
+                    rows.at(i).controls.salePrice.value?.toString() || '0'
+                  )
+                "
+                mask="separator.2"
+                thousandSeparator="."
+                decimalMarker=","
+                prefix="R$ "
+                [dropSpecialCharacters]="true"
+                [showMaskTyped]="false"
+                [allowNegativeNumbers]="false"
+                style="width: 75px"
+                (click)="$event.stopPropagation()"
+              />
+              @if (rows.at(i).controls.suggestedSalePrice.value) {
+                <div fxLayout="column">
+                  <span class="details-rows">{{ 'Preço Sugerido:' }} </span>
+                  <span class="details-rows">
+                    {{ `R$ ${rows.at(i).controls.suggestedSalePrice.value}` }}
+                  </span>
+                </div>
+              }
+            </div>
+          }
         </td>
       </ng-container>
 
@@ -203,48 +211,50 @@
       <ng-container matColumnDef="loyalty_price">
         <th mat-header-cell *matHeaderCellDef>Novo Preço Fidelidade</th>
         <td mat-cell *matCellDef="let element; let i = dataIndex" class="loyalty-price-cell">
-          @if (element.currentLoyaltyPrice) {
-            <div fxLayout="column" fxLayoutGap="2px">
-              <input
-                #loyaltyPriceInput
-                matInput
-                class="only-line loyalty-price-cell"
-                [formControl]="rows.at(i).controls.loyaltyPrice"
-                mask="separator.2"
-                thousandSeparator="."
-                decimalMarker=","
-                prefix="R$ "
-                (keyup.enter)="onEnterNext(loyaltyPriceInputs, loyaltyPriceInput)"
-                (blur)="
-                  onPriceBlur(
-                    loyaltyPriceInput.getAttribute('initial-loyalty-price') || '0',
-                    element.product.id,
-                    rows.at(i).controls.loyaltyPrice,
-                    'loyalty_price'
-                  )
-                "
-                (focus)="onFocus(loyaltyPriceInput)"
-                (focusin)="
-                  loyaltyPriceInput.setAttribute(
-                    'initial-loyalty-price',
-                    rows.at(i).controls.loyaltyPrice.value?.toString() || '0,00'
-                  )
-                "
-                [dropSpecialCharacters]="true"
-                [showMaskTyped]="false"
-                [allowNegativeNumbers]="false"
-                style="width: 75px"
-                (click)="$event.stopPropagation()"
-              />
-              @if (rows.at(i).controls.suggestedLoyaltyPrice.value) {
-                <div fxLayout="column">
-                  <span class="details-rows">{{ `Preço Sugerido:` }}</span>
-                  <span class="details-rows">
-                    {{ `R$ ${rows.at(i).controls.suggestedLoyaltyPrice.value}` }}
-                  </span>
-                </div>
-              }
-            </div>
+          @if (userPermissions?.allowEditPrices) {
+            @if (element.currentLoyaltyPrice) {
+              <div fxLayout="column" fxLayoutGap="2px">
+                <input
+                  #loyaltyPriceInput
+                  matInput
+                  class="only-line loyalty-price-cell"
+                  [formControl]="rows.at(i).controls.loyaltyPrice"
+                  mask="separator.2"
+                  thousandSeparator="."
+                  decimalMarker=","
+                  prefix="R$ "
+                  (keyup.enter)="onEnterNext(loyaltyPriceInputs, loyaltyPriceInput)"
+                  (blur)="
+                    onPriceBlur(
+                      loyaltyPriceInput.getAttribute('initial-loyalty-price') || '0',
+                      element.product.id,
+                      rows.at(i).controls.loyaltyPrice,
+                      'loyalty_price'
+                    )
+                  "
+                  (focus)="onFocus(loyaltyPriceInput)"
+                  (focusin)="
+                    loyaltyPriceInput.setAttribute(
+                      'initial-loyalty-price',
+                      rows.at(i).controls.loyaltyPrice.value?.toString() || '0,00'
+                    )
+                  "
+                  [dropSpecialCharacters]="true"
+                  [showMaskTyped]="false"
+                  [allowNegativeNumbers]="false"
+                  style="width: 75px"
+                  (click)="$event.stopPropagation()"
+                />
+                @if (rows.at(i).controls.suggestedLoyaltyPrice.value) {
+                  <div fxLayout="column">
+                    <span class="details-rows">{{ `Preço Sugerido:` }}</span>
+                    <span class="details-rows">
+                      {{ `R$ ${rows.at(i).controls.suggestedLoyaltyPrice.value}` }}
+                    </span>
+                  </div>
+                }
+              </div>
+            }
           }
         </td>
       </ng-container>
@@ -256,26 +266,30 @@
           *matCellDef="let element; let i = dataIndex"
           (click)="$event.stopPropagation()"
         >
-          @if (sendingProductId !== element.product.id) {
-            <div fxLayout="column" fxLayoutAlign="center">
-              <app-icon-button
-                icon="send"
-                [class]="isPriceInvalid(i) ? 'icon-button-table-disabled' : 'icon-button-table'"
-                [tooltipText]="isPriceInvalid(i) ? '' : `Enviar preços para o ERP`"
-                (click)="sendPrices(element.product.id)"
-                [disabled]="isPriceInvalid(i)"
-              />
-              @if (element.erpImportDate) {
-                <div fxLayout="column" matTooltip="Data e hora de importação no ERP">
-                  <span class="details-rows">
-                    {{ `${(element.erpImportDate | date: 'dd/MM/yy - HH:mm')}` }}
-                  </span>
-                </div>
-              }
-              <span style="font-weight: 500">{{ rows.at(i).controls.warningPriceText.value }}</span>
-            </div>
-          } @else {
-            <app-spinner [diameter]="30"></app-spinner>
+          @if (userPermissions?.allowSendToErp) {
+            @if (sendingProductId !== element.product.id) {
+              <div fxLayout="column" fxLayoutAlign="center">
+                <app-icon-button
+                  icon="send"
+                  [class]="isPriceInvalid(i) ? 'icon-button-table-disabled' : 'icon-button-table'"
+                  [tooltipText]="isPriceInvalid(i) ? '' : `Enviar preços para o ERP`"
+                  (click)="sendPrices(element.product.id)"
+                  [disabled]="isPriceInvalid(i)"
+                />
+                @if (element.erpImportDate) {
+                  <div fxLayout="column" matTooltip="Data e hora de importação no ERP">
+                    <span class="details-rows">
+                      {{ `${(element.erpImportDate | date: 'dd/MM/yy - HH:mm')}` }}
+                    </span>
+                  </div>
+                }
+                <span style="font-weight: 500">{{
+                  rows.at(i).controls.warningPriceText.value
+                }}</span>
+              </div>
+            } @else {
+              <app-spinner [diameter]="30"></app-spinner>
+            }
           }
         </td>
       </ng-container>
@@ -296,126 +310,134 @@
                     </div>
                     <mat-divider />
                   </div>
-
-                  @if (rows.at(i); as currentRow) {
-                    <div fxLayout="column" fxLayoutGap="15px">
-                      <div fxLayout="row" fxLayoutAlign="space-between" [formGroup]="currentRow">
-                        @for (competitor of competitorList; track competitor.id; let j = $index) {
-                          <div
-                            fxLayout="column"
-                            formArrayName="competitorPrices"
-                            fxLayoutGap="1"
-                            [class.row-critical]="
-                              isLowestPrice(
-                                i,
-                                rows.at(i).get('competitorPrices')?.get(j.toString())?.value
-                              )
-                            "
-                          >
-                            <p>{{ competitor.name }}</p>
-                            <input
-                              matInput
-                              #competitorPriceInput
-                              class="only-line"
-                              type="text"
-                              [formControlName]="j"
-                              (focusin)="
-                                competitorPriceInput.setAttribute(
-                                  'initial-competitor-price',
-                                  currentRow
-                                    .get('competitorPrices')
-                                    ?.get(j.toString())
-                                    ?.value?.toString() || '0,00'
+                  @if (userPermissions?.allowEditCompetitorPrices) {
+                    @if (rows.at(i); as currentRow) {
+                      <div fxLayout="column" fxLayoutGap="15px">
+                        <div fxLayout="row" fxLayoutAlign="space-between" [formGroup]="currentRow">
+                          @for (competitor of competitorList; track competitor.id; let j = $index) {
+                            <div
+                              fxLayout="column"
+                              formArrayName="competitorPrices"
+                              fxLayoutGap="1"
+                              [class.row-critical]="
+                                isLowestPrice(
+                                  i,
+                                  rows.at(i).get('competitorPrices')?.get(j.toString())?.value
                                 )
                               "
-                              (focus)="onFocus(competitorPriceInput)"
-                              (blur)="
-                                onPriceBlur(
-                                  competitorPriceInput.getAttribute('initial-competitor-price') ||
-                                    '0',
-                                  element.product.id,
-                                  rows.at(i).controls.competitorPrices.at(j),
-                                  'competitor_price',
-                                  competitor.id
-                                )
-                              "
-                              mask="separator.2"
-                              maxlength="10"
-                              (keyup.enter)="
-                                onEnterInRow(i, j, competitorPriceInputs.toArray(), competitorList)
-                              "
-                              thousandSeparator="."
-                              decimalMarker=","
-                              prefix="R$ "
-                              [dropSpecialCharacters]="true"
-                              [showMaskTyped]="false"
-                              [allowNegativeNumbers]="false"
-                              style="width: 80px"
-                            />
-                            <span
-                              class="details-rows"
-                              matTooltip="Margem do concorrente em relação ao custo (Pr. cotação + Frete)."
-                              >{{
-                                `Margem do concorrente: ${competitorMargin(i, rows.at(i).get('competitorPrices')?.get(j.toString())?.value)}`
-                              }}</span
                             >
-                          </div>
-                        }
-                      </div>
-
-                      @if (
-                        marginRuleText(i).loyaltyMarginRuleText ||
-                        marginRuleText(i).saleMarginRuleText
-                      ) {
-                        <mat-divider />
-                        <div fxLayout="column">
-                          <div
-                            fxLayout="row"
-                            fxLayoutGap="5px"
-                            style="color: var(--font-secondary); padding-bottom: 10px"
-                          >
-                            <span style="font-weight: 500">{{
-                              'Regra usada na sugestão de preços'
-                            }}</span>
-                          </div>
-
-                          @if (marginRuleText(i).loyaltyMarginRuleText) {
-                            <div
-                              fxLayout="row"
-                              fxLayoutGap="5px"
-                              style="color: var(--loyalty-price-color)"
-                            >
-                              <mat-icon style="font-size: 18px; width: 18px; height: 18px"
-                                >info</mat-icon
+                              <p>{{ competitor.name }}</p>
+                              <input
+                                matInput
+                                #competitorPriceInput
+                                class="only-line"
+                                type="text"
+                                [formControlName]="j"
+                                (focusin)="
+                                  competitorPriceInput.setAttribute(
+                                    'initial-competitor-price',
+                                    currentRow
+                                      .get('competitorPrices')
+                                      ?.get(j.toString())
+                                      ?.value?.toString() || '0,00'
+                                  )
+                                "
+                                (focus)="onFocus(competitorPriceInput)"
+                                (blur)="
+                                  onPriceBlur(
+                                    competitorPriceInput.getAttribute('initial-competitor-price') ||
+                                      '0',
+                                    element.product.id,
+                                    rows.at(i).controls.competitorPrices.at(j),
+                                    'competitor_price',
+                                    competitor.id
+                                  )
+                                "
+                                mask="separator.2"
+                                maxlength="10"
+                                (keyup.enter)="
+                                  onEnterInRow(
+                                    i,
+                                    j,
+                                    competitorPriceInputs.toArray(),
+                                    competitorList
+                                  )
+                                "
+                                thousandSeparator="."
+                                decimalMarker=","
+                                prefix="R$ "
+                                [dropSpecialCharacters]="true"
+                                [showMaskTyped]="false"
+                                [allowNegativeNumbers]="false"
+                                style="width: 80px"
+                              />
+                              <span
+                                class="details-rows"
+                                matTooltip="Margem do concorrente em relação ao custo (Pr. cotação + Frete)."
+                                >{{
+                                  `Margem do concorrente: ${competitorMargin(i, rows.at(i).get('competitorPrices')?.get(j.toString())?.value)}`
+                                }}</span
                               >
-                              <span class="mat-caption" style="font-weight: 500">{{
-                                'Preço Fidelidade: '
-                              }}</span>
-                              <span class="mat-caption">{{
-                                marginRuleText(i).loyaltyMarginRuleText
-                              }}</span>
-                            </div>
-                          }
-                          @if (marginRuleText(i).saleMarginRuleText) {
-                            <div
-                              fxLayout="row"
-                              fxLayoutGap="5px"
-                              style="color: var(--sale-price-color)"
-                            >
-                              <mat-icon style="font-size: 18px; width: 18px; height: 18px"
-                                >info</mat-icon
-                              >
-                              <span class="mat-caption" style="font-weight: 500">{{
-                                'Preço de venda: '
-                              }}</span>
-                              <span class="mat-caption">{{
-                                marginRuleText(i).saleMarginRuleText
-                              }}</span>
                             </div>
                           }
                         </div>
-                      }
-                    </div>
+
+                        @if (
+                          marginRuleText(i).loyaltyMarginRuleText ||
+                          marginRuleText(i).saleMarginRuleText
+                        ) {
+                          @if (userPermissions?.allowEditPrices) {
+                            <mat-divider />
+                            <div fxLayout="column">
+                              <div
+                                fxLayout="row"
+                                fxLayoutGap="5px"
+                                style="color: var(--font-secondary); padding-bottom: 10px"
+                              >
+                                <span style="font-weight: 500">{{
+                                  'Regra usada na sugestão de preços'
+                                }}</span>
+                              </div>
+
+                              @if (marginRuleText(i).loyaltyMarginRuleText) {
+                                <div
+                                  fxLayout="row"
+                                  fxLayoutGap="5px"
+                                  style="color: var(--loyalty-price-color)"
+                                >
+                                  <mat-icon style="font-size: 18px; width: 18px; height: 18px"
+                                    >info</mat-icon
+                                  >
+                                  <span class="mat-caption" style="font-weight: 500">{{
+                                    'Preço Fidelidade: '
+                                  }}</span>
+                                  <span class="mat-caption">{{
+                                    marginRuleText(i).loyaltyMarginRuleText
+                                  }}</span>
+                                </div>
+                              }
+                              @if (marginRuleText(i).saleMarginRuleText) {
+                                <div
+                                  fxLayout="row"
+                                  fxLayoutGap="5px"
+                                  style="color: var(--sale-price-color)"
+                                >
+                                  <mat-icon style="font-size: 18px; width: 18px; height: 18px"
+                                    >info</mat-icon
+                                  >
+                                  <span class="mat-caption" style="font-weight: 500">{{
+                                    'Preço de venda: '
+                                  }}</span>
+                                  <span class="mat-caption">{{
+                                    marginRuleText(i).saleMarginRuleText
+                                  }}</span>
+                                </div>
+                              }
+                            </div>
+                          }
+                        }
+                      </div>
+                    }
                   }
                 </div>
               </div>

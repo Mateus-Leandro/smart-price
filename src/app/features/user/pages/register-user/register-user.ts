@@ -79,9 +79,11 @@ export class RegisterUser {
         },
       });
 
-      this.authService
-        .updateUser({
+      this.userService
+        .updateUserCredentials({
+          userId,
           email: user.email,
+          password: user.password,
         })
         .subscribe({
           next: () => {
@@ -89,36 +91,41 @@ export class RegisterUser {
             this.notificationService.showSuccess(`Usuário atualizado com sucesso!`);
           },
           error: (err) => {
-            this.notificationService.showError(`Erro ao atualizar usuário: ${err.message || err}`);
+            this.notificationService.showError(
+              `Erro ao atualizar credenciais: ${err.message || err}`,
+            );
           },
         });
-    } else {
-      if (!this?.loggedUserInfo?.app_metadata['company_id'])
-        throw new Error('Não encontrado companyid para criação do usuário!');
 
-      this.authService
-        .createUser({
-          user: {
-            name: user.name,
-            email: user.email,
-            password: user.password,
-          },
-          company: {
-            id: this?.loggedUserInfo?.app_metadata['company_id'],
-          },
-        })
-        .subscribe({
-          next: (data) => {
-            const userId = data.user.id;
-            userForm.controls['id'].setValue(userId);
-            this.upsertUserPermissions(userForm);
-            this.notificationService.showSuccess(`Usuário criado com sucesso`);
-          },
-          error: (err) => {
-            this.notificationService.showError(`Erro ao criar usuário: ${err.message || err}`);
-          },
-        });
+      return;
     }
+
+    if (!this?.loggedUserInfo?.app_metadata['company_id']) {
+      throw new Error('Não encontrado companyid para criação do usuário!');
+    }
+
+    this.authService
+      .createUser({
+        user: {
+          name: user.name,
+          email: user.email,
+          password: user.password,
+        },
+        company: {
+          id: this?.loggedUserInfo?.app_metadata['company_id'],
+        },
+      })
+      .subscribe({
+        next: (data) => {
+          const userId = data.user.id;
+          userForm.controls['id'].setValue(userId);
+          this.upsertUserPermissions(userForm);
+          this.notificationService.showSuccess(`Usuário criado com sucesso`);
+        },
+        error: (err) => {
+          this.notificationService.showError(`Erro ao criar usuário: ${err.message || err}`);
+        },
+      });
   }
 
   upsertUserPermissions(userForm: FormGroup) {

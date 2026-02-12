@@ -25,3 +25,9 @@ export interface IUpdateUser {
   password?: string;
   email?: string;
 }
+
+export interface IUpdateCredentials {
+  userId: string;
+  email?: string;
+  password?: string;
+}

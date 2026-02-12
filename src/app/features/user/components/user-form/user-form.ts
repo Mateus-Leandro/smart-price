@@ -21,6 +21,7 @@ import { ForgotPasswordDialog } from 'src/app/features/auth/components/forgot-pa
 import { IconButton } from 'src/app/shared/components/icon-button/icon-button';
 import { User } from '@supabase/supabase-js';
 import { AuthService } from 'src/app/features/auth/services/auth.service';
+import { IUserPermission } from 'src/app/core/models/user-permission.model';
 
 @Component({
   selector: 'app-user-form',
@@ -43,6 +44,7 @@ import { AuthService } from 'src/app/features/auth/services/auth.service';
 export class UserForm {
   @Output() submitForm = new EventEmitter<FormGroup>();
   loading = inject(LoadingService).loading;
+  userPermissions: IUserPermission | null = null;
 
   userFormGroup: FormGroup;
   userId: string | null = null;
@@ -93,42 +95,62 @@ export class UserForm {
     this.authService.getUser().subscribe({
       next: (user) => {
         this.loggedUserInfo = user;
-        if (this.userId) {
-          this.userService.getUserInfoByUserId(this.userId).subscribe({
-            next: (user) => {
-              this.userPermissionService.getPermissions(this.userId!).subscribe({
-                next: (permissions) => {
-                  this.userFormGroup.patchValue({
-                    id: this.userId,
-                    email: user.email,
-                    name: user.name,
+        this.userPermissionService.getPermissions(user.id).subscribe({
+          next: (permissions) => {
+            this.userPermissions = permissions;
 
-                    isAdmin: permissions?.isAdmin,
-                    allowEditPrices: permissions?.allowEditPrices,
-                    allowEditCompetitorPrices: permissions?.allowEditCompetitorPrices,
-                    allowEditShippingValue: permissions?.allowEditShippingValue,
-                    allowSendToErp: permissions?.allowSendToErp,
-                    allowEditShippingType: permissions?.allowEditShippingType,
-                    allowEditProductMargin: permissions?.allowEditProductMargin,
+            if (this.userId) {
+              this.userService.getUserInfoByUserId(this.userId).subscribe({
+                next: (user) => {
+                  this.userPermissionService.getPermissions(this.userId!).subscribe({
+                    next: (permissions) => {
+                      this.userFormGroup.patchValue({
+                        id: this.userId,
+                        email: user.email,
+                        name: user.name,
+
+                        isAdmin: permissions?.isAdmin,
+                        allowEditPrices: permissions?.allowEditPrices,
+                        allowEditCompetitorPrices: permissions?.allowEditCompetitorPrices,
+                        allowEditShippingValue: permissions?.allowEditShippingValue,
+                        allowSendToErp: permissions?.allowSendToErp,
+                        allowEditShippingType: permissions?.allowEditShippingType,
+                        allowEditProductMargin: permissions?.allowEditProductMargin,
+                      });
+
+                      this.userFormGroup.get('pass')?.disable();
+                      this.userFormGroup.get('confirmationPass')?.disable();
+
+                      if (
+                        this.loggedUserInfo.id !== this.userId &&
+                        !this.userPermissions?.isAdmin
+                      ) {
+                        this.userFormGroup.get('email')?.disable();
+                        this.userFormGroup.get('name')?.disable();
+                      }
+                    },
+                    error: (err) => {
+                      this.notificationService.showError(
+                        `Erro ao carregar permissões do usuário: ${err.message || err}`,
+                      );
+                    },
                   });
-                  this.userFormGroup.get('pass')?.disable();
-                  this.userFormGroup.get('confirmationPass')?.disable();
                 },
                 error: (err) => {
                   this.notificationService.showError(
-                    `Erro ao carregar permissões do usuário: ${err.message || err}`,
+                    `Erro ao carregar informações do usuário: ${err.message || err}`,
                   );
+                  this.handleNotFoundError();
                 },
               });
-            },
-            error: (err) => {
-              this.notificationService.showError(
-                `Erro ao carregar informações do usuário: ${err.message || err}`,
-              );
-              this.handleNotFoundError();
-            },
-          });
-        }
+            }
+          },
+          error: (err) => {
+            this.notificationService.showError(
+              `Erro ao carregar permissões do usuário logado: ${err.message || err}`,
+            );
+          },
+        });
       },
     });
   }
