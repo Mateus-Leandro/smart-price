@@ -7,6 +7,7 @@ import {
   input,
   Input,
   QueryList,
+  signal,
   SimpleChanges,
   ViewChild,
   ViewChildren,
@@ -42,7 +43,12 @@ import { IDefaultPaginatorDataSource } from 'src/app/core/models/query.model';
 import { LoadingService } from 'src/app/core/services/loading.service';
 import { NotificationService } from 'src/app/core/services/notification.service';
 import { MatTooltip } from '@angular/material/tooltip';
-import { ProductPriceType } from '../../../../core/enums/product.enum';
+import {
+  EnumFilterPromotionalFlyerProducts,
+  getPromotionalFlyerProductsFilterOptions,
+  MarginFilterEnum,
+  ProductPriceType,
+} from '../../../../core/enums/product.enum';
 import {
   IPromotionalFlyerProductsView,
   IPromotionalFlyerView,
@@ -58,6 +64,8 @@ import { MatDivider } from '@angular/material/divider';
 import { SupplierDeliveryTypeEnum } from 'src/app/core/enums/supplier.enum';
 import { IUserPermission } from 'src/app/core/models/user-permission.model';
 import { UserPermissionService } from 'src/app/features/user-permission/user-permission.service';
+import { IconFilterButton } from 'src/app/shared/components/icon-filter-button/icon-filter-button';
+import { IFilterOptions } from 'src/app/shared/components/icon-filter-button/icon-filter-list';
 
 type FlyerRowForm = FormGroup<{
   actualSalePrice: FormControl<string | null>;
@@ -96,6 +104,7 @@ type FlyerRowForm = FormGroup<{
     IconButton,
     MatTooltip,
     MatDivider,
+    IconFilterButton,
   ],
   templateUrl: './promotional-flyer-product-table.html',
 
@@ -153,6 +162,10 @@ export class PromotionalFlyerProductTable {
     'send',
   ];
 
+  filterOptions: IFilterOptions<EnumFilterPromotionalFlyerProducts>[] =
+    getPromotionalFlyerProductsFilterOptions();
+  selectedFilterType = signal<null | EnumFilterPromotionalFlyerProducts>(null);
+
   paginatorDataSource: IDefaultPaginatorDataSource<IPromotionalFlyerProductsView> = {
     pageIndex: 0,
     pageSize: 10,
@@ -182,6 +195,10 @@ export class PromotionalFlyerProductTable {
       if (info && info.idIntegral) {
         this.loadData();
       }
+    });
+    effect(() => {
+      const filterValue = this.selectedFilterType();
+      this.reload(filterValue);
     });
   }
 
@@ -265,9 +282,10 @@ export class PromotionalFlyerProductTable {
     idIntegral: number,
     paginatorDataSource: IDefaultPaginatorDataSource<IPromotionalFlyerProductsView>,
     search?: string,
+    selectedFilterType?: EnumFilterPromotionalFlyerProducts,
   ): void {
     this.promotionalFlyerService
-      .loadProducts(flyerId, idIntegral, paginatorDataSource, search)
+      .loadProducts(flyerId, idIntegral, paginatorDataSource, search, selectedFilterType)
       .subscribe({
         next: (response) => {
           this.paginatorDataSource.records = response;
@@ -297,7 +315,7 @@ export class PromotionalFlyerProductTable {
     this.search$.next(value);
   }
 
-  reload(): void {
+  reload(filterType?: EnumFilterPromotionalFlyerProducts | null): void {
     this.competitorService
       .loadCompetitors({
         pageIndex: 0,
@@ -312,6 +330,7 @@ export class PromotionalFlyerProductTable {
             this.flyerInfo().idIntegral,
             this.paginatorDataSource,
             this.searchTerm,
+            filterType!!,
           );
         },
         error: (err) => {

@@ -8,6 +8,7 @@ import {
   IPromotionalFlyerProductsView,
   IPromotionalFlyerView,
 } from '../models/promotional-flyer.model';
+import { EnumFilterPromotionalFlyerProducts } from '../enums/product.enum';
 
 @Injectable({ providedIn: 'root' })
 export class PromotionalFlyerRepository {
@@ -73,6 +74,7 @@ export class PromotionalFlyerRepository {
     idIntegral: number,
     paginator: IDefaultPaginatorDataSource<IPromotionalFlyerProductsView>,
     search?: string,
+    selectedFilterType?: EnumFilterPromotionalFlyerProducts,
   ): Observable<{ data: IPromotionalFlyerProductsView[]; count: number }> {
     const fromIdx = paginator.pageIndex * paginator.pageSize;
     const toIdx = fromIdx + paginator.pageSize - 1;
@@ -133,6 +135,26 @@ export class PromotionalFlyerRepository {
       query = query.or(`name.ilike.%${search}%,id_text.ilike.%${search}%`, {
         foreignTable: 'products',
       });
+    }
+
+    if (selectedFilterType) {
+      switch (selectedFilterType) {
+        case EnumFilterPromotionalFlyerProducts.NoSalePrice:
+          query = query.is('sale_price', null);
+          break;
+
+        case EnumFilterPromotionalFlyerProducts.NoLoyaltyPrice:
+          query = query.is('loyalty_price', null);
+          break;
+
+        case EnumFilterPromotionalFlyerProducts.NoImported:
+          query = query.is('erp_import_date', null);
+          break;
+
+        case EnumFilterPromotionalFlyerProducts.NoCompetingPrice:
+          query = query.filter('product.competitorPrices', 'is', null);
+          break;
+      }
     }
 
     this.loadingService.show();

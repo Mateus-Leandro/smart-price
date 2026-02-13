@@ -5,6 +5,7 @@ import {
   IPromotionalFlyerProductsView,
   IPromotionalFlyerView,
 } from 'src/app/core/models/promotional-flyer.model';
+import { EnumFilterPromotionalFlyerProducts } from 'src/app/core/enums/product.enum';
 
 @Injectable({
   providedIn: 'root',
@@ -25,8 +26,9 @@ export class PromotionalFlyerService {
     idIntegral: number,
     paginator: IDefaultPaginatorDataSource<IPromotionalFlyerProductsView>,
     search?: string,
+    selectedFilterType?: EnumFilterPromotionalFlyerProducts,
   ) {
-    return this.repository.getProducts(flyerId, idIntegral, paginator, search);
+    return this.repository.getProducts(flyerId, idIntegral, paginator, search, selectedFilterType);
   }
 
   updateProductPrice(flyerId: number, productId: number, price: number, columnName: string) {
