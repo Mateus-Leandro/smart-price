@@ -99,6 +99,7 @@ export class PromotionalFlyerRepository {
 
       product:products!inner (
         id,
+        id_text,
         name,
 
         productMarginBranches:product_margin_branches (
@@ -129,7 +130,9 @@ export class PromotionalFlyerRepository {
       .order('product(name)', { ascending: true });
 
     if (search) {
-      query = query.ilike('product.name', `%${search}%`);
+      query = query.or(`name.ilike.%${search}%,id_text.ilike.%${search}%`, {
+        foreignTable: 'products',
+      });
     }
 
     this.loadingService.show();

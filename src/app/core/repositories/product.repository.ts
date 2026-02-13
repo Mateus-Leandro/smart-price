@@ -28,6 +28,7 @@ export class ProductRepository {
 
     let query = this.supabase.from('products').select(
       `id,
+      id_text,
       name,
       marginBranches:product_margin_branches${relationJoin} (
         brancheId:branche_id,
@@ -39,7 +40,7 @@ export class ProductRepository {
     );
 
     if (search) {
-      query = query.ilike('name', `%${search}%`);
+      query = query.or(`name.ilike.%${search}%,id_text.ilike.%${search}%`);
     }
 
     if (marginFilter === MarginFilterEnum.WITHOUT_MARGIN) {
