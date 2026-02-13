@@ -39,6 +39,8 @@ serve(async (req) => {
       ? Number(payload.promotional_flyer_id)
       : null;
 
+    const update_prices = payload?.update_prices || false;
+
     let query = supabase
       .from('promotional_flyer_products')
       .select('promotional_flyer_id, product_id, sale_price, loyalty_price')
@@ -60,18 +62,20 @@ serve(async (req) => {
       return success([]);
     }
 
-    const ids = data.map((r) => r.product_id);
-    const { error: updError } = await supabase
-      .from('promotional_flyer_products')
-      .update({
-        send_to_erp: false,
-        erp_import_date: new Date().toISOString(),
-      })
-      .in('product_id', ids)
-      .eq('company_id', company_id);
+    if (update_prices) {
+      const ids = data.map((r) => r.product_id);
+      const { error: updError } = await supabase
+        .from('promotional_flyer_products')
+        .update({
+          send_to_erp: false,
+          erp_import_date: new Date().toISOString(),
+        })
+        .in('product_id', ids)
+        .eq('company_id', company_id);
 
-    if (updError) {
-      return fail('Erro ao setar data de importação: ' + updError.message, 500);
+      if (updError) {
+        return fail('Erro ao setar data de importação: ' + updError.message, 500);
+      }
     }
 
     return success(data);
