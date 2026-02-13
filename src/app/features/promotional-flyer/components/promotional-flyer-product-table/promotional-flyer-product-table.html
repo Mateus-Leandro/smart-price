@@ -259,6 +259,23 @@
         </td>
       </ng-container>
 
+      <ng-container matColumnDef="fixed_price">
+        <th mat-header-cell *matHeaderCellDef>Fixar Preço</th>
+        <td
+          mat-cell
+          *matCellDef="let element; let i = dataIndex"
+          (click)="$event.stopPropagation()"
+        >
+          <app-icon-button
+            [icon]="rows.at(i).controls.lockPrices.value ? 'lock' : 'lock_open_right'"
+            [tooltipText]="rows.at(i).controls.lockPrices.value ? 'Desafixar Preço' : 'Fixar preço'"
+            (click)="
+              lockOrUnlockPrices(element.product.id, !rows.at(i).controls.lockPrices.value, i)
+            "
+          />
+        </td>
+      </ng-container>
+
       <ng-container matColumnDef="send">
         <th mat-header-cell *matHeaderCellDef></th>
         <td

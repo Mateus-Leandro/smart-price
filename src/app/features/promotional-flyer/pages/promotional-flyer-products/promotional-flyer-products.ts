@@ -16,6 +16,7 @@ import { LoadingService } from 'src/app/core/services/loading.service';
 import { IUserPermission } from 'src/app/core/models/user-permission.model';
 import { UserPermissionService } from 'src/app/features/user-permission/user-permission.service';
 import { AuthService } from 'src/app/features/auth/services/auth.service';
+import { MatIcon } from '@angular/material/icon';
 
 @Component({
   selector: 'app-promotional-flyer-products',
@@ -29,6 +30,7 @@ import { AuthService } from 'src/app/features/auth/services/auth.service';
     FlexLayoutModule,
     Button,
     Spinner,
+    MatIcon,
   ],
   templateUrl: './promotional-flyer-products.html',
   styleUrl: './promotional-flyer-products.scss',
