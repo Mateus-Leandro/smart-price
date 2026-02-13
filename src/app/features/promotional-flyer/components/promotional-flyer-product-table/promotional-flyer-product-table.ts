@@ -75,6 +75,7 @@ type FlyerRowForm = FormGroup<{
   warningPriceText: FormControl<string | null>;
   saleMarginRuleText: FormControl<string | null>;
   loyaltyMarginRuleText: FormControl<string | null>;
+  lockPrices: FormControl<boolean | null>;
 }>;
 
 @Component({
@@ -148,6 +149,7 @@ export class PromotionalFlyerProductTable {
     'sale_price',
     'current_loyalty_price',
     'loyalty_price',
+    'fixed_price',
     'send',
   ];
 
@@ -368,6 +370,7 @@ export class PromotionalFlyerProductTable {
           warningPriceText: this.fb.control<string | null>(null),
           saleMarginRuleText: this.fb.control<string | null>(null),
           loyaltyMarginRuleText: this.fb.control<string | null>(null),
+          lockPrices: this.fb.control<boolean | null>(item.lockPrice === true),
         }) as FlyerRowForm;
 
         this.calculateSuggestedPrice(rowForm);
@@ -535,6 +538,23 @@ export class PromotionalFlyerProductTable {
       complete: () => {
         this.sendingProductId = null;
         this.cdr.detectChanges();
+      },
+    });
+  }
+
+  lockOrUnlockPrices(productId: number, lock: boolean, index: number) {
+    this.promotionalFlyerService.lockOrUnlockPrices(this.flyerId(), productId, lock).subscribe({
+      next: () => {
+        const typeOperation = lock ? 'fixado' : 'desafixado';
+        this.notificationService.showSuccess(
+          `Preço ${typeOperation} corretamente para o produto ${productId}`,
+        );
+        this.rows.at(index).controls.lockPrices.setValue(lock);
+      },
+      error: (err) => {
+        this.notificationService.showError(
+          `Erro ao fixar preços no produto ${productId}:  ${err.message || err}.`,
+        );
       },
     });
   }

@@ -90,6 +90,7 @@ export class PromotionalFlyerRepository {
       current_sale_price,
       current_loyalty_price,
       erp_import_date,
+      lock_price,
 
       promotionalFlyer:promotional_flyers!inner (
         branche_id,
@@ -152,6 +153,7 @@ export class PromotionalFlyerRepository {
             currentSalePrice: item.current_sale_price,
             currentLoyaltyPrice: item.current_loyalty_price,
             erpImportDate: item.erp_import_date,
+            lockPrice: item.lock_price,
             product: {
               id: item?.product?.id,
               name: item?.product?.name,
@@ -224,6 +226,22 @@ export class PromotionalFlyerRepository {
         if (error) throw error;
       }),
       finalize(() => this.loadingService.hide()),
+    );
+  }
+
+  lockOrUnlockPrices(flyerId: number, productId: number, lock: boolean) {
+    return from(
+      this.supabase
+        .from('promotional_flyer_products')
+        .update({
+          lock_price: lock,
+        })
+        .eq('promotional_flyer_id', flyerId)
+        .eq('product_id', productId),
+    ).pipe(
+      map(({ error }) => {
+        if (error) throw error;
+      }),
     );
   }
 }
