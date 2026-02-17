@@ -38,6 +38,7 @@ export interface IPromotionalFlyerProductsView {
   currentLoyaltyPrice?: number;
   erpImportDate?: string;
   lockPrice?: boolean;
+  priceDiscountPercent?: number;
   product: {
     id: number;
     name: string;

@@ -46,4 +46,8 @@ export class PromotionalFlyerService {
   lockOrUnlockPrices(flyerId: number, productId: number, lock: boolean) {
     return this.repository.lockOrUnlockPrices(flyerId, productId, lock);
   }
+
+  updatePriceDiscountPercent(flyerId: number, productId: number, discountPercent: number) {
+    return this.repository.updatePriceDiscountPercent(flyerId, productId, discountPercent);
+  }
 }
