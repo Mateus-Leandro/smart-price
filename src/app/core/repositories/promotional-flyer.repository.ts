@@ -93,6 +93,7 @@ export class PromotionalFlyerRepository {
       current_loyalty_price,
       erp_import_date,
       lock_price,
+      price_discount_percent,
 
       promotionalFlyer:promotional_flyers!inner (
         branche_id,
@@ -179,6 +180,7 @@ export class PromotionalFlyerRepository {
             currentLoyaltyPrice: item.current_loyalty_price,
             erpImportDate: item.erp_import_date,
             lockPrice: item.lock_price,
+            priceDiscountPercent: item.price_discount_percent,
             product: {
               id: item?.product?.id,
               name: item?.product?.name,
@@ -264,6 +266,26 @@ export class PromotionalFlyerRepository {
         .eq('promotional_flyer_id', flyerId)
         .eq('product_id', productId),
     ).pipe(
+      map(({ error }) => {
+        if (error) throw error;
+      }),
+    );
+  }
+
+  updatePriceDiscountPercent(
+    flyerId: number,
+    productId: number,
+    discountPercent: number,
+  ): Observable<void> {
+    const promise = this.supabase
+      .from('promotional_flyer_products')
+      .update({
+        price_discount_percent: discountPercent,
+      })
+      .eq('promotional_flyer_id', flyerId)
+      .eq('product_id', productId);
+
+    return from(promise).pipe(
       map(({ error }) => {
         if (error) throw error;
       }),

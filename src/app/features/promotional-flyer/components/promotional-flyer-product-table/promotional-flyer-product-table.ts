@@ -84,6 +84,7 @@ type FlyerRowForm = FormGroup<{
   saleMarginRuleText: FormControl<string | null>;
   loyaltyMarginRuleText: FormControl<string | null>;
   lockPrices: FormControl<boolean | null>;
+  priceDiscountPercent: FormControl<number>;
 }>;
 
 @Component({
@@ -229,7 +230,7 @@ export class PromotionalFlyerProductTable {
 
   private setupSearchListener(): void {
     this.search$
-      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
+      .pipe(debounceTime(600), distinctUntilChanged(), takeUntil(this.destroy$))
       .subscribe((value) => {
         this.searchTerm = value;
         this.paginatorDataSource.pageIndex = 0;
@@ -390,6 +391,7 @@ export class PromotionalFlyerProductTable {
           saleMarginRuleText: this.fb.control<string | null>(null),
           loyaltyMarginRuleText: this.fb.control<string | null>(null),
           lockPrices: this.fb.control<boolean | null>(item.lockPrice === true),
+          priceDiscountPercent: this.fb.control<number>(item.priceDiscountPercent ?? 0),
         }) as FlyerRowForm;
 
         this.calculateSuggestedPrice(rowForm);
@@ -608,6 +610,8 @@ export class PromotionalFlyerProductTable {
       warningPriceText,
       saleMarginRuleText,
       loyaltyMarginRuleText,
+      productId,
+      priceDiscountPercent,
     } = flyerRow.controls;
     suggestedSalePrice.setValue(null, { emitEvent: false });
     suggestedLoyaltyPrice.setValue(null, { emitEvent: false });
@@ -694,6 +698,19 @@ export class PromotionalFlyerProductTable {
         );
       }
     }
+
+    const actualDiscountPercent = priceDiscountPercent?.value || 0;
+    if ((marginRule?.discountPercent || 0) !== actualDiscountPercent) {
+      this.promotionalFlyerService
+        .updatePriceDiscountPercent(
+          this.flyerId(),
+          productId.value,
+          marginRule?.discountPercent || 0,
+        )
+        .subscribe();
+    }
+
+    priceDiscountPercent.setValue(marginRule?.discountPercent || 0);
   }
 
   private setObservables(rowForm: FlyerRowForm) {
@@ -703,7 +720,7 @@ export class PromotionalFlyerProductTable {
       rowForm.controls.productMargin.valueChanges,
       rowForm.controls.quoteCost.valueChanges,
     )
-      .pipe(debounceTime(400))
+      .pipe(debounceTime(600), distinctUntilChanged(), takeUntil(this.destroy$))
       .subscribe(() => {
         this.calculateSuggestedPrice(rowForm);
       });
