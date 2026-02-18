@@ -43,7 +43,7 @@ serve(async (req) => {
 
     let query = supabase
       .from('promotional_flyer_products')
-      .select('promotional_flyer_id, product_id, sale_price, loyalty_price')
+      .select('promotional_flyer_id, product_id, sale_price, loyalty_price, price_discount_percent')
       .eq('company_id', company_id)
       .eq('send_to_erp', true)
       .or('sale_price.gt.0,loyalty_price.gt.0');
