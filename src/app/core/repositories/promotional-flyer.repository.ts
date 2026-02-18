@@ -152,6 +152,14 @@ export class PromotionalFlyerRepository {
           query = query.is('erp_import_date', null);
           break;
 
+        case EnumFilterPromotionalFlyerProducts.CompetitorMargin:
+          query = query.eq('warning_type', EnumFilterPromotionalFlyerProducts.CompetitorMargin);
+          break;
+
+        case EnumFilterPromotionalFlyerProducts.CompetitorPrice:
+          query = query.eq('warning_type', EnumFilterPromotionalFlyerProducts.CompetitorPrice);
+          break;
+
         case EnumFilterPromotionalFlyerProducts.NoCompetingPrice:
           query = query.filter('product.competitorPrices', 'is', null);
           break;
