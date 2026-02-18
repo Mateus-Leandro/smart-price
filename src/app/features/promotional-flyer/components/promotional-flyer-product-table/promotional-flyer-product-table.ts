@@ -320,11 +320,14 @@ export class PromotionalFlyerProductTable {
 
   reload(filterType?: EnumFilterPromotionalFlyerProducts | null): void {
     this.competitorService
-      .loadCompetitors({
-        pageIndex: 0,
-        pageSize: 999,
-        records: { data: [], count: 0 },
-      })
+      .loadCompetitors(
+        {
+          pageIndex: 0,
+          pageSize: 999,
+          records: { data: [], count: 0 },
+        },
+        this.flyerInfo().brancheId,
+      )
       .subscribe({
         next: (competitors) => {
           this.competitorList = competitors.data;

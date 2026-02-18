@@ -17,8 +17,12 @@ export class CompetitorService {
     return this.repository.updateCompetitor(updateCompetitor);
   }
 
-  loadCompetitors(paginator: IDefaultPaginatorDataSource<ICompetitor>, search?: string) {
-    return this.repository.loadCompetitors(paginator, search);
+  loadCompetitors(
+    paginator: IDefaultPaginatorDataSource<ICompetitor>,
+    brancheId?: number,
+    search?: string,
+  ) {
+    return this.repository.loadCompetitors(paginator, brancheId, search);
   }
 
   getCompetitorInfoById(competitorId: number) {
