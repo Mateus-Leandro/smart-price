@@ -45,6 +45,7 @@ import { NotificationService } from 'src/app/core/services/notification.service'
 import { MatTooltip } from '@angular/material/tooltip';
 import {
   EnumFilterPromotionalFlyerProducts,
+  EnumWarningProductType,
   getPromotionalFlyerProductsFilterOptions,
   MarginFilterEnum,
   ProductPriceType,
@@ -85,6 +86,7 @@ type FlyerRowForm = FormGroup<{
   loyaltyMarginRuleText: FormControl<string | null>;
   lockPrices: FormControl<boolean | null>;
   priceDiscountPercent: FormControl<number>;
+  warningType: FormControl<EnumWarningProductType | null>;
 }>;
 
 @Component({
@@ -392,6 +394,7 @@ export class PromotionalFlyerProductTable {
           loyaltyMarginRuleText: this.fb.control<string | null>(null),
           lockPrices: this.fb.control<boolean | null>(item.lockPrice === true),
           priceDiscountPercent: this.fb.control<number>(item.priceDiscountPercent ?? 0),
+          warningType: this.fb.control<EnumWarningProductType | null>(item?.warningType || null),
         }) as FlyerRowForm;
 
         this.calculateSuggestedPrice(rowForm);
@@ -612,6 +615,7 @@ export class PromotionalFlyerProductTable {
       loyaltyMarginRuleText,
       productId,
       priceDiscountPercent,
+      warningType,
     } = flyerRow.controls;
     suggestedSalePrice.setValue(null, { emitEvent: false });
     suggestedLoyaltyPrice.setValue(null, { emitEvent: false });
@@ -640,6 +644,15 @@ export class PromotionalFlyerProductTable {
 
     if (finalCost >= lowestCompetitorPrice) {
       warningPriceText.setValue('Preço do concorrente menor ou igual ao custo.');
+      if (warningType.value !== EnumWarningProductType.CompetitorPrice) {
+        this.promotionalFlyerService
+          .updateWarningType(
+            this.flyerId(),
+            productId.value,
+            EnumWarningProductType.CompetitorPrice,
+          )
+          .subscribe();
+      }
       return;
     }
 
@@ -663,6 +676,20 @@ export class PromotionalFlyerProductTable {
           `${productMarginValue}% em relação ao custo final(Pr.Cotação + Frete).`,
         );
       }
+
+      if (warningType.value !== EnumWarningProductType.CompetitorMargin) {
+        this.promotionalFlyerService
+          .updateWarningType(
+            this.flyerId(),
+            productId.value,
+            EnumWarningProductType.CompetitorMargin,
+          )
+          .subscribe();
+      }
+    } else {
+      this.promotionalFlyerService
+        .updateWarningType(this.flyerId(), productId.value, undefined)
+        .subscribe();
     }
 
     let suggestedPriceAfterDiscountPercent = suggestedPrice;

@@ -8,7 +8,7 @@ import {
   IPromotionalFlyerProductsView,
   IPromotionalFlyerView,
 } from '../models/promotional-flyer.model';
-import { EnumFilterPromotionalFlyerProducts } from '../enums/product.enum';
+import { EnumFilterPromotionalFlyerProducts, EnumWarningProductType } from '../enums/product.enum';
 
 @Injectable({ providedIn: 'root' })
 export class PromotionalFlyerRepository {
@@ -94,6 +94,7 @@ export class PromotionalFlyerRepository {
       erp_import_date,
       lock_price,
       price_discount_percent,
+      warning_type,
 
       promotionalFlyer:promotional_flyers!inner (
         branche_id,
@@ -189,6 +190,7 @@ export class PromotionalFlyerRepository {
             erpImportDate: item.erp_import_date,
             lockPrice: item.lock_price,
             priceDiscountPercent: item.price_discount_percent,
+            warningType: item.warning_type,
             product: {
               id: item?.product?.id,
               name: item?.product?.name,
@@ -289,6 +291,26 @@ export class PromotionalFlyerRepository {
       .from('promotional_flyer_products')
       .update({
         price_discount_percent: discountPercent,
+      })
+      .eq('promotional_flyer_id', flyerId)
+      .eq('product_id', productId);
+
+    return from(promise).pipe(
+      map(({ error }) => {
+        if (error) throw error;
+      }),
+    );
+  }
+
+  updateWarningType(
+    flyerId: number,
+    productId: number,
+    warningType?: EnumWarningProductType,
+  ): Observable<void> {
+    const promise = this.supabase
+      .from('promotional_flyer_products')
+      .update({
+        warning_type: warningType ?? null,
       })
       .eq('promotional_flyer_id', flyerId)
       .eq('product_id', productId);

@@ -39,7 +39,7 @@ export function getPromotionalFlyerProductsFilterOptions(): IFilterOptions<EnumF
       value: EnumFilterPromotionalFlyerProducts.NoCompetingPrice,
     },
     {
-      label: 'Preço do Concorrente < Custo',
+      label: 'Preço do Concorrente <= Custo',
       value: EnumWarningProductType.CompetitorPrice,
     },
     {

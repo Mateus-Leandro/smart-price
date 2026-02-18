@@ -1,3 +1,5 @@
+import { EnumWarningProductType } from '../enums/product.enum';
+
 export interface IPromotionalFlyer {
   id: number;
   name: string;
@@ -39,6 +41,7 @@ export interface IPromotionalFlyerProductsView {
   erpImportDate?: string;
   lockPrice?: boolean;
   priceDiscountPercent?: number;
+  warningType?: EnumWarningProductType;
   product: {
     id: number;
     name: string;

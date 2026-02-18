@@ -5,7 +5,10 @@ import {
   IPromotionalFlyerProductsView,
   IPromotionalFlyerView,
 } from 'src/app/core/models/promotional-flyer.model';
-import { EnumFilterPromotionalFlyerProducts } from 'src/app/core/enums/product.enum';
+import {
+  EnumFilterPromotionalFlyerProducts,
+  EnumWarningProductType,
+} from 'src/app/core/enums/product.enum';
 
 @Injectable({
   providedIn: 'root',
@@ -49,5 +52,9 @@ export class PromotionalFlyerService {
 
   updatePriceDiscountPercent(flyerId: number, productId: number, discountPercent: number) {
     return this.repository.updatePriceDiscountPercent(flyerId, productId, discountPercent);
+  }
+
+  updateWarningType(flyerId: number, productId: number, warningType?: EnumWarningProductType) {
+    return this.repository.updateWarningType(flyerId, productId, warningType);
   }
 }
