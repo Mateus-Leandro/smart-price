@@ -339,7 +339,12 @@
                   @if (userPermissions?.allowEditCompetitorPrices) {
                     @if (rows.at(i); as currentRow) {
                       <div fxLayout="column" fxLayoutGap="15px">
-                        <div fxLayout="row" fxLayoutAlign="space-between" [formGroup]="currentRow">
+                        <div
+                          fxLayout="row"
+                          fxLayoutGap="115px"
+                          fxLayoutGap.gt-md="230px"
+                          [formGroup]="currentRow"
+                        >
                           @for (competitor of competitorList; track competitor.id; let j = $index) {
                             <div
                               fxLayout="column"

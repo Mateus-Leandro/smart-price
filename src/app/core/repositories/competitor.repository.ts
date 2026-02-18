@@ -55,7 +55,11 @@ export class CompetitorRepository {
     );
   }
 
-  loadCompetitors(paginator: IDefaultPaginatorDataSource<ICompetitor>, search?: string) {
+  loadCompetitors(
+    paginator: IDefaultPaginatorDataSource<ICompetitor>,
+    branchId?: number,
+    search?: string,
+  ) {
     const fromIdx = paginator.pageIndex * paginator.pageSize;
     const toIdx = fromIdx + paginator.pageSize - 1;
 
@@ -66,11 +70,19 @@ export class CompetitorRepository {
       id, 
       name, 
       created_at, 
-      updated_at
+      updated_at,
+      competitor_branches!inner (
+        branche_id,
+        company_id
+      )
       `,
         { count: 'exact' },
       )
       .order('name', { ascending: true });
+
+    if (branchId) {
+      query = query.eq('competitor_branches.branche_id', branchId);
+    }
 
     if (search) {
       query = query.ilike('name', `%${search}%`);
