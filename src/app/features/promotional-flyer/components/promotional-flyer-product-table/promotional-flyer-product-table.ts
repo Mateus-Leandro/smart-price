@@ -237,7 +237,7 @@ export class PromotionalFlyerProductTable {
         this.searchTerm = value;
         this.paginatorDataSource.pageIndex = 0;
         if (this.companyId) {
-          this.reload();
+          this.reload(this.selectedFilterType());
         }
       });
   }
@@ -318,7 +318,7 @@ export class PromotionalFlyerProductTable {
     this.search$.next(value);
   }
 
-  reload(filterType?: EnumFilterPromotionalFlyerProducts | null): void {
+  reload(filterType: EnumFilterPromotionalFlyerProducts | null = this.selectedFilterType()): void {
     this.competitorService
       .loadCompetitors(
         {
@@ -336,7 +336,7 @@ export class PromotionalFlyerProductTable {
             this.flyerInfo().idIntegral,
             this.paginatorDataSource,
             this.searchTerm,
-            filterType!!,
+            filterType ?? undefined,
           );
         },
         error: (err) => {
