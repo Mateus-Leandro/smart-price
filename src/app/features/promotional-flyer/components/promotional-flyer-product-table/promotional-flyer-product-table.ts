@@ -55,7 +55,7 @@ import {
   IPromotionalFlyerView,
 } from 'src/app/core/models/promotional-flyer.model';
 import { CompetitorService } from 'src/app/features/competitor/services/competitor.service';
-import { ICompetitor } from 'src/app/core/models/competitor';
+import { ICompetitor, ICompetitorView } from 'src/app/core/models/competitor';
 import { CompetitorPriceFlyerProductService } from 'src/app/features/competitor-price-flyer-product/competitor-price-flyer-product.service';
 import { AuthService } from 'src/app/features/auth/services/auth.service';
 import { roundToTwo, transformToNumberValue } from 'src/app/shared/functions/utils';
@@ -77,7 +77,8 @@ type FlyerRowForm = FormGroup<{
   productId: FormControl<number>;
   productMargin: FormControl<number>;
   quoteCost: FormControl<number>;
-  competitorPrices: FormArray<FormControl<string | null>>;
+  linkedCompetitorPrices: FormArray<FormControl<string | null>>;
+  unlinkedCompetitorPrices: FormArray<FormControl<string | null>>;
   suggestedSalePrice: FormControl<string | null>;
   suggestedLoyaltyPrice: FormControl<string | null>;
   suggestedSalePriceWithMargin: FormControl<number | null>;
@@ -140,7 +141,8 @@ export class PromotionalFlyerProductTable {
   searchTerm = '';
   loading = inject(LoadingService).loading;
   sendingProductId?: number | null;
-  competitorList: ICompetitor[] = [];
+  unlinkedCompetitorList: ICompetitorView[] = [];
+  linkedCompetitorsList: ICompetitorView[] = [];
   suggestedPriceSettingsList: ISuggestedPriceSettingView[] = [];
   companyId!: number;
   userPermissions: IUserPermission | null = null;
@@ -319,18 +321,23 @@ export class PromotionalFlyerProductTable {
   }
 
   reload(filterType: EnumFilterPromotionalFlyerProducts | null = this.selectedFilterType()): void {
+    const currentBrancheId = this.flyerInfo().branche.id;
     this.competitorService
-      .loadCompetitors(
-        {
-          pageIndex: 0,
-          pageSize: 999,
-          records: { data: [], count: 0 },
-        },
-        this.flyerInfo().branche.id,
-      )
+      .loadCompetitors({
+        pageIndex: 0,
+        pageSize: 999,
+        records: { data: [], count: 0 },
+      })
       .subscribe({
         next: (competitors) => {
-          this.competitorList = competitors.data;
+          this.linkedCompetitorsList = competitors.data.filter((c) =>
+            c.competitorBranches.some((cb) => cb.brancheId === currentBrancheId),
+          );
+
+          this.unlinkedCompetitorList = competitors.data.filter(
+            (c) => !c.competitorBranches.some((cb) => cb.brancheId === currentBrancheId),
+          );
+
           this.loadProductsFromPromotionalFlyer(
             this.flyerId(),
             this.flyerInfo().idIntegral,
@@ -352,7 +359,19 @@ export class PromotionalFlyerProductTable {
   private buildForm(data: IPromotionalFlyerProductsView[]): void {
     const rowsArray = this.fb.array<FlyerRowForm>(
       data.map((item) => {
-        const competitorControls = this.competitorList.map((competitor) => {
+        const linkedCompetitorControls = this.linkedCompetitorsList.map((competitor) => {
+          const priceEntry = item.competitorPrices?.find(
+            (cp: any) => cp.competitor?.id === competitor.id,
+          );
+
+          const formattedPrice = priceEntry?.price
+            ? priceEntry.price.toFixed(2).replace('.', ',')
+            : '0,00';
+
+          return this.fb.control<string | null>(formattedPrice);
+        });
+
+        const unlinkedCompetitorControls = this.unlinkedCompetitorList.map((competitor) => {
           const priceEntry = item.competitorPrices?.find(
             (cp: any) => cp.competitor?.id === competitor.id,
           );
@@ -385,10 +404,10 @@ export class PromotionalFlyerProductTable {
               ? item.currentLoyaltyPrice.toFixed(2).replace('.', ',')
               : '0,00',
           ),
-          competitorPrices: this.fb.array(competitorControls),
+          linkedCompetitorPrices: this.fb.array(linkedCompetitorControls),
+          unlinkedCompetitorPrices: this.fb.array(unlinkedCompetitorControls),
           productMargin: this.fb.control<number>(item.product?.margin ?? 0),
           quoteCost: this.fb.control<number>(item.quoteCost ?? 0),
-
           suggestedSalePrice: this.fb.control<string | null>(null),
           suggestedSalePriceWithMargin: this.fb.control<string | null>(null),
           suggestedLoyaltyPrice: this.fb.control<string | null>('0,00'),
@@ -607,7 +626,7 @@ export class PromotionalFlyerProductTable {
     const {
       shippingPrice,
       productMargin,
-      competitorPrices,
+      linkedCompetitorPrices,
       quoteCost,
       suggestedSalePrice,
       suggestedLoyaltyPrice,
@@ -634,7 +653,7 @@ export class PromotionalFlyerProductTable {
     const suggestedPrice = finalCost * (1 + productMarginValue / 100);
     suggestedSalePriceWithMargin.setValue(suggestedPrice, { emitEvent: false });
 
-    const competitorPriceValues = competitorPrices.value.map((value) => {
+    const competitorPriceValues = linkedCompetitorPrices.value.map((value) => {
       return transformToNumberValue(value ?? '0');
     });
     const pricesOnly = competitorPriceValues.filter((price) => price > 0);
@@ -745,7 +764,7 @@ export class PromotionalFlyerProductTable {
 
   private setObservables(rowForm: FlyerRowForm) {
     merge(
-      rowForm.controls.competitorPrices.valueChanges,
+      rowForm.controls.linkedCompetitorPrices.valueChanges,
       rowForm.controls.shippingPrice.valueChanges,
       rowForm.controls.productMargin.valueChanges,
       rowForm.controls.quoteCost.valueChanges,
@@ -769,7 +788,7 @@ export class PromotionalFlyerProductTable {
     const row = this.rows.at(rowIndex);
     if (!row || !currentPrice) return false;
 
-    const priceValues = row.controls.competitorPrices.value
+    const priceValues = row.controls.linkedCompetitorPrices.value
       .map((v) => transformToNumberValue(v ?? '0'))
       .filter((v) => v > 0);
 
