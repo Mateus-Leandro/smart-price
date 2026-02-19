@@ -16,8 +16,10 @@
           <div fxLayout="column">
             @if (flyerInfo()) {
               <mat-card-title>
-                Produtos da cotação {{ flyerInfo()?.idIntegral }} - Loja:
-                {{ flyerInfo()?.brancheId?.toString()?.padStart(2, '0') }}
+                Produtos da cotação {{ flyerInfo()?.idIntegral }} | Loja:
+                {{
+                  `${flyerInfo()?.branche?.id?.toString()?.padStart(2, '0')} - ${flyerInfo()?.branche?.name} `
+                }}
               </mat-card-title>
             }
 
