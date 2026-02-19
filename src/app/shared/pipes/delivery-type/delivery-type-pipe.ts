@@ -1,17 +1,17 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { SupplierDeliveryTypeEnum } from 'src/app/core/enums/supplier.enum';
+import { EnumSupplierDeliveryTypeEnum } from 'src/app/core/enums/supplier.enum';
 
 @Pipe({
   name: 'deliveryType',
 })
 export class DeliveryTypePipe implements PipeTransform {
-  transform(value: SupplierDeliveryTypeEnum): string {
+  transform(value: EnumSupplierDeliveryTypeEnum): string {
     if (!value) return '';
 
     switch (value) {
-      case SupplierDeliveryTypeEnum.BH:
+      case EnumSupplierDeliveryTypeEnum.BH:
         return 'BH';
-      case SupplierDeliveryTypeEnum.PORTA:
+      case EnumSupplierDeliveryTypeEnum.PORTA:
         return 'PORTA';
       default:
         return '';

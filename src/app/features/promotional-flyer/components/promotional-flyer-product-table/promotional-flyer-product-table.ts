@@ -62,7 +62,7 @@ import { roundToTwo, transformToNumberValue } from 'src/app/shared/functions/uti
 import { SuggestedPriceSettingService } from 'src/app/features/settings-suggested-price/services/suggested-price-setting.service';
 import { ISuggestedPriceSettingView } from 'src/app/core/models/suggested-price-setting.model';
 import { MatDivider } from '@angular/material/divider';
-import { SupplierDeliveryTypeEnum } from 'src/app/core/enums/supplier.enum';
+import { EnumSupplierDeliveryTypeEnum } from 'src/app/core/enums/supplier.enum';
 import { IUserPermission } from 'src/app/core/models/user-permission.model';
 import { UserPermissionService } from 'src/app/features/user-permission/user-permission.service';
 import { IconFilterButton } from 'src/app/shared/components/icon-filter-button/icon-filter-button';
@@ -134,7 +134,7 @@ export class PromotionalFlyerProductTable {
   flyerId = input.required<number>();
 
   readonly ProductPriceType = ProductPriceType;
-  readonly SupplierDeliveryTypeEnum = SupplierDeliveryTypeEnum;
+  readonly SupplierDeliveryTypeEnum = EnumSupplierDeliveryTypeEnum;
   private destroy$ = new Subject<void>();
 
   searchTerm = '';

@@ -1,4 +1,4 @@
-export enum SupplierDeliveryTypeEnum {
+export enum EnumSupplierDeliveryTypeEnum {
   BH = 'PAID',
   PORTA = 'FREE',
 }

@@ -4,7 +4,7 @@ import { SupabaseService } from 'src/app/shared/services/supabase.service';
 import { LoadingService } from '../services/loading.service';
 import { IDefaultPaginatorDataSource } from '../models/query.model';
 import { finalize, from, map, Observable } from 'rxjs';
-import { SupplierDeliveryTypeEnum } from 'src/app/core/enums/supplier.enum';
+import { EnumSupplierDeliveryTypeEnum } from 'src/app/core/enums/supplier.enum';
 import { ISupplierView, IUpdateSupplier } from '../models/supplier.model';
 
 @Injectable({ providedIn: 'root' })
@@ -19,7 +19,7 @@ export class SupplierRepository {
 
   getSuppliers(
     paginator: IDefaultPaginatorDataSource<ISupplierView>,
-    deliveryType: null | SupplierDeliveryTypeEnum | 'EMPTY',
+    deliveryType: null | EnumSupplierDeliveryTypeEnum | 'EMPTY',
     search?: string,
   ): Observable<{ data: ISupplierView[]; count: number }> {
     const fromIdx = paginator.pageIndex * paginator.pageSize;

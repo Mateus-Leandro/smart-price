@@ -15,7 +15,7 @@ import { CnpjPipe } from '../../../../shared/pipes/cnpj/cnpj-pipe';
 import { DeliveryTypePipe } from '../../../../shared/pipes/delivery-type/delivery-type-pipe';
 import { IconFilterButton } from 'src/app/shared/components/icon-filter-button/icon-filter-button';
 import { FlexLayoutModule } from '@angular/flex-layout';
-import { SupplierDeliveryTypeEnum } from '../../../../core/enums/supplier.enum';
+import { EnumSupplierDeliveryTypeEnum } from '../../../../core/enums/supplier.enum';
 import { IFilterOptions } from 'src/app/shared/components/icon-filter-button/icon-filter-list';
 import { ISupplierView } from 'src/app/core/models/supplier.model';
 
@@ -41,14 +41,14 @@ export class SupplierTable {
   columnsToDisplay = ['id', 'name', 'delivery_type', 'cnpj', 'created_at', 'updated_at'];
   dataSource = new MatTableDataSource<ISupplierView>([]);
   searchTerm = '';
-  filterOptions: IFilterOptions<SupplierDeliveryTypeEnum>[] = Object.entries(
-    SupplierDeliveryTypeEnum,
+  filterOptions: IFilterOptions<EnumSupplierDeliveryTypeEnum>[] = Object.entries(
+    EnumSupplierDeliveryTypeEnum,
   ).map(([key, value]) => ({
     label: key,
     value: value,
   }));
 
-  selectedDeliveryFilterType = signal<null | SupplierDeliveryTypeEnum>(null);
+  selectedDeliveryFilterType = signal<null | EnumSupplierDeliveryTypeEnum>(null);
   paginatorDataSource: IDefaultPaginatorDataSource<ISupplierView> = {
     pageIndex: 0,
     pageSize: 10,
@@ -85,7 +85,7 @@ export class SupplierTable {
 
   loadSuppliers(
     paginator: IDefaultPaginatorDataSource<ISupplierView>,
-    deliveryType: null | SupplierDeliveryTypeEnum | 'EMPTY',
+    deliveryType: null | EnumSupplierDeliveryTypeEnum | 'EMPTY',
     search?: string,
   ) {
     this.supplierService.getSuppliers(paginator, deliveryType, search).subscribe({
@@ -112,7 +112,7 @@ export class SupplierTable {
     this.reload(this.selectedDeliveryFilterType());
   }
 
-  private reload(deliveryType: null | SupplierDeliveryTypeEnum): void {
+  private reload(deliveryType: null | EnumSupplierDeliveryTypeEnum): void {
     this.loadSuppliers(this.paginatorDataSource, deliveryType, this.searchTerm);
   }
 
