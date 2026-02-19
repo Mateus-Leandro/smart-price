@@ -326,7 +326,7 @@ export class PromotionalFlyerProductTable {
           pageSize: 999,
           records: { data: [], count: 0 },
         },
-        this.flyerInfo().brancheId,
+        this.flyerInfo().branche.id,
       )
       .subscribe({
         next: (competitors) => {

@@ -18,6 +18,7 @@ import { IPromotionalFlyerView } from 'src/app/core/models/promotional-flyer.mod
 import { IUserPermission } from 'src/app/core/models/user-permission.model';
 import { UserPermissionService } from 'src/app/features/user-permission/user-permission.service';
 import { AuthService } from 'src/app/features/auth/services/auth.service';
+import { FlexLayoutModule } from '@angular/flex-layout';
 
 @Component({
   selector: 'app-promotional-flyer-table',
@@ -32,6 +33,7 @@ import { AuthService } from 'src/app/features/auth/services/auth.service';
     MatLabel,
     MatInputModule,
     CommonModule,
+    FlexLayoutModule,
   ],
   templateUrl: './promotional-flyer-table.html',
   styleUrl: './promotional-flyer-table.scss',
