@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { IDefaultPaginatorDataSource } from 'src/app/core/models/query.model';
 import { SupplierRepository } from 'src/app/core/repositories/supplier.repository';
-import { SupplierDeliveryTypeEnum } from '../../../core/enums/supplier.enum';
+import { EnumSupplierDeliveryTypeEnum } from '../../../core/enums/supplier.enum';
 import { ISupplierView, IUpdateSupplier } from 'src/app/core/models/supplier.model';
 
 @Injectable({
@@ -12,7 +12,7 @@ export class SupplierService {
 
   getSuppliers(
     paginator: IDefaultPaginatorDataSource<ISupplierView>,
-    deliveryType: null | SupplierDeliveryTypeEnum | 'EMPTY',
+    deliveryType: null | EnumSupplierDeliveryTypeEnum | 'EMPTY',
     search?: string,
   ) {
     return this.repository.getSuppliers(paginator, deliveryType, search);

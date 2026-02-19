@@ -1,4 +1,4 @@
-import { SupplierDeliveryTypeEnum } from 'src/app/core/enums/supplier.enum';
+import { EnumSupplierDeliveryTypeEnum } from 'src/app/core/enums/supplier.enum';
 
 export interface ISupplier {
   id: number;
@@ -19,5 +19,5 @@ export interface ISupplierView {
 
 export interface IUpdateSupplier {
   supplierId: number;
-  deliveryType: SupplierDeliveryTypeEnum;
+  deliveryType: EnumSupplierDeliveryTypeEnum;
 }

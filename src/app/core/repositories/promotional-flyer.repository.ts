@@ -9,6 +9,7 @@ import {
   IPromotionalFlyerView,
 } from '../models/promotional-flyer.model';
 import { EnumFilterPromotionalFlyerProducts, EnumWarningProductType } from '../enums/product.enum';
+import { EnumSupplierDeliveryTypeEnum } from '../enums/supplier.enum';
 
 @Injectable({ providedIn: 'root' })
 export class PromotionalFlyerRepository {
@@ -163,7 +164,15 @@ export class PromotionalFlyerRepository {
           break;
 
         case EnumFilterPromotionalFlyerProducts.NoCompetingPrice:
-          query = query.filter('product.competitorPrices', 'is', null);
+          query = query.is('product.competitorPrices', null);
+          break;
+
+        case EnumFilterPromotionalFlyerProducts.SupplierDeliveryFree:
+          query = query.eq('supplier.delivery_type', EnumSupplierDeliveryTypeEnum.PORTA);
+          break;
+
+        case EnumFilterPromotionalFlyerProducts.SupplierDeliveryPaid:
+          query = query.eq('supplier.delivery_type', EnumSupplierDeliveryTypeEnum.BH);
           break;
       }
     }
