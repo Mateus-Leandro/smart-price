@@ -327,10 +327,32 @@
               <div class="expanded-detail-content" fxLayout="column">
                 <div fxLayout="column">
                   <div fxLayout="column" fxLayoutGap="8px">
-                    <div fxLayout="row" class="full-width" fxLayoutAlign="center">
+                    <div
+                      fxLayout="row"
+                      class="full-width"
+                      fxLayoutAlign="center"
+                      fxLayoutGap="10px"
+                    >
+                      <mat-icon style="font-size: 18px; width: 18px; height: 18px"
+                        >groups_3</mat-icon
+                      >
                       <span class="label">Preço dos concorrentes</span>
                     </div>
                     <mat-divider />
+                  </div>
+
+                  <div
+                    fxLayout="row"
+                    class="full-width"
+                    fxLayoutAlign="start"
+                    fxLayoutGap="10px"
+                    style="padding-top: 15px"
+                  >
+                    <mat-icon style="font-size: 18px; width: 18px; height: 18px">groups_3</mat-icon>
+                    <mat-icon style="font-size: 18px; width: 18px; height: 18px"
+                      >storefront</mat-icon
+                    >
+                    <span class="label">Concorrentes vinculados na loja</span>
                   </div>
                   @if (userPermissions?.allowEditCompetitorPrices) {
                     @if (rows.at(i); as currentRow) {
@@ -341,15 +363,19 @@
                           fxLayoutGap.gt-md="230px"
                           [formGroup]="currentRow"
                         >
-                          @for (competitor of competitorList; track competitor.id; let j = $index) {
+                          @for (
+                            competitor of linkedCompetitorsList;
+                            track competitor.id;
+                            let j = $index
+                          ) {
                             <div
                               fxLayout="column"
-                              formArrayName="competitorPrices"
+                              formArrayName="linkedCompetitorPrices"
                               fxLayoutGap="1"
                               [class.row-critical]="
                                 isLowestPrice(
                                   i,
-                                  rows.at(i).get('competitorPrices')?.get(j.toString())?.value
+                                  rows.at(i).get('linkedCompetitorPrices')?.get(j.toString())?.value
                                 )
                               "
                             >
@@ -364,7 +390,7 @@
                                   competitorPriceInput.setAttribute(
                                     'initial-competitor-price',
                                     currentRow
-                                      .get('competitorPrices')
+                                      .get('linkedCompetitorPrices')
                                       ?.get(j.toString())
                                       ?.value?.toString() || '0,00'
                                   )
@@ -375,7 +401,7 @@
                                     competitorPriceInput.getAttribute('initial-competitor-price') ||
                                       '0',
                                     element.product.id,
-                                    rows.at(i).controls.competitorPrices.at(j),
+                                    rows.at(i).controls.linkedCompetitorPrices.at(j),
                                     'competitor_price',
                                     competitor.id
                                   )
@@ -387,7 +413,7 @@
                                     i,
                                     j,
                                     competitorPriceInputs.toArray(),
-                                    competitorList
+                                    linkedCompetitorsList
                                   )
                                 "
                                 thousandSeparator="."
@@ -402,11 +428,101 @@
                                 class="details-rows"
                                 matTooltip="Margem do concorrente em relação ao custo (Pr. cotação + Frete)."
                                 >{{
-                                  `Margem do concorrente: ${competitorMargin(i, rows.at(i).get('competitorPrices')?.get(j.toString())?.value)}`
+                                  `Margem do concorrente: ${competitorMargin(i, rows.at(i).get('linkedCompetitorPrices')?.get(j.toString())?.value)}`
                                 }}</span
                               >
                             </div>
                           }
+                        </div>
+
+                        <mat-divider />
+
+                        <div>
+                          <div
+                            fxLayout="row"
+                            class="full-width"
+                            fxLayoutAlign="start"
+                            fxLayoutGap="10px"
+                            style="padding-top: 15px"
+                          >
+                            <mat-icon style="font-size: 18px; width: 18px; height: 18px"
+                              >groups_3</mat-icon
+                            >
+                            <span class="label">Demais Concorrentes</span>
+                          </div>
+
+                          <div
+                            fxLayout="row"
+                            fxLayoutGap="115px"
+                            fxLayoutGap.gt-md="230px"
+                            [formGroup]="currentRow"
+                          >
+                            @for (
+                              competitor of unlinkedCompetitorList;
+                              track competitor.id;
+                              let j = $index
+                            ) {
+                              <div
+                                fxLayout="column"
+                                formArrayName="unlinkedCompetitorPrices"
+                                fxLayoutGap="1"
+                              >
+                                <p>{{ competitor.name }}</p>
+                                <input
+                                  matInput
+                                  #competitorPriceInput
+                                  class="only-line"
+                                  type="text"
+                                  [formControlName]="j"
+                                  (focusin)="
+                                    competitorPriceInput.setAttribute(
+                                      'initial-competitor-price',
+                                      currentRow
+                                        .get('unlinkedCompetitorPrices')
+                                        ?.get(j.toString())
+                                        ?.value?.toString() || '0,00'
+                                    )
+                                  "
+                                  (focus)="onFocus(competitorPriceInput)"
+                                  (blur)="
+                                    onPriceBlur(
+                                      competitorPriceInput.getAttribute(
+                                        'initial-competitor-price'
+                                      ) || '0',
+                                      element.product.id,
+                                      rows.at(i).controls.unlinkedCompetitorPrices.at(j),
+                                      'competitor_price',
+                                      competitor.id
+                                    )
+                                  "
+                                  mask="separator.2"
+                                  maxlength="10"
+                                  (keyup.enter)="
+                                    onEnterInRow(
+                                      i,
+                                      j,
+                                      competitorPriceInputs.toArray(),
+                                      linkedCompetitorsList
+                                    )
+                                  "
+                                  thousandSeparator="."
+                                  decimalMarker=","
+                                  prefix="R$ "
+                                  [dropSpecialCharacters]="true"
+                                  [showMaskTyped]="false"
+                                  [allowNegativeNumbers]="false"
+                                  style="width: 80px"
+                                />
+                                <span
+                                  class="details-rows"
+                                  matTooltip="Margem do concorrente em relação ao custo (Pr. cotação + Frete)."
+                                  >{{
+                                    `Margem do concorrente: ${competitorMargin(i, rows.at(i).get('unlinkedCompetitorPrices')?.get(j.toString())?.value)}`
+                                  }}</span
+                                >
+                              </div>
+                            }
+                          </div>
                         </div>
 
                         @if (

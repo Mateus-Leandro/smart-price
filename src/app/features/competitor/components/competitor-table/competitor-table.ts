@@ -78,7 +78,7 @@ export class CompetitorTable {
   }
 
   loadCompetitors(paginator: IDefaultPaginatorDataSource<ICompetitor>, search?: string) {
-    this.competitorService.loadCompetitors(paginator, undefined, search).subscribe({
+    this.competitorService.loadCompetitors(paginator, search).subscribe({
       next: (response) => {
         this.paginatorDataSource.records = response;
         this.dataSource.data = response.data;

@@ -4,7 +4,7 @@ import { SupabaseService } from 'src/app/shared/services/supabase.service';
 import { LoadingService } from '../services/loading.service';
 import { finalize, from, map } from 'rxjs';
 import { IDefaultPaginatorDataSource } from '../models/query.model';
-import { ICompetitor, IUpdateCompetitor } from '../models/competitor';
+import { ICompetitor, ICompetitorView, IUpdateCompetitor } from '../models/competitor';
 
 @Injectable({ providedIn: 'root' })
 export class CompetitorRepository {
@@ -55,11 +55,7 @@ export class CompetitorRepository {
     );
   }
 
-  loadCompetitors(
-    paginator: IDefaultPaginatorDataSource<ICompetitor>,
-    branchId?: number,
-    search?: string,
-  ) {
+  loadCompetitors(paginator: IDefaultPaginatorDataSource<ICompetitor>, search?: string) {
     const fromIdx = paginator.pageIndex * paginator.pageSize;
     const toIdx = fromIdx + paginator.pageSize - 1;
 
@@ -71,18 +67,13 @@ export class CompetitorRepository {
       name, 
       created_at, 
       updated_at,
-      competitor_branches!inner (
-        branche_id,
-        company_id
+      competitorBranches:competitor_branches (
+        branche_id
       )
       `,
         { count: 'exact' },
       )
       .order('name', { ascending: true });
-
-    if (branchId) {
-      query = query.eq('competitor_branches.branche_id', branchId);
-    }
 
     if (search) {
       query = query.ilike('name', `%${search}%`);
@@ -93,12 +84,19 @@ export class CompetitorRepository {
       map(({ data, count, error }) => {
         if (error) throw error;
 
-        const mappedData: ICompetitor[] = (data || []).map((item: any) => ({
-          id: item.id,
-          name: item.name,
-          createdAt: item.created_at,
-          updatedAt: item.updated_at,
-        }));
+        const mappedData: ICompetitorView[] = (data || []).map((item: any) => {
+          const competitorBranches = (item.competitorBranches || []).map((cb: any) => ({
+            brancheId: cb.branche_id,
+          }));
+
+          return {
+            id: item.id,
+            name: item.name,
+            competitorBranches: competitorBranches,
+            createdAt: item.created_at,
+            updatedAt: item.updated_at,
+          };
+        }) as ICompetitorView[];
 
         return { data: mappedData, count: count ?? 0 };
       }),
