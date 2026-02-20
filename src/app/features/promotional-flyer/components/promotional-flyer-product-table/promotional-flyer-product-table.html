@@ -382,12 +382,12 @@
                               <p>{{ competitor.name }}</p>
                               <input
                                 matInput
-                                #competitorPriceInput
+                                #linkedCompetitorPriceInput
                                 class="only-line"
                                 type="text"
                                 [formControlName]="j"
                                 (focusin)="
-                                  competitorPriceInput.setAttribute(
+                                  linkedCompetitorPriceInput.setAttribute(
                                     'initial-competitor-price',
                                     currentRow
                                       .get('linkedCompetitorPrices')
@@ -395,11 +395,12 @@
                                       ?.value?.toString() || '0,00'
                                   )
                                 "
-                                (focus)="onFocus(competitorPriceInput)"
+                                (focus)="onFocus(linkedCompetitorPriceInput)"
                                 (blur)="
                                   onPriceBlur(
-                                    competitorPriceInput.getAttribute('initial-competitor-price') ||
-                                      '0',
+                                    linkedCompetitorPriceInput.getAttribute(
+                                      'initial-competitor-price'
+                                    ) || '0',
                                     element.product.id,
                                     rows.at(i).controls.linkedCompetitorPrices.at(j),
                                     'competitor_price',
@@ -412,7 +413,7 @@
                                   onEnterInRow(
                                     i,
                                     j,
-                                    competitorPriceInputs.toArray(),
+                                    linkedCompetitorPriceInputs.toArray(),
                                     linkedCompetitorsList
                                   )
                                 "
@@ -457,7 +458,7 @@
                             [formGroup]="currentRow"
                           >
                             @for (
-                              competitor of unlinkedCompetitorList;
+                              competitor of unlinkedCompetitorsList;
                               track competitor.id;
                               let j = $index
                             ) {
@@ -469,12 +470,12 @@
                                 <p>{{ competitor.name }}</p>
                                 <input
                                   matInput
-                                  #competitorPriceInput
+                                  #unlikendCompetitorPriceInput
                                   class="only-line"
                                   type="text"
                                   [formControlName]="j"
                                   (focusin)="
-                                    competitorPriceInput.setAttribute(
+                                    unlikendCompetitorPriceInput.setAttribute(
                                       'initial-competitor-price',
                                       currentRow
                                         .get('unlinkedCompetitorPrices')
@@ -482,10 +483,10 @@
                                         ?.value?.toString() || '0,00'
                                     )
                                   "
-                                  (focus)="onFocus(competitorPriceInput)"
+                                  (focus)="onFocus(unlikendCompetitorPriceInput)"
                                   (blur)="
                                     onPriceBlur(
-                                      competitorPriceInput.getAttribute(
+                                      unlikendCompetitorPriceInput.getAttribute(
                                         'initial-competitor-price'
                                       ) || '0',
                                       element.product.id,
@@ -500,8 +501,8 @@
                                     onEnterInRow(
                                       i,
                                       j,
-                                      competitorPriceInputs.toArray(),
-                                      linkedCompetitorsList
+                                      unlinkedCompetitorPriceInputs.toArray(),
+                                      unlinkedCompetitorsList
                                     )
                                   "
                                   thousandSeparator="."
