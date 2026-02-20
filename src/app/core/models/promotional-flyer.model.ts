@@ -22,6 +22,7 @@ export interface IPromotionalFlyerView {
   updatedAt?: string | null;
   finished: boolean;
   totalProducts: number;
+  importedProducts: number;
 }
 
 export interface IPromotionalFlyerCompetitorPrices {

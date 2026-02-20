@@ -42,13 +42,19 @@
       <ng-container matColumnDef="status">
         <th mat-header-cell *matHeaderCellDef>Status</th>
         <td mat-cell *matCellDef="let element">
-          {{ element?.status ? 'Finalizada' : 'Em andamento' }}
+          <div fxLayout="column">
+            <span>{{
+              `${calculeCompletePercent(element.totalProducts, element.importedProducts)}%`
+            }}</span>
+          </div>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="produtos">
-        <th mat-header-cell *matHeaderCellDef>Produtos</th>
-        <td mat-cell *matCellDef="let element">{{ element.totalProducts }}</td>
+        <th mat-header-cell *matHeaderCellDef>Preços importados no ERP</th>
+        <td mat-cell *matCellDef="let element">
+          {{ `${element.importedProducts} / ${element.totalProducts}` }}
+        </td>
       </ng-container>
 
       <ng-container matColumnDef="send">
