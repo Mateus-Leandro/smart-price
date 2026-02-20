@@ -55,6 +55,16 @@ export class CompetitorRepository {
     );
   }
 
+  deleteCompetitor(competitorId: number) {
+    this.loadingService.show();
+    return from(this.supabase.from('competitors').delete().eq('id', competitorId)).pipe(
+      map(({ error }) => {
+        if (error) throw error;
+      }),
+      finalize(() => this.loadingService.hide()),
+    );
+  }
+
   loadCompetitors(paginator: IDefaultPaginatorDataSource<ICompetitor>, search?: string) {
     const fromIdx = paginator.pageIndex * paginator.pageSize;
     const toIdx = fromIdx + paginator.pageSize - 1;
