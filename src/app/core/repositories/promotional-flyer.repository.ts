@@ -84,7 +84,6 @@ export class PromotionalFlyerRepository {
         `
       sale_price,
       loyalty_price,
-      shipping_price,
       quote_cost,
       average_cost_quote,
       quantity_suppliers,
@@ -104,6 +103,10 @@ export class PromotionalFlyerRepository {
         id,
         id_text,
         name,
+
+        supplierShippingPrice:supplier_shipping_price (
+          shipping_price
+        ),
 
         productMarginBranches:product_margin_branches (
           margin,
@@ -125,6 +128,7 @@ export class PromotionalFlyerRepository {
         name,
         delivery_type
       )
+
       `,
         { count: 'exact' },
       )
@@ -188,7 +192,7 @@ export class PromotionalFlyerRepository {
           return {
             salePrice: item.sale_price,
             loyaltyPrice: item.loyalty_price,
-            shippingPrice: item.shipping_price,
+            shippingPrice: item.product?.supplierShippingPrice[0]?.shipping_price || 0,
             quoteCost: item.quote_cost,
             averageCostQuote: item.average_cost_quote,
             quantitySuppliers: item.quantity_suppliers || 0,

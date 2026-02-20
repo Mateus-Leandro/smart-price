@@ -105,7 +105,8 @@
                   shippingPriceInput.getAttribute('initial-shipping-price') || '0',
                   element.product.id,
                   rows.at(i).controls.shippingPrice,
-                  'shipping_price'
+                  'shipping_price',
+                  element.supplier.id
                 )
               "
               (focus)="onFocus(shippingPriceInput)"
@@ -404,6 +405,7 @@
                                     element.product.id,
                                     rows.at(i).controls.linkedCompetitorPrices.at(j),
                                     'competitor_price',
+                                    undefined,
                                     competitor.id
                                   )
                                 "
@@ -492,6 +494,7 @@
                                       element.product.id,
                                       rows.at(i).controls.unlinkedCompetitorPrices.at(j),
                                       'competitor_price',
+                                      undefined,
                                       competitor.id
                                     )
                                   "
