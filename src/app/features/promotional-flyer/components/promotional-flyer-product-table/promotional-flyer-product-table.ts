@@ -734,7 +734,7 @@ export class PromotionalFlyerProductTable {
 
       if (marginRule) {
         loyaltyMarginRuleText.setValue(
-          `-${marginRule.discountPercent}% em relação ao menor preço dos concorrentes.`,
+          `-${marginRule.discountPercent}% em relação ao menor preço dos concorrentes vinculados a loja.`,
         );
       }
 
@@ -746,7 +746,7 @@ export class PromotionalFlyerProductTable {
 
       if (marginRule) {
         saleMarginRuleText.setValue(
-          `-${marginRule.discountPercent}% em relação ao menor preço dos concorrentes.`,
+          `-${marginRule.discountPercent}% em relação ao menor preço dos concorrentes vinculados a loja.`,
         );
       }
     }
