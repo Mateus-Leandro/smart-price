@@ -17,6 +17,10 @@ export class CompetitorService {
     return this.repository.updateCompetitor(updateCompetitor);
   }
 
+  deleteCompetitor(competitorId: number) {
+    return this.repository.deleteCompetitor(competitorId);
+  }
+
   loadCompetitors(paginator: IDefaultPaginatorDataSource<ICompetitor>, search?: string) {
     return this.repository.loadCompetitors(paginator, search);
   }
