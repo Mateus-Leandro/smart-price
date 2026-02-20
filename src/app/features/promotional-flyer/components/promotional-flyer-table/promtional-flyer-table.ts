@@ -171,4 +171,8 @@ export class PromotionalFlyerTable {
     const value = (event.target as HTMLInputElement).value;
     this.search$.next(value);
   }
+
+  calculeCompletePercent(totalProducts: number, importedProducts: number) {
+    return (100 * (importedProducts / totalProducts)).toFixed(2);
+  }
 }

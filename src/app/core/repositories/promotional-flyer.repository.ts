@@ -30,15 +30,8 @@ export class PromotionalFlyerRepository {
     const toIdx = fromIdx + paginator.pageSize - 1;
 
     let query = this.supabase
-      .from('promotional_flyers')
-      .select(
-        `
-        id, id_integral, branche_id, name, finished, created_at, updated_at, 
-        promotional_flyer_products(count),
-        companyBranche:company_branches!inner (id, name)
-      `,
-        { count: 'exact' },
-      )
+      .from('promotional_flyers_with_counts')
+      .select('*', { count: 'exact' })
       .order('created_at', { ascending: false });
 
     if (search) {
@@ -50,6 +43,7 @@ export class PromotionalFlyerRepository {
     }
 
     this.loadingService.show();
+
     return from(query.range(fromIdx, toIdx)).pipe(
       map(({ data, count, error }) => {
         if (error) throw error;
@@ -57,12 +51,16 @@ export class PromotionalFlyerRepository {
         const mappedData: IPromotionalFlyerView[] = (data || []).map((item: any) => ({
           id: item.id,
           idIntegral: item.id_integral,
-          branche: item.companyBranche,
+          branche: {
+            id: item.branche_id,
+            name: item.branche_name,
+          },
           name: item.name,
           finished: item.finished,
           createdAt: item.created_at,
           updatedAt: item.updated_at,
-          totalProducts: item.promotional_flyer_products?.[0]?.count ?? 0,
+          totalProducts: item.total_products ?? 0,
+          importedProducts: item.imported_products ?? 0,
         }));
 
         return { data: mappedData, count: count ?? 0 };
@@ -70,7 +68,6 @@ export class PromotionalFlyerRepository {
       finalize(() => this.loadingService.hide()),
     );
   }
-
   getProducts(
     flyerId: number,
     idIntegral: number,
