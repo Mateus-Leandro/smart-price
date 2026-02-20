@@ -692,16 +692,6 @@ export class PromotionalFlyerProductTable {
     if (competitorMargin < 7) {
       warningPriceText.setValue('Margem do concorrente menor que 7%.');
 
-      if (loyaltyPriceValue) {
-        loyaltyMarginRuleText.setValue(
-          `${productMarginValue}% em relação ao custo final(Pr.Cotação + Frete).`,
-        );
-      } else {
-        saleMarginRuleText.setValue(
-          `${productMarginValue}% em relação ao custo final(Pr.Cotação + Frete).`,
-        );
-      }
-
       if (warningType.value !== EnumWarningProductType.CompetitorMargin) {
         this.promotionalFlyerService
           .updateWarningType(
@@ -732,9 +722,13 @@ export class PromotionalFlyerProductTable {
         emitEvent: false,
       });
 
-      if (marginRule) {
+      if (lowestCompetitorPrice < suggestedPrice && marginRule) {
         loyaltyMarginRuleText.setValue(
           `-${marginRule.discountPercent}% em relação ao menor preço dos concorrentes vinculados a loja.`,
+        );
+      } else {
+        loyaltyMarginRuleText.setValue(
+          `${productMarginValue}% em relação ao custo final(Pr.Cotação + Frete).`,
         );
       }
 
@@ -744,9 +738,13 @@ export class PromotionalFlyerProductTable {
         emitEvent: false,
       });
 
-      if (marginRule) {
+      if (lowestCompetitorPrice < suggestedPrice && marginRule) {
         saleMarginRuleText.setValue(
           `-${marginRule.discountPercent}% em relação ao menor preço dos concorrentes vinculados a loja.`,
+        );
+      } else {
+        saleMarginRuleText.setValue(
+          `${productMarginValue}% em relação ao custo final(Pr.Cotação + Frete).`,
         );
       }
     }
