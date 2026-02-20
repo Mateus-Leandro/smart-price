@@ -250,7 +250,7 @@ export class PromotionalFlyerRepository {
         updated_at: new Date(),
       })
       .eq('promotional_flyer_id', flyerId)
-      .gt('sale_price', 0);
+      .or('sale_price.gt.0,loyalty_price.gt.0');
 
     if (productId) {
       query = query.eq('product_id', productId);
