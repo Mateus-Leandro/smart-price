@@ -61,7 +61,7 @@
         <th mat-header-cell *matHeaderCellDef></th>
         <td mat-cell *matCellDef="let element" (click)="$event.stopPropagation()">
           @if (userPermissions?.allowSendToErp) {
-            @if (sendingFlyerId != element.idIntegral) {
+            @if (sendingFlyerId !== element.id) {
               <app-icon-button
                 icon="send"
                 class="icon-button-table"
