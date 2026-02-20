@@ -126,8 +126,11 @@ export class PromotionalFlyerProductTable {
   @ViewChildren('shippingPriceInput')
   shippingPriceInputs!: QueryList<ElementRef<HTMLInputElement>>;
 
-  @ViewChildren('competitorPriceInput')
-  competitorPriceInputs!: QueryList<ElementRef<HTMLInputElement>>;
+  @ViewChildren('linkedCompetitorPriceInput')
+  linkedCompetitorPriceInputs!: QueryList<ElementRef<HTMLInputElement>>;
+
+  @ViewChildren('unlikendCompetitorPriceInput')
+  unlinkedCompetitorPriceInputs!: QueryList<ElementRef<HTMLInputElement>>;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
@@ -141,7 +144,7 @@ export class PromotionalFlyerProductTable {
   searchTerm = '';
   loading = inject(LoadingService).loading;
   sendingProductId?: number | null;
-  unlinkedCompetitorList: ICompetitorView[] = [];
+  unlinkedCompetitorsList: ICompetitorView[] = [];
   linkedCompetitorsList: ICompetitorView[] = [];
   suggestedPriceSettingsList: ISuggestedPriceSettingView[] = [];
   companyId!: number;
@@ -334,7 +337,7 @@ export class PromotionalFlyerProductTable {
             c.competitorBranches.some((cb) => cb.brancheId === currentBrancheId),
           );
 
-          this.unlinkedCompetitorList = competitors.data.filter(
+          this.unlinkedCompetitorsList = competitors.data.filter(
             (c) => !c.competitorBranches.some((cb) => cb.brancheId === currentBrancheId),
           );
 
@@ -371,7 +374,7 @@ export class PromotionalFlyerProductTable {
           return this.fb.control<string | null>(formattedPrice);
         });
 
-        const unlinkedCompetitorControls = this.unlinkedCompetitorList.map((competitor) => {
+        const unlinkedCompetitorControls = this.unlinkedCompetitorsList.map((competitor) => {
           const priceEntry = item.competitorPrices?.find(
             (cp: any) => cp.competitor?.id === competitor.id,
           );
