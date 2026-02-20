@@ -5,14 +5,11 @@ import {
   ElementRef,
   inject,
   input,
-  Input,
   QueryList,
   signal,
-  SimpleChanges,
   ViewChild,
   ViewChildren,
 } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
 
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
@@ -47,7 +44,6 @@ import {
   EnumFilterPromotionalFlyerProducts,
   EnumWarningProductType,
   getPromotionalFlyerProductsFilterOptions,
-  MarginFilterEnum,
   ProductPriceType,
 } from '../../../../core/enums/product.enum';
 import {
@@ -55,7 +51,7 @@ import {
   IPromotionalFlyerView,
 } from 'src/app/core/models/promotional-flyer.model';
 import { CompetitorService } from 'src/app/features/competitor/services/competitor.service';
-import { ICompetitor, ICompetitorView } from 'src/app/core/models/competitor';
+import { ICompetitorView } from 'src/app/core/models/competitor';
 import { CompetitorPriceFlyerProductService } from 'src/app/features/competitor-price-flyer-product/competitor-price-flyer-product.service';
 import { AuthService } from 'src/app/features/auth/services/auth.service';
 import { roundToTwo, transformToNumberValue } from 'src/app/shared/functions/utils';
@@ -67,6 +63,7 @@ import { IUserPermission } from 'src/app/core/models/user-permission.model';
 import { UserPermissionService } from 'src/app/features/user-permission/user-permission.service';
 import { IconFilterButton } from 'src/app/shared/components/icon-filter-button/icon-filter-button';
 import { IFilterOptions } from 'src/app/shared/components/icon-filter-button/icon-filter-list';
+import { SupplierShippingPriceService } from 'src/app/features/supplier-shipping-price/services/supplier-shipping-price.service';
 
 type FlyerRowForm = FormGroup<{
   actualSalePrice: FormControl<string | null>;
@@ -197,6 +194,7 @@ export class PromotionalFlyerProductTable {
     private authService: AuthService,
     private suggestedPriceSettings: SuggestedPriceSettingService,
     private userPermissionService: UserPermissionService,
+    private supplierShippingPriceService: SupplierShippingPriceService,
   ) {
     effect(() => {
       const info = this.flyerInfo();
@@ -498,6 +496,7 @@ export class PromotionalFlyerProductTable {
     productId: number,
     control: FormControl<string | null>,
     columnName: string,
+    supplierId?: number,
     competitorId?: number,
   ): Promise<void> {
     let value = control.value;
@@ -516,17 +515,7 @@ export class PromotionalFlyerProductTable {
       const formatted = numericPrice.toFixed(2).replace('.', ',');
       control.setValue(formatted, { emitEvent: false });
 
-      if (columnName.toLocaleLowerCase() !== 'competitor_price') {
-        this.promotionalFlyerService
-          .updateProductPrice(this.flyerId(), productId, numericPrice, columnName)
-          .subscribe({
-            error: (err) => {
-              this.notificationService.showError(
-                `Erro ao atualizar preço. Item: ${productId} | Erro: ${err.message || err}`,
-              );
-            },
-          });
-      } else {
+      if (columnName.toLocaleLowerCase() === 'competitor_price') {
         if (!competitorId) return;
 
         if (numericPrice > 0) {
@@ -559,13 +548,61 @@ export class PromotionalFlyerProductTable {
               error: (err) => {
                 this.notificationService.showError(
                   `Erro ao deletar preço do concorrente. Item: ${productId} | Erro: ${
-                    err.message || err
+                    err?.message || err
                   }`,
                 );
               },
             });
         }
+
+        return;
       }
+
+      if (columnName.toLocaleLowerCase() === 'shipping_price') {
+        if (!supplierId) return;
+
+        if (numericPrice > 0) {
+          this.supplierShippingPriceService
+            .upsertSupplierShippingPrice({
+              company_id: this.companyId,
+              deliveryCost: numericPrice,
+              productId: productId,
+              supplierId: supplierId,
+            })
+            .subscribe({
+              error: (err) => {
+                this.notificationService.showError(
+                  `Erro ao atualizar valor do frete: ${err?.message || err}`,
+                );
+              },
+            });
+        } else {
+          this.supplierShippingPriceService
+            .deleteSupplierShippingPrice({
+              productId: productId,
+              supplierId: supplierId,
+            })
+            .subscribe({
+              error: (err) => {
+                this.notificationService.showError(
+                  `Erro ao remover valor do frete: ${err?.message || err}`,
+                );
+              },
+            });
+        }
+
+        return;
+      }
+
+      this.promotionalFlyerService
+        .updateProductPrice(this.flyerId(), productId, numericPrice, columnName)
+        .subscribe({
+          error: (err) => {
+            this.notificationService.showError(
+              `Erro ao atualizar preço. Item: ${productId} | Erro: ${err.message || err}`,
+            );
+          },
+        });
     }
   }
 
