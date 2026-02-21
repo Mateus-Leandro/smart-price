@@ -79,7 +79,7 @@ export class PromotionalFlyerRepository {
     const toIdx = fromIdx + paginator.pageSize - 1;
 
     let query = this.supabase
-      .from('promotional_flyer_products')
+      .from('vw_promotional_flyer_products')
       .select(
         `
       sale_price,
@@ -93,6 +93,8 @@ export class PromotionalFlyerRepository {
       lock_price,
       price_discount_percent,
       warning_type,
+      quote_supplier_id,
+      quote_supplier_shipping_price,
 
       promotionalFlyer:promotional_flyers!inner (
         branche_id,
@@ -103,10 +105,6 @@ export class PromotionalFlyerRepository {
         id,
         id_text,
         name,
-
-        supplierShippingPrice:supplier_shipping_price (
-          shipping_price
-        ),
 
         productMarginBranches:product_margin_branches (
           margin,
@@ -192,7 +190,7 @@ export class PromotionalFlyerRepository {
           return {
             salePrice: item.sale_price,
             loyaltyPrice: item.loyalty_price,
-            shippingPrice: item.product?.supplierShippingPrice[0]?.shipping_price || 0,
+            shippingPrice: item.quote_supplier_shipping_price || 0,
             quoteCost: item.quote_cost,
             averageCostQuote: item.average_cost_quote,
             quantitySuppliers: item.quantity_suppliers || 0,
