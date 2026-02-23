@@ -576,7 +576,7 @@ export class PromotionalFlyerProductTable {
           this.supplierShippingPriceService
             .upsertSupplierShippingPrice({
               company_id: this.companyId,
-              deliveryCost: numericPrice,
+              shippingPrice: numericPrice,
               productId: productId,
               supplierId: supplierId,
             })
