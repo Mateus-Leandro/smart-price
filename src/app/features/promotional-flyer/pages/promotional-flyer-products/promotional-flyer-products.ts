@@ -84,11 +84,16 @@ export class PromotionalFlyerProducts {
   }
 
   openSettingsSuggestedPriceDialog(): void {
-    this.dialog.open(SuggestedPriceSettingsDialog, {
-      width: '800px',
-      disableClose: false,
-      autoFocus: true,
-    });
+    this.dialog
+      .open(SuggestedPriceSettingsDialog, {
+        width: '800px',
+        disableClose: false,
+        autoFocus: true,
+      })
+      .afterClosed()
+      .subscribe(() => {
+        this.flyerTable.loadData();
+      });
   }
 
   aplySuggestedPrice() {
