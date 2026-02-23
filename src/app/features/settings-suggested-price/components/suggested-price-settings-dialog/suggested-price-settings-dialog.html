@@ -4,95 +4,132 @@
   </div>
 }
 
-<div mat-dialog-title fxLayout="row" fxLayoutAlign="start start">
-  <div fxLayout="column">
-    <span> Configurações para sugestão de preço</span>
-    <span class="subtitle">
-      Ajuste os percentuais e a % de redução no preço sugerido em relação ao preço do concorrente.
-    </span>
-  </div>
+<div mat-dialog-title fxLayout="column">
+  <span>Configurações para sugestão de preço</span>
+  <span class="subtitle" style="font-size: 14px; color: gray">
+    Ajuste os percentuais e a % de redução no preço sugerido em relação ao preço do concorrente.
+  </span>
 </div>
 
-<form [formGroup]="suggestedPriceSettingsFormGroup" (ngSubmit)="submit()">
-  <mat-dialog-content>
-    <div fxLayout="column" fxLayoutGap="15px">
-      <div fxLayout="row" fxLayoutGap="10px">
-        <mat-form-field appearance="outline" style="width: 200px">
-          <mat-label>Margem de</mat-label>
+<mat-dialog-content>
+  <div fxLayout="column" fxLayoutGap="20px">
+    <div fxLayout="column">
+      <span style="font-weight: bold; color: black">
+        Porcentagem de acréscimo no preço de venda sugerido
+      </span>
+      <mat-form-field appearance="outline" style="width: 200px; padding-top: 15px">
+        <mat-label>% de acréscimo</mat-label>
+        <input
+          matInput
+          [formControl]="increasePricePercentControl"
+          mask="separator.2"
+          maxlength="8"
+          suffix=" %"
+          decimalMarker=","
+          [dropSpecialCharacters]="true"
+          (blur)="saveIncreasePricePercent()"
+          placeholder="0,00"
+        />
+        @if (increasePricePercentControl.touched && increasePricePercentControl.hasError('max')) {
+          <mat-error>Acréscimo maior que 100</mat-error>
+        }
+      </mat-form-field>
 
-          <input
-            matInput
-            formControlName="marginMin"
-            mask="separator.2"
-            maxlength="8"
-            suffix=" %"
-            decimalMarker=","
-            [dropSpecialCharacters]="true"
-            style="width: 75px"
-          />
-          @if (marginMin.touched && marginMin.hasError('required')) {
-            <mat-error>Campo obrigatório</mat-error>
-          }
-
-          @if (marginMin.touched && marginMin.hasError('min')) {
-            <mat-error>Margem menor que 7</mat-error>
-          }
-
-          @if (marginMin.touched && marginMin.hasError('max')) {
-            <mat-error>Margem maior que 100</mat-error>
-          }
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" style="width: 200px">
-          <mat-label>Margem ate</mat-label>
-
-          <input
-            matInput
-            formControlName="marginMax"
-            mask="separator.2"
-            maxlength="8"
-            suffix=" %"
-            decimalMarker=","
-            [dropSpecialCharacters]="true"
-          />
-          @if (marginMax.touched && marginMax.hasError('required')) {
-            <mat-error>Campo obrigatório</mat-error>
-          }
-
-          @if (marginMax.touched && marginMax.hasError('min')) {
-            <mat-error>Margem menor que 0</mat-error>
-          }
-
-          @if (marginMax.touched && marginMax.hasError('max')) {
-            <mat-error>Margem maior que 100</mat-error>
-          }
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" style="width: 200px">
-          <mat-label>% de redução</mat-label>
-
-          <input
-            matInput
-            formControlName="discounPercent"
-            mask="separator.2"
-            maxlength="8"
-            suffix=" %"
-            decimalMarker=","
-            [dropSpecialCharacters]="true"
-          />
-          @if (discounPercent.touched && discounPercent.hasError('required')) {
-            <mat-error>Campo obrigatório</mat-error>
-          }
-
-          @if (discounPercent.touched && discounPercent.hasError('min')) {
-            <mat-error>Porcentagem menor que 0</mat-error>
-          }
-
-          @if (discounPercent.touched && discounPercent.hasError('max')) {
-            <mat-error>Porcentagem maior que 100</mat-error>
-          }
-        </mat-form-field>
+      <div fxLayout="row" fxLayoutGap="5px" style="padding-bottom: 15px">
+        <mat-icon style="font-size: 18px; width: 18px; height: 18px">info</mat-icon>
+        <div fxLayout="column">
+          <span style="font-weight: 500"
+            >Caso o produto possua preço fidelidade, o preço de venda sugerido será:</span
+          >
+          <span style="font-weight: 500"
+            >preço fidelidade sugerido + % de acréscimo definida no campo acima.</span
+          >
+        </div>
       </div>
+      <mat-divider />
+    </div>
+
+    <div fxLayout="column" fxLayoutGap="15px">
+      <span style="font-weight: bold; color: black">Regras para redução no preço sugerido</span>
+
+      @if (isViewing) {
+        <div>
+          <app-button text="Criar Nova Regra" (click)="setCreateMode()" />
+        </div>
+      } @else {
+        <form [formGroup]="ruleFormGroup" (ngSubmit)="submitRule()">
+          <div fxLayout="column">
+            <div fxLayout="row" fxLayoutGap="25px">
+              <mat-form-field appearance="outline" style="width: 150px">
+                <mat-label>Margem de</mat-label>
+                <input
+                  matInput
+                  formControlName="marginMin"
+                  mask="separator.2"
+                  maxlength="8"
+                  suffix=" %"
+                  decimalMarker=","
+                  [dropSpecialCharacters]="true"
+                />
+                @if (marginMin.hasError('required')) {
+                  <mat-error>Obrigatório</mat-error>
+                }
+                @if (marginMin.hasError('min')) {
+                  <mat-error>Mínimo 7%</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" style="width: 150px">
+                <mat-label>Margem até</mat-label>
+                <input
+                  matInput
+                  formControlName="marginMax"
+                  mask="separator.2"
+                  maxlength="8"
+                  suffix=" %"
+                  decimalMarker=","
+                  [dropSpecialCharacters]="true"
+                />
+                @if (marginMax.hasError('required')) {
+                  <mat-error>Obrigatório</mat-error>
+                }
+                @if (marginMax.hasError('max')) {
+                  <mat-error>Máximo 100%</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" style="width: 150px">
+                <mat-label>% de redução</mat-label>
+                <input
+                  matInput
+                  formControlName="discountPercent"
+                  mask="separator.2"
+                  maxlength="8"
+                  suffix=" %"
+                  decimalMarker=","
+                  [dropSpecialCharacters]="true"
+                />
+                @if (discountPercent.hasError('required')) {
+                  <mat-error>Obrigatório</mat-error>
+                }
+                @if (discountPercent.hasError('max')) {
+                  <mat-error>Máximo 100%</mat-error>
+                }
+              </mat-form-field>
+            </div>
+            <div fxLayout="row" fxLayoutGap="5px" fxLayoutAlign="start">
+              <app-button text="Salvar Regra" type="submit" [disabled]="ruleFormGroup.invalid" />
+              <app-button
+                text="Cancelar"
+                type="button"
+                bgColor="var(--cancel-color)"
+                (click)="cancel()"
+              />
+            </div>
+          </div>
+        </form>
+      }
+
       <table
         mat-table
         [dataSource]="dataSource"
@@ -102,17 +139,29 @@
       >
         <ng-container matColumnDef="margin_min">
           <th mat-header-cell *matHeaderCellDef>Margem de</th>
-          <td mat-cell *matCellDef="let element">{{ `${element.marginMin}%` }}</td>
+          <td mat-cell *matCellDef="let element">{{ element.marginMin }}%</td>
         </ng-container>
 
         <ng-container matColumnDef="margin_max">
           <th mat-header-cell *matHeaderCellDef>Margem até</th>
-          <td mat-cell *matCellDef="let element">{{ `${element.marginMax}%` }}</td>
+          <td mat-cell *matCellDef="let element">{{ element.marginMax }}%</td>
         </ng-container>
 
         <ng-container matColumnDef="discount_percent">
           <th mat-header-cell *matHeaderCellDef>% de redução do preço</th>
-          <td mat-cell *matCellDef="let element">{{ `${element.discountPercent}%` }}</td>
+          <td mat-cell *matCellDef="let element">{{ element.discountPercent }}%</td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let element">
+            <app-icon-button icon="edit" (click)="setEditMode(element)" />
+            <app-icon-button
+              icon="delete"
+              tooltipText="Excluir configuração"
+              (click)="deleteRule(element.id)"
+            />
+          </td>
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
@@ -121,9 +170,9 @@
           *matRowDef="let row; columns: columnsToDisplay"
           style="cursor: pointer"
           [class.selected-row]="editingSettingId() === row.id"
-          (click)="editSetting(row)"
         ></tr>
       </table>
+
       <div fxLayout="row" fxLayoutGap="5px" style="color: var(--error-color)">
         <mat-icon style="font-size: 18px; width: 18px; height: 18px">warning</mat-icon>
         <span style="font-weight: bold">Margem < 7%: </span>
@@ -140,30 +189,14 @@
         >
       </div>
     </div>
-  </mat-dialog-content>
+  </div>
+</mat-dialog-content>
 
-  <mat-dialog-actions>
-    <div fxLayout="row" fxLayoutGap="8px" class="full-width" fxLayoutAlign="space-between">
-      <app-icon-button
-        icon="delete"
-        [disabled]="!editingSettingId()"
-        tooltipText="Excluir configuração"
-        (click)="deleteSuggestedPriceSettings()"
-      ></app-icon-button>
-      <div fxLayout="row" fxLayoutGap="10px">
-        <app-button
-          [text]="editingSettingId() ? 'Cancelar edição' : 'Cancelar'"
-          type="button"
-          bgColor="var(--cancel-color)"
-          (click)="cancel()"
-        />
-
-        <app-button
-          [text]="editingSettingId() ? 'Salvar edição' : 'Salvar'"
-          type="submit"
-          [disabled]="suggestedPriceSettingsFormGroup.invalid"
-        />
-      </div>
-    </div>
-  </mat-dialog-actions>
-</form>
+<mat-dialog-actions align="end">
+  <app-button
+    text="Fechar"
+    type="button"
+    bgColor="var(--cancel-color)"
+    (click)="dialogRef.close()"
+  />
+</mat-dialog-actions>
