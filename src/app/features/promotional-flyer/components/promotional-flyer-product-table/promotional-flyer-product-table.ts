@@ -30,7 +30,7 @@ import {
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { debounceTime } from 'rxjs/internal/operators/debounceTime';
 import { distinctUntilChanged } from 'rxjs/internal/operators/distinctUntilChanged';
-import { merge, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { forkJoin, merge, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { NgxMaskDirective } from 'ngx-mask';
 import { CommonModule } from '@angular/common';
 import { PromotionalFlyerService } from '../../services/promotional-flyer.service';
@@ -64,6 +64,7 @@ import { UserPermissionService } from 'src/app/features/user-permission/user-per
 import { IconFilterButton } from 'src/app/shared/components/icon-filter-button/icon-filter-button';
 import { IFilterOptions } from 'src/app/shared/components/icon-filter-button/icon-filter-list';
 import { SupplierShippingPriceService } from 'src/app/features/supplier-shipping-price/services/supplier-shipping-price.service';
+import { CompanySettingsService } from 'src/app/features/company-settings/services/company-settings.service';
 
 type FlyerRowForm = FormGroup<{
   actualSalePrice: FormControl<string | null>;
@@ -146,6 +147,7 @@ export class PromotionalFlyerProductTable {
   suggestedPriceSettingsList: ISuggestedPriceSettingView[] = [];
   companyId!: number;
   userPermissions: IUserPermission | null = null;
+  companyIncreasePricePercent: number = 0;
 
   sortEvent!: Sort;
 
@@ -195,6 +197,7 @@ export class PromotionalFlyerProductTable {
     private suggestedPriceSettings: SuggestedPriceSettingService,
     private userPermissionService: UserPermissionService,
     private supplierShippingPriceService: SupplierShippingPriceService,
+    private companySettingsService: CompanySettingsService,
   ) {
     effect(() => {
       const info = this.flyerInfo();
@@ -245,17 +248,25 @@ export class PromotionalFlyerProductTable {
       });
   }
 
-  private loadData(): void {
+  loadData(): void {
     this.authService
       .getCompanyIdFromLoggedUser()
       .pipe(
         tap((companyId) => (this.companyId = companyId)),
-        switchMap((companyId) => this.suggestedPriceSettings.loadSuggestedPriceSettings(companyId)),
+        switchMap((companyId) =>
+          forkJoin({
+            suggestedPriceSettings:
+              this.suggestedPriceSettings.loadSuggestedPriceSettings(companyId),
+            companySettings: this.companySettingsService.loadCompanySettings(companyId),
+          }),
+        ),
         takeUntil(this.destroy$),
       )
       .subscribe({
-        next: (suggestedPriceSettings) => {
-          this.suggestedPriceSettingsList = suggestedPriceSettings;
+        next: (responses) => {
+          this.suggestedPriceSettingsList = responses.suggestedPriceSettings;
+          this.companyIncreasePricePercent = responses.companySettings.data.increasePricePercent;
+
           this.reload();
         },
         error: (err) => {
@@ -565,7 +576,7 @@ export class PromotionalFlyerProductTable {
           this.supplierShippingPriceService
             .upsertSupplierShippingPrice({
               company_id: this.companyId,
-              deliveryCost: numericPrice,
+              shippingPrice: numericPrice,
               productId: productId,
               supplierId: supplierId,
             })
@@ -755,9 +766,14 @@ export class PromotionalFlyerProductTable {
     }
 
     if (loyaltyPriceValue) {
-      suggestedSalePrice.setValue(roundToTwo(suggestedPriceAfterDiscountPercent * 1.15), {
-        emitEvent: false,
-      });
+      suggestedSalePrice.setValue(
+        roundToTwo(
+          suggestedPriceAfterDiscountPercent * (1 + this.companyIncreasePricePercent / 100),
+        ),
+        {
+          emitEvent: false,
+        },
+      );
       suggestedLoyaltyPrice.setValue(roundToTwo(suggestedPriceAfterDiscountPercent), {
         emitEvent: false,
       });
@@ -772,7 +788,9 @@ export class PromotionalFlyerProductTable {
         );
       }
 
-      saleMarginRuleText.setValue(`+15% em relação ao preço fidelidade sugerido.`);
+      saleMarginRuleText.setValue(
+        `+${this.companyIncreasePricePercent}% em relação ao preço fidelidade sugerido.`,
+      );
     } else {
       suggestedSalePrice.setValue(roundToTwo(suggestedPriceAfterDiscountPercent), {
         emitEvent: false,

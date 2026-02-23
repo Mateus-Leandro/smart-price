@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, model, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit, signal } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import {
   FormBuilder,
@@ -11,21 +11,28 @@ import {
 import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatIconModule } from '@angular/material/icon';
+import { MatDivider } from '@angular/material/divider';
 import { NgxMaskDirective } from 'ngx-mask';
+
 import { LoadingService } from 'src/app/core/services/loading.service';
 import { NotificationService } from 'src/app/core/services/notification.service';
-import { Button } from 'src/app/shared/components/button/button';
-import { Spinner } from 'src/app/shared/components/spinner/spinner';
-import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { SuggestedPriceSettingService } from '../../services/suggested-price-setting.service';
 import { AuthService } from 'src/app/features/auth/services/auth.service';
 import { ISuggestedPriceSettingUpsert } from 'src/app/core/models/suggested-price-setting.model';
-import { MatIconModule } from '@angular/material/icon';
+
+import { Button } from 'src/app/shared/components/button/button';
+import { Spinner } from 'src/app/shared/components/spinner/spinner';
 import { IconButton } from 'src/app/shared/components/icon-button/icon-button';
 import { ConfirmationDialog } from 'src/app/shared/components/confirmation-dialog/confirmation-dialog';
+import { CompanySettingsService } from 'src/app/features/company-settings/services/company-settings.service';
+
+type FormState = 'view' | 'create' | 'edit';
 
 @Component({
   selector: 'app-settings-suggested-price-dialog',
+  standalone: true,
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -33,37 +40,47 @@ import { ConfirmationDialog } from 'src/app/shared/components/confirmation-dialo
     MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
-    Button,
-    Spinner,
-    NgxMaskDirective,
     MatTableModule,
     MatIconModule,
+    MatDivider,
+    NgxMaskDirective,
+    Button,
+    Spinner,
     IconButton,
   ],
   templateUrl: './suggested-price-settings-dialog.html',
-  styleUrl: '../../../../global/styles/_tables.scss',
+  styleUrls: ['../../../../global/styles/_tables.scss', './suggested-price-settings-dialog.scss'],
 })
-export class SuggestedPriceSettingsDialog {
-  companyId = 0;
-  suggestedPriceSettingsFormGroup!: FormGroup;
-  loading = inject(LoadingService).loading;
-  dataSource = new MatTableDataSource<any>([]);
-  columnsToDisplay = ['margin_min', 'margin_max', 'discount_percent'];
-  editingSettingId = signal<string | null>(null);
-
+export class SuggestedPriceSettingsDialog implements OnInit {
   constructor(
     private fb: FormBuilder,
-    private dialogRef: MatDialogRef<SuggestedPriceSettingsDialog>,
     private notificationService: NotificationService,
     private suggestedPriceSettingService: SuggestedPriceSettingService,
     private authService: AuthService,
     private dialog: MatDialog,
-  ) {
-    this.buildFormGroup();
+    private cdr: ChangeDetectorRef,
+    private companySettings: CompanySettingsService,
+  ) {}
+
+  dialogRef = inject(MatDialogRef<SuggestedPriceSettingsDialog>);
+  loading = inject(LoadingService).loading;
+  companyId = 0;
+  dataSource = new MatTableDataSource<any>([]);
+  columnsToDisplay = ['margin_min', 'margin_max', 'discount_percent', 'actions'];
+
+  currentState = signal<FormState>('view');
+  editingSettingId = signal<string | null>(null);
+
+  increasePricePercentControl = new FormControl('', [Validators.maxLength(3), Validators.max(100)]);
+  ruleFormGroup!: FormGroup;
+
+  ngOnInit(): void {
+    this.buildRuleForm();
+    this.loadUserData();
   }
 
-  buildFormGroup() {
-    this.suggestedPriceSettingsFormGroup = this.fb.group({
+  buildRuleForm(): void {
+    this.ruleFormGroup = this.fb.group({
       marginMin: [
         '',
         [Validators.required, Validators.maxLength(3), Validators.max(100), Validators.min(7)],
@@ -72,85 +89,128 @@ export class SuggestedPriceSettingsDialog {
         '',
         [Validators.required, Validators.maxLength(3), Validators.max(100), Validators.min(0)],
       ],
-      discounPercent: [
+      discountPercent: [
         '',
         [Validators.required, Validators.maxLength(3), Validators.max(100), Validators.min(0)],
       ],
     });
   }
 
-  ngOnInit(): void {
-    this.reload();
-  }
-
-  loadSuggestedPriceSettings() {
-    this.suggestedPriceSettingService.loadSuggestedPriceSettings(this.companyId).subscribe({
-      next: (response) => {
-        this.dataSource.data = response;
-      },
-      error: (err) => {
-        this.notificationService.showError(`Erro ao carregar configurações: ${err.message || err}`);
-      },
-    });
-  }
-
-  reload() {
+  loadUserData(): void {
     this.authService.getCompanyIdFromLoggedUser().subscribe({
       next: (companyId) => {
         this.companyId = companyId;
         this.loadSuggestedPriceSettings();
+        this.loadCompanySettings();
+      },
+      error: (err) =>
+        this.notificationService.showError(`Erro ao obter empresa: ${err.message || err}`),
+    });
+  }
+
+  loadSuggestedPriceSettings(): void {
+    this.suggestedPriceSettingService.loadSuggestedPriceSettings(this.companyId).subscribe({
+      next: (response) => (this.dataSource.data = response),
+      error: (err) =>
+        this.notificationService.showError(`Erro ao carregar regras: ${err.message || err}`),
+    });
+  }
+
+  loadCompanySettings() {
+    this.companySettings.loadCompanySettings(this.companyId).subscribe({
+      next: (companySettings) => {
+        if (companySettings) {
+          this.increasePricePercentControl.setValue(
+            companySettings.data.increasePricePercent?.toString(),
+            {
+              emitEvent: false,
+            },
+          );
+          this.cdr.detectChanges();
+        }
       },
       error: (err) => {
         this.notificationService.showError(
-          `Erro ao obter empresa do usuário: ${err.message || err}`,
+          `Erro ao carregar configurações da empresa: ${err?.message || err}`,
         );
       },
     });
   }
 
-  submit() {
-    if (this.suggestedPriceSettingsFormGroup.invalid) return;
+  saveIncreasePricePercent() {
+    if (this.increasePricePercent.invalid || this.increasePricePercent.value === null) return;
+
+    const value = this.increasePricePercent.value;
+    this.companySettings
+      .saveCompanySettings({
+        companyId: this.companyId,
+        increasePricePercent: value,
+      })
+      .subscribe({
+        error: (err) => {
+          this.notificationService.showError(
+            `Erro ao salvar percentual de acréscimo: ${err.message || err}`,
+          );
+        },
+      });
+  }
+
+  setCreateMode(): void {
+    this.buildRuleForm();
+    this.editingSettingId.set(null);
+    this.currentState.set('create');
+  }
+
+  setEditMode(element: any): void {
+    this.ruleFormGroup.patchValue({
+      marginMin: element.marginMin?.toString(),
+      marginMax: element.marginMax?.toString(),
+      discountPercent: element.discountPercent?.toString(),
+    });
+
+    this.editingSettingId.set(element.id);
+    this.currentState.set('edit');
+
+    this.cdr.detectChanges();
+  }
+
+  resetState(): void {
+    this.buildRuleForm();
+    this.editingSettingId.set(null);
+    this.currentState.set('view');
+  }
+
+  cancel(): void {
+    if (this.currentState() !== 'view') {
+      this.resetState();
+    } else {
+      this.dialogRef.close();
+    }
+  }
+
+  submitRule(): void {
+    if (this.ruleFormGroup.invalid) return;
 
     const setting: ISuggestedPriceSettingUpsert = {
       id: this.editingSettingId() ?? undefined,
       companyId: this.companyId,
       marginMin: this.marginMin.value,
       marginMax: this.marginMax.value,
-      discountPercent: this.discounPercent.value,
+      discountPercent: this.discountPercent.value,
     };
 
     this.suggestedPriceSettingService.upsertSuggestedPriceSettings(setting).subscribe({
       next: () => {
-        this.editingSettingId.set(null);
-        this.buildFormGroup();
-        this.reload();
-        this.notificationService.showSuccess('Configuração gravada com sucesso.');
+        this.notificationService.showSuccess('Regra salva com sucesso.');
+        this.resetState();
+        this.loadSuggestedPriceSettings();
       },
-      error: (err) => {
-        this.notificationService.showError(`Erro ao salvar configuração: ${err.message || err}`);
-      },
+      error: (err) =>
+        this.notificationService.showError(`Erro ao salvar regra: ${err.message || err}`),
     });
   }
 
-  cancel() {
-    if (this.editingSettingId()) {
-      this.editingSettingId.set(null);
-      this.buildFormGroup();
-      return;
-    }
-    this.dialogRef.close();
-  }
-
-  editSetting(row: any) {
-    this.editingSettingId.set(row.id);
-    this.marginMin.setValue(row.marginMin);
-    this.marginMax.setValue(row.marginMax);
-    this.discounPercent.setValue(row.discountPercent);
-  }
-
-  deleteSuggestedPriceSettings() {
-    if (!this.editingSettingId()) return;
-
+  deleteRule(id: string): void {
     this.dialog
       .open(ConfirmationDialog, {
         width: '400px',
@@ -166,36 +226,33 @@ export class SuggestedPriceSettingsDialog {
       .afterClosed()
       .subscribe((confirmation) => {
         if (confirmation) {
-          this.suggestedPriceSettingService
-            .deleteSuggestedPriceSettings(this.editingSettingId()!)
-            .subscribe({
-              next: () => {
-                this.reload();
-                this.buildFormGroup();
-                this.notificationService.showSuccess(`Configuração removido com sucesso`);
-              },
-              error: (err) => {
-                this.notificationService.showError(
-                  `Erro ao remover configuração: ${err.message || err}`,
-                );
-              },
-            });
+          this.suggestedPriceSettingService.deleteSuggestedPriceSettings(id).subscribe({
+            next: () => {
+              this.notificationService.showSuccess('Regra removida com sucesso');
+              this.loadSuggestedPriceSettings();
+              if (this.editingSettingId() === id) this.resetState(); // Reseta se estiver editando o que foi apagado
+            },
+            error: (err) =>
+              this.notificationService.showError(`Erro ao remover regra: ${err.message || err}`),
+          });
         }
-
-        this.editingSettingId.set(null);
-        this.buildFormGroup();
       });
   }
 
+  get isViewing() {
+    return this.currentState() === 'view';
+  }
   get marginMin() {
-    return this.suggestedPriceSettingsFormGroup.get('marginMin')! as FormControl;
+    return this.ruleFormGroup.get('marginMin') as FormControl;
   }
-
   get marginMax() {
-    return this.suggestedPriceSettingsFormGroup.get('marginMax')! as FormControl;
+    return this.ruleFormGroup.get('marginMax') as FormControl;
+  }
+  get discountPercent() {
+    return this.ruleFormGroup.get('discountPercent') as FormControl;
   }
 
-  get discounPercent() {
-    return this.suggestedPriceSettingsFormGroup.get('discounPercent')! as FormControl;
+  get increasePricePercent() {
+    return this.increasePricePercentControl as FormControl;
   }
 }

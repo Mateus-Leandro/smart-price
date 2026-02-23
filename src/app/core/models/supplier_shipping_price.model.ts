@@ -11,7 +11,7 @@ export interface ICreateSupplierShippingPrice {
   company_id: number;
   supplierId: number;
   productId: number;
-  deliveryCost: number;
+  shippingPrice: number;
 }
 
 export interface IDeleteSupplierShippingPrice {

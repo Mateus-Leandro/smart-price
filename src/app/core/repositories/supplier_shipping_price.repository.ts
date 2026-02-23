@@ -21,7 +21,7 @@ export class SupplierShippingPriceRepository {
           company_id: supplierShippingPrice.company_id,
           supplier_id: supplierShippingPrice.supplierId,
           product_id: supplierShippingPrice.productId,
-          shipping_price: supplierShippingPrice.deliveryCost,
+          shipping_price: supplierShippingPrice.shippingPrice,
         },
         {
           onConflict: 'product_id, supplier_id, company_id',
