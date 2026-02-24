@@ -191,6 +191,23 @@ export class SuggestedPriceSettingsDialog implements OnInit {
   submitRule(): void {
     if (this.ruleFormGroup.invalid) return;
 
+    const newMarginMin = Number(this.marginMin.value);
+    const newMarginMax = Number(this.marginMax.value);
+
+    if (newMarginMin >= newMarginMax) {
+      this.notificationService.showError(
+        'A "Margem de" deve ser estritamente menor que a "Margem até".',
+      );
+      return;
+    }
+
+    if (this.hasMarginOverlap(newMarginMin, newMarginMax, this.editingSettingId())) {
+      this.notificationService.showError(
+        'Este intervalo conflita com uma regra já existente. Ajuste as margens e tente novamente.',
+      );
+      return;
+    }
+
     const setting: ISuggestedPriceSettingUpsert = {
       id: this.editingSettingId() ?? undefined,
       companyId: this.companyId,
@@ -230,13 +247,27 @@ export class SuggestedPriceSettingsDialog implements OnInit {
             next: () => {
               this.notificationService.showSuccess('Regra removida com sucesso');
               this.loadSuggestedPriceSettings();
-              if (this.editingSettingId() === id) this.resetState(); // Reseta se estiver editando o que foi apagado
+              if (this.editingSettingId() === id) this.resetState();
             },
             error: (err) =>
               this.notificationService.showError(`Erro ao remover regra: ${err.message || err}`),
           });
         }
       });
+  }
+
+  hasMarginOverlap(newMin: number, newMax: number, currentId: string | null = null): boolean {
+    const existingRules = this.dataSource.data || [];
+
+    return existingRules.some((rule) => {
+      if (currentId && rule.id === currentId) {
+        return false;
+      }
+
+      const existingMin = Number(rule.marginMin);
+      const existingMax = Number(rule.marginMax);
+      return newMin <= existingMax && newMax >= existingMin;
+    });
   }
 
   get isViewing() {
