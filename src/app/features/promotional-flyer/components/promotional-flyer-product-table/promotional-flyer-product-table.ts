@@ -700,6 +700,18 @@ export class PromotionalFlyerProductTable {
     const pricesOnly = competitorPriceValues.filter((price) => price > 0);
     const lowestCompetitorPrice = pricesOnly.length > 0 ? Math.min(...pricesOnly) : 0;
 
+    const finalCost =
+      transformToNumberValue(shippingPrice.value ?? 0) +
+      transformToNumberValue(quoteCost.value ?? 0);
+
+    const productMarginValue = transformToNumberValue(productMargin.value ?? 0);
+
+    let suggestedPrice = 0;
+    if (productMarginValue) {
+      suggestedPrice = finalCost * (1 + productMarginValue / 100);
+      suggestedSalePriceWithMargin.setValue(suggestedPrice, { emitEvent: false });
+    }
+
     if (!lowestCompetitorPrice) {
       warningPriceText.setValue('Não informado preço dos concorrentes.');
       if (warningType.value !== EnumWarningProductType.NoCompetitorPrice) {
@@ -714,9 +726,7 @@ export class PromotionalFlyerProductTable {
       return;
     }
 
-    const finalCost =
-      transformToNumberValue(shippingPrice.value ?? 0) +
-      transformToNumberValue(quoteCost.value ?? 0);
+    if (!productMarginValue) return;
 
     if (finalCost >= lowestCompetitorPrice) {
       warningPriceText.setValue('Preço do concorrente menor ou igual ao custo.');
@@ -737,12 +747,6 @@ export class PromotionalFlyerProductTable {
         .updateWarningType(this.flyerId(), productId.value, undefined)
         .subscribe();
     }
-
-    const productMarginValue = transformToNumberValue(productMargin.value ?? 0);
-    if (!productMarginValue) return;
-
-    const suggestedPrice = finalCost * (1 + productMarginValue / 100);
-    suggestedSalePriceWithMargin.setValue(suggestedPrice, { emitEvent: false });
 
     const competitorMargin = (1 - finalCost / lowestCompetitorPrice) * 100;
     const marginRule = this.suggestedPriceSettingsList.find(

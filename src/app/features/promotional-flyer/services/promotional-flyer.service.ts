@@ -42,7 +42,7 @@ export class PromotionalFlyerService {
     return this.repository.sendPricesToErp(flyerId, productId);
   }
 
-  applySuggestedPrices(flyerId: number, onlyCompetitorPriceZero: boolean = true) {
+  applySuggestedPrices(flyerId: number, onlyCompetitorPriceZero: boolean = false) {
     return this.repository.applySuggestedPrices(flyerId, onlyCompetitorPriceZero);
   }
 
