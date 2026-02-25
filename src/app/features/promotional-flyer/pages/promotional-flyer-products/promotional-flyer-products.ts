@@ -17,6 +17,7 @@ import { IUserPermission } from 'src/app/core/models/user-permission.model';
 import { UserPermissionService } from 'src/app/features/user-permission/user-permission.service';
 import { AuthService } from 'src/app/features/auth/services/auth.service';
 import { MatIcon } from '@angular/material/icon';
+import { EnumFilterPromotionalFlyerProducts } from 'src/app/core/enums/product.enum';
 
 @Component({
   selector: 'app-promotional-flyer-products',
@@ -39,10 +40,11 @@ export class PromotionalFlyerProducts {
   userPermissions: IUserPermission | null = null;
   loading = inject(LoadingService).loading;
   flyerInfo = signal<IPromotionalFlyerView | undefined>(undefined);
+  readonly FilterPromotionalFlyerProductsEnum = EnumFilterPromotionalFlyerProducts;
   id = signal<number>(0);
 
   @ViewChild(PromotionalFlyerProductTable)
-  flyerTable!: PromotionalFlyerProductTable;
+  flyerTable: PromotionalFlyerProductTable | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -92,7 +94,7 @@ export class PromotionalFlyerProducts {
       })
       .afterClosed()
       .subscribe(() => {
-        this.flyerTable.loadData();
+        this?.flyerTable?.loadData();
       });
   }
 
@@ -105,7 +107,10 @@ export class PromotionalFlyerProducts {
         data: {
           titleText: 'Utilizar preço sugerido',
           messageText:
-            'Utilizar o preço de venda sugerido e o preço fidelidade sugerido em todos os itens?',
+            this?.flyerTable?.selectedFilterType() ===
+            EnumFilterPromotionalFlyerProducts.NoCompetitorPrice
+              ? 'Utilizar o preço de venda e o preço fidelidade sugerido? (SOMENTE NOS ITENS QUE NÃO POSSUEM PREÇO DOS CONCORRENTES)'
+              : 'Utilizar o preço de venda e o preço fidelidade sugerido? (SOMENTE NOS ITENS QUE POSSUEM PREÇO DOS CONCORRENTES NA LOJA VINCULADA)',
           confirmationText: 'Sim',
           cancelText: 'Não',
           confirmationColor: 'var(--primary)',
@@ -114,17 +119,23 @@ export class PromotionalFlyerProducts {
       .afterClosed()
       .subscribe((confirmation) => {
         if (confirmation) {
-          this.promotionalFlyerService.applySuggestedPrices(this.id()).subscribe({
-            next: () => {
-              this.flyerTable.reload();
-              this.notificationService.showSuccess(`Preços atualizados com sucesso!`);
-            },
-            error: (err) => {
-              this.notificationService.showError(
-                `Erro ao utilizar preços sugeridos: ${err.message || err}`,
-              );
-            },
-          });
+          this.promotionalFlyerService
+            .applySuggestedPrices(
+              this.id(),
+              this?.flyerTable?.selectedFilterType() ===
+                EnumFilterPromotionalFlyerProducts.NoCompetitorPrice,
+            )
+            .subscribe({
+              next: () => {
+                this?.flyerTable?.reload();
+                this.notificationService.showSuccess(`Preços atualizados com sucesso!`);
+              },
+              error: (err) => {
+                this.notificationService.showError(
+                  `Erro ao utilizar preços sugeridos: ${err.message || err}`,
+                );
+              },
+            });
         }
       });
   }

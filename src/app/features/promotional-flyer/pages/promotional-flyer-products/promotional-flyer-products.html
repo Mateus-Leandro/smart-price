@@ -32,13 +32,29 @@
           <div fxLayout="column" fxLayoutGap="25px" fxLayoutAlign="start end">
             <div fxLayout="row" fxLayoutGap="5px">
               <app-button
-                tooltipText="Mover preço sugerido para preço de venda e preço fidelidade"
-                bgColor="var(--font-primary)"
-                textColor="var(--primary)"
+                [tooltipText]="
+                  flyerTable?.selectedFilterType() ===
+                  FilterPromotionalFlyerProductsEnum.NoCompetitorPrice
+                    ? 'Mover preço sugerido para preço de venda e preço fidelidade (SOMENTE PARA OS ITENS SEM PREÇO DOS CONCORRENTES NA LOJA VINCULADA)'
+                    : 'Mover preço sugerido para preço de venda e preço fidelidade (SOMENTE PARA OS ITENS COM PREÇO DOS CONCORRENTES NA LOJA VINCULADA)'
+                "
+                [bgColor]="
+                  flyerTable?.selectedFilterType() ===
+                  FilterPromotionalFlyerProductsEnum.NoCompetitorPrice
+                    ? 'var(--error-color)'
+                    : 'var(--font-primary)'
+                "
+                [textColor]="
+                  flyerTable?.selectedFilterType() ===
+                  FilterPromotionalFlyerProductsEnum.NoCompetitorPrice
+                    ? 'var(--font-primary)'
+                    : 'var(--primary)'
+                "
                 icon="currency_exchange"
                 text="Utilizar preço sugerido"
                 (click)="aplySuggestedPrice()"
               />
+
               <app-button
                 icon="settings"
                 text="Regras de Precificação"
