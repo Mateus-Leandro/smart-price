@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import {
+  IDeleteAllCompetitorPriceByFlyerId,
   IDeleteCompetitorPriceFlyerProduct,
   IUpsertCompetitorPriceFlyerProduct,
 } from 'src/app/core/models/competitor_price_flyer_products.model';
@@ -20,5 +21,11 @@ export class CompetitorPriceFlyerProductService {
     deleteCompetitorPriceFlyerProduct: IDeleteCompetitorPriceFlyerProduct,
   ) {
     return this.repository.deleteCompetitorPriceFlyerProduct(deleteCompetitorPriceFlyerProduct);
+  }
+
+  deleteAllcompetitorPriceByFlyerId(
+    deleteAllCompetitorPriceByFlyerId: IDeleteAllCompetitorPriceByFlyerId,
+  ) {
+    return this.repository.deleteAllcompetitorPriceByFlyerId(deleteAllCompetitorPriceByFlyerId);
   }
 }

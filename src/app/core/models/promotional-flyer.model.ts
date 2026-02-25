@@ -57,3 +57,9 @@ export interface IPromotionalFlyerProductsView {
   };
   competitorPrices: IPromotionalFlyerCompetitorPrices[];
 }
+
+export interface ClearPriceResult {
+  clearSalePrice: boolean;
+  clearLoyaltyPrice: boolean;
+  clearCompetitorPrice: boolean;
+}

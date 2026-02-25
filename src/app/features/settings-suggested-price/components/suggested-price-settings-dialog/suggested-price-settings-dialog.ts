@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, inject, OnInit, signal } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import {
   FormBuilder,
@@ -8,7 +8,12 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import {
+  MAT_DIALOG_DATA,
+  MatDialog,
+  MatDialogModule,
+  MatDialogRef,
+} from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -27,8 +32,21 @@ import { Spinner } from 'src/app/shared/components/spinner/spinner';
 import { IconButton } from 'src/app/shared/components/icon-button/icon-button';
 import { ConfirmationDialog } from 'src/app/shared/components/confirmation-dialog/confirmation-dialog';
 import { CompanySettingsService } from 'src/app/features/company-settings/services/company-settings.service';
+import { PromotionalFlyerClearPriceDialog } from '../promotional-flyer-clear-price-dialog/promotional-flyer-clear-price-dialog';
+import {
+  ClearPriceResult,
+  IPromotionalFlyerView,
+} from 'src/app/core/models/promotional-flyer.model';
+import { PromotionalFlyerService } from 'src/app/features/promotional-flyer/services/promotional-flyer.service';
+import { CompetitorPriceFlyerProductService } from 'src/app/features/competitor-price-flyer-product/competitor-price-flyer-product.service';
+import { forkJoin, of } from 'rxjs';
 
 type FormState = 'view' | 'create' | 'edit';
+
+interface DialogData {
+  flyerInfo: IPromotionalFlyerView;
+  companyId: number;
+}
 
 @Component({
   selector: 'app-settings-suggested-price-dialog',
@@ -60,6 +78,9 @@ export class SuggestedPriceSettingsDialog implements OnInit {
     private dialog: MatDialog,
     private cdr: ChangeDetectorRef,
     private companySettings: CompanySettingsService,
+    private promotionalFlyerService: PromotionalFlyerService,
+    private competitorPriceFlyerProductsService: CompetitorPriceFlyerProductService,
+    @Inject(MAT_DIALOG_DATA) public data: DialogData,
   ) {}
 
   dialogRef = inject(MatDialogRef<SuggestedPriceSettingsDialog>);
@@ -268,6 +289,51 @@ export class SuggestedPriceSettingsDialog implements OnInit {
       const existingMax = Number(rule.marginMax);
       return newMin <= existingMax && newMax >= existingMin;
     });
+  }
+
+  openClearPriceDialog() {
+    const { companyId, flyerInfo } = this.data || {};
+    const flyerId = flyerInfo?.id;
+    const integralId = flyerInfo?.idIntegral;
+
+    if (!companyId || !flyerId || !integralId) return;
+
+    this.dialog
+      .open<PromotionalFlyerClearPriceDialog, { flyerId: number }, ClearPriceResult>(
+        PromotionalFlyerClearPriceDialog,
+        { width: '600px', data: { flyerId } },
+      )
+      .afterClosed()
+      .subscribe((clearValues) => {
+        if (!clearValues) return;
+
+        const { clearSalePrice, clearLoyaltyPrice, clearCompetitorPrice } = clearValues;
+
+        // Define as tarefas
+        const tasks$ = {
+          prices:
+            clearSalePrice || clearLoyaltyPrice
+              ? this.promotionalFlyerService.clearPrices(clearValues, flyerId)
+              : of(null),
+
+          competitors: clearCompetitorPrice
+            ? this.competitorPriceFlyerProductsService.deleteAllcompetitorPriceByFlyerId({
+                companyId,
+                integralFlyerId: integralId,
+              })
+            : of(null),
+        };
+
+        // Executa ambas em paralelo e espera o fim de todas
+        forkJoin(tasks$).subscribe({
+          next: () => {
+            this.notificationService.showSuccess('Preços removidos corretamente');
+          },
+          error: (err) => {
+            this.notificationService.showError(`Erro ao remover preços: ${err?.message || err}`);
+          },
+        });
+      });
   }
 
   get isViewing() {
