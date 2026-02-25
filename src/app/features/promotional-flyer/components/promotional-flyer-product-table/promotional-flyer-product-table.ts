@@ -713,7 +713,11 @@ export class PromotionalFlyerProductTable {
     if (!lowestCompetitorPrice) {
       warningPriceText.setValue('Não informado preço dos concorrentes.');
       this.promotionalFlyerService
-        .updateWarningType(this.flyerId(), productId.value, undefined)
+        .updateWarningType(
+          this.flyerId(),
+          productId.value,
+          EnumWarningProductType.NoCompetitorPrice,
+        )
         .subscribe();
       return;
     }

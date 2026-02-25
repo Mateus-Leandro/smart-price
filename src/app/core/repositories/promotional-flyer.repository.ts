@@ -162,8 +162,8 @@ export class PromotionalFlyerRepository {
           query = query.eq('warning_type', EnumFilterPromotionalFlyerProducts.CompetitorPrice);
           break;
 
-        case EnumFilterPromotionalFlyerProducts.NoCompetingPrice:
-          query = query.is('product.competitorPrices', null);
+        case EnumFilterPromotionalFlyerProducts.NoCompetitorPrice:
+          query = query.eq('warning_type', EnumFilterPromotionalFlyerProducts.NoCompetitorPrice);
           break;
 
         case EnumFilterPromotionalFlyerProducts.SupplierDeliveryFree:
