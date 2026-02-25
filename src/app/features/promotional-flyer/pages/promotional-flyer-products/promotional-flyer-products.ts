@@ -91,6 +91,10 @@ export class PromotionalFlyerProducts {
         width: '800px',
         disableClose: false,
         autoFocus: true,
+        data: {
+          flyerInfo: this.flyerInfo(),
+          companyId: this.flyerTable?.companyId,
+        },
       })
       .afterClosed()
       .subscribe(() => {

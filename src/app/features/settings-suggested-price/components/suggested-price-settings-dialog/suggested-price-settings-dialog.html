@@ -17,23 +17,36 @@
       <span style="font-weight: bold; color: black">
         Porcentagem de acréscimo no preço de venda sugerido
       </span>
-      <mat-form-field appearance="outline" style="width: 200px; padding-top: 15px">
-        <mat-label>% de acréscimo</mat-label>
-        <input
-          matInput
-          [formControl]="increasePricePercentControl"
-          mask="separator.2"
-          maxlength="8"
-          suffix=" %"
-          decimalMarker=","
-          [dropSpecialCharacters]="true"
-          (blur)="saveIncreasePricePercent()"
-          placeholder="0,00"
+      <div fxLayout="row" fxLayoutAlign="space-between center">
+        <mat-form-field appearance="outline" style="width: 200px; padding-top: 15px">
+          <mat-label>% de acréscimo</mat-label>
+          <input
+            matInput
+            [formControl]="increasePricePercentControl"
+            mask="separator.2"
+            maxlength="8"
+            suffix=" %"
+            decimalMarker=","
+            [dropSpecialCharacters]="true"
+            (blur)="saveIncreasePricePercent()"
+            placeholder="0,00"
+          />
+          @if (increasePricePercentControl.touched && increasePricePercentControl.hasError('max')) {
+            <mat-error>Acréscimo maior que 100</mat-error>
+          }
+        </mat-form-field>
+        <app-button
+          icon="money_off"
+          bgColor="var(--error-color)"
+          text="Remover Preços Informados"
+          [tooltipText]="
+            'Clique aqui e selecione quais preços deseja remover da cotação ' +
+            data.flyerInfo.idIntegral +
+            '.'
+          "
+          (click)="openClearPriceDialog()"
         />
-        @if (increasePricePercentControl.touched && increasePricePercentControl.hasError('max')) {
-          <mat-error>Acréscimo maior que 100</mat-error>
-        }
-      </mat-form-field>
+      </div>
 
       <div fxLayout="row" fxLayoutGap="5px" style="padding-bottom: 15px">
         <mat-icon style="font-size: 18px; width: 18px; height: 18px">info</mat-icon>

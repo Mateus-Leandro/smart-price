@@ -57,4 +57,8 @@ export class PromotionalFlyerService {
   updateWarningType(flyerId: number, productId: number, warningType?: EnumWarningProductType) {
     return this.repository.updateWarningType(flyerId, productId, warningType);
   }
+
+  clearPrices(clearValues: any, flyerId: number) {
+    return this.repository.clearPrices(clearValues, flyerId);
+  }
 }

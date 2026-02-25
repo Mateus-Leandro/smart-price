@@ -1,0 +1,51 @@
+<div mat-dialog-title fxLayout="column" fxLayoutGap.gt-lg="10px">
+  <span>Remover preços informados na cotação</span>
+  <mat-divider />
+</div>
+
+<mat-dialog-content>
+  <form [formGroup]="clearPriceFormGroup">
+    <div fxLayout="column" fxLayoutGap="15px">
+      <h3 style="color: black">Selecione os preços que deseja remover:</h3>
+      <div fxLayout="column" fxLayoutGap="6px">
+        <app-checkbox checkboxText="Remover novo preço de venda" formControlName="clearSalePrice" />
+        <app-checkbox
+          checkboxText="Remover novo preço fidelidade"
+          formControlName="clearLoyaltyPrice"
+        />
+        <app-checkbox
+          checkboxText="Remover preço dos concorrentes"
+          formControlName="clearCompetitorPrice"
+        />
+      </div>
+      @if (clearCompetitorPrice) {
+        <div fxLayout="row" fxLayoutGap="5px" style="color: var(--error-color)">
+          <mat-icon style="font-size: 18px; width: 30px; height: 30px">warning</mat-icon>
+          <span class="mat-caption" style="font-weight: 500"
+            >Ao marcar para remover o preço dos concorrentes, ele será removido em todas as lojas da
+            cotação selecionada.</span
+          >
+        </div>
+      }
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <div fxLayout="row" fxLayoutGap="10px">
+    <app-button
+      text="Cancelar"
+      type="button"
+      bgColor="var(--ripple-color)"
+      textColor="var(--primary)"
+      (click)="dialogRef.close()"
+    />
+    <app-button
+      text="Remover Preços"
+      type="button"
+      bgColor="var(--cancel-color)"
+      (click)="submit()"
+      [disabled]="clearPriceFormGroup.invalid"
+    />
+  </div>
+</mat-dialog-actions>

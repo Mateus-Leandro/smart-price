@@ -335,4 +335,31 @@ export class PromotionalFlyerRepository {
       }),
     );
   }
+
+  clearPrices(clearValues: any, flyerId: number) {
+    let updateColuns = [];
+
+    if (clearValues.clearSalePrice) {
+      updateColuns.push({
+        sale_price: 0,
+      });
+    }
+
+    if (clearValues.clearLoyaltyPrice) {
+      updateColuns.push({
+        loyalty_price: 0,
+      });
+    }
+
+    return from(
+      this.supabase
+        .from('promotional_flyer_products')
+        .update(updateColuns)
+        .eq('promotional_flyer_id', flyerId),
+    ).pipe(
+      map(({ error }) => {
+        if (error) throw error;
+      }),
+    );
+  }
 }

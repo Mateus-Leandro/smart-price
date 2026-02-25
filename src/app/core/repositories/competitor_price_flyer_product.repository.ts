@@ -3,6 +3,7 @@ import { SupabaseClient } from '@supabase/supabase-js';
 import { SupabaseService } from 'src/app/shared/services/supabase.service';
 import { from, map } from 'rxjs';
 import {
+  IDeleteAllCompetitorPriceByFlyerId,
   IDeleteCompetitorPriceFlyerProduct,
   IUpsertCompetitorPriceFlyerProduct,
 } from '../models/competitor_price_flyer_products.model';
@@ -57,6 +58,22 @@ export class CompetitorPriceFlyerProductRepository {
       map(({ data, error }) => {
         if (error) throw error;
         return data;
+      }),
+    );
+  }
+
+  deleteAllcompetitorPriceByFlyerId(
+    deleteAllCompetitorPriceByFlyerId: IDeleteAllCompetitorPriceByFlyerId,
+  ) {
+    return from(
+      this.supabase
+        .from('competitor_price_flyer_products')
+        .delete()
+        .eq('integral_flyer_id', deleteAllCompetitorPriceByFlyerId.integralFlyerId)
+        .eq('company_id', deleteAllCompetitorPriceByFlyerId.companyId),
+    ).pipe(
+      map(({ error }) => {
+        if (error) throw error;
       }),
     );
   }

@@ -13,6 +13,11 @@ export interface IDeleteCompetitorPriceFlyerProduct {
   competitorId: number;
   companyId: number;
 }
+
+export interface IDeleteAllCompetitorPriceByFlyerId {
+  integralFlyerId: number;
+  companyId: number;
+}
 export interface IUpsertCompetitorPriceFlyerProduct extends IDeleteCompetitorPriceFlyerProduct {
   price: number;
 }
