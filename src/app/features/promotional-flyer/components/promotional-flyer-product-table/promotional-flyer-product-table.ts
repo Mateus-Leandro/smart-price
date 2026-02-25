@@ -742,16 +742,6 @@ export class PromotionalFlyerProductTable {
       return;
     }
 
-    if (warningType.value) {
-      this.promotionalFlyerService
-        .updateWarningType(this.flyerId(), productId.value, undefined)
-        .subscribe();
-
-      warningType.setValue(null, { emitEvent: false });
-    }
-
-    if (!productMarginValue) return;
-
     const competitorMargin = (1 - finalCost / lowestCompetitorPrice) * 100;
     const marginRule = this.suggestedPriceSettingsList.find(
       (marginSetting) =>
@@ -772,7 +762,12 @@ export class PromotionalFlyerProductTable {
           )
           .subscribe();
       }
+    } else {
+      this.promotionalFlyerService.updateWarningType(this.flyerId(), productId.value).subscribe();
+      warningType.setValue(null, { emitEvent: false });
     }
+
+    if (!productMarginValue) return;
 
     let suggestedPriceAfterDiscountPercent = suggestedPrice;
 
