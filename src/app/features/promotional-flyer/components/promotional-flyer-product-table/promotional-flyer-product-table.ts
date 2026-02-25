@@ -694,16 +694,6 @@ export class PromotionalFlyerProductTable {
     suggestedLoyaltyPrice.setValue(null, { emitEvent: false });
     warningPriceText.setValue(null);
 
-    const productMarginValue = transformToNumberValue(productMargin.value ?? 0);
-    if (!productMarginValue) return;
-
-    const finalCost =
-      transformToNumberValue(shippingPrice.value ?? 0) +
-      transformToNumberValue(quoteCost.value ?? 0);
-
-    const suggestedPrice = finalCost * (1 + productMarginValue / 100);
-    suggestedSalePriceWithMargin.setValue(suggestedPrice, { emitEvent: false });
-
     const competitorPriceValues = linkedCompetitorPrices.value.map((value) => {
       return transformToNumberValue(value ?? '0');
     });
@@ -712,15 +702,21 @@ export class PromotionalFlyerProductTable {
 
     if (!lowestCompetitorPrice) {
       warningPriceText.setValue('Não informado preço dos concorrentes.');
-      this.promotionalFlyerService
-        .updateWarningType(
-          this.flyerId(),
-          productId.value,
-          EnumWarningProductType.NoCompetitorPrice,
-        )
-        .subscribe();
+      if (warningType.value !== EnumWarningProductType.NoCompetitorPrice) {
+        this.promotionalFlyerService
+          .updateWarningType(
+            this.flyerId(),
+            productId.value,
+            EnumWarningProductType.NoCompetitorPrice,
+          )
+          .subscribe();
+      }
       return;
     }
+
+    const finalCost =
+      transformToNumberValue(shippingPrice.value ?? 0) +
+      transformToNumberValue(quoteCost.value ?? 0);
 
     if (finalCost >= lowestCompetitorPrice) {
       warningPriceText.setValue('Preço do concorrente menor ou igual ao custo.');
@@ -735,6 +731,18 @@ export class PromotionalFlyerProductTable {
       }
       return;
     }
+
+    if (warningType.value) {
+      this.promotionalFlyerService
+        .updateWarningType(this.flyerId(), productId.value, undefined)
+        .subscribe();
+    }
+
+    const productMarginValue = transformToNumberValue(productMargin.value ?? 0);
+    if (!productMarginValue) return;
+
+    const suggestedPrice = finalCost * (1 + productMarginValue / 100);
+    suggestedSalePriceWithMargin.setValue(suggestedPrice, { emitEvent: false });
 
     const competitorMargin = (1 - finalCost / lowestCompetitorPrice) * 100;
     const marginRule = this.suggestedPriceSettingsList.find(
@@ -756,10 +764,6 @@ export class PromotionalFlyerProductTable {
           )
           .subscribe();
       }
-    } else {
-      this.promotionalFlyerService
-        .updateWarningType(this.flyerId(), productId.value, undefined)
-        .subscribe();
     }
 
     let suggestedPriceAfterDiscountPercent = suggestedPrice;
