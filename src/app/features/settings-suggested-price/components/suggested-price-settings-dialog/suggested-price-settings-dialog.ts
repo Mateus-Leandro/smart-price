@@ -301,7 +301,7 @@ export class SuggestedPriceSettingsDialog implements OnInit {
     this.dialog
       .open<PromotionalFlyerClearPriceDialog, { flyerId: number }, ClearPriceResult>(
         PromotionalFlyerClearPriceDialog,
-        { width: '600px', data: { flyerId } },
+        { width: '600px', data: { flyerId }, autoFocus: false },
       )
       .afterClosed()
       .subscribe((clearValues) => {
