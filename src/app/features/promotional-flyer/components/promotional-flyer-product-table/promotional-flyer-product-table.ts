@@ -172,7 +172,6 @@ export class PromotionalFlyerProductTable {
   filterOptions: IFilterOptions<EnumFilterPromotionalFlyerProducts>[] =
     getPromotionalFlyerProductsFilterOptions();
   selectedFilterType = signal<null | EnumFilterPromotionalFlyerProducts>(null);
-
   paginatorDataSource: IDefaultPaginatorDataSource<IPromotionalFlyerProductsView> = {
     pageIndex: 0,
     pageSize: 10,
@@ -207,6 +206,8 @@ export class PromotionalFlyerProductTable {
     });
     effect(() => {
       const filterValue = this.selectedFilterType();
+      this.paginatorDataSource.pageIndex = 0;
+      this.paginatorDataSource.pageSize = 10;
       this.reload(filterValue);
     });
   }
@@ -819,17 +820,15 @@ export class PromotionalFlyerProductTable {
     }
 
     const actualDiscountPercent = priceDiscountPercent?.value || 0;
-    if ((marginRule?.discountPercent || 0) !== actualDiscountPercent) {
+    const discountPercent =
+      lowestCompetitorPrice < suggestedPrice ? marginRule?.discountPercent || 0 : 0;
+    if (discountPercent !== actualDiscountPercent) {
       this.promotionalFlyerService
-        .updatePriceDiscountPercent(
-          this.flyerId(),
-          productId.value,
-          marginRule?.discountPercent || 0,
-        )
+        .updatePriceDiscountPercent(this.flyerId(), productId.value, discountPercent)
         .subscribe();
     }
 
-    priceDiscountPercent.setValue(marginRule?.discountPercent || 0);
+    priceDiscountPercent.setValue(discountPercent);
   }
 
   private setObservables(rowForm: FlyerRowForm) {
