@@ -751,6 +751,18 @@ export class PromotionalFlyerProductTable {
 
     const loyaltyPriceValue = transformToNumberValue(actualLoyaltyPrice.value ?? 0);
 
+    const actualDiscountPercent = priceDiscountPercent?.value || 0;
+    const discountPercent =
+      lowestCompetitorPrice < suggestedPrice ? marginRule?.discountPercent || 0 : 0;
+
+    if (discountPercent !== actualDiscountPercent) {
+      this.promotionalFlyerService
+        .updatePriceDiscountPercent(this.flyerId(), productId.value, discountPercent)
+        .subscribe();
+    }
+
+    priceDiscountPercent.setValue(discountPercent);
+
     if (competitorMargin < 7) {
       warningPriceText.setValue('Margem do concorrente menor que 7%.');
 
@@ -763,6 +775,8 @@ export class PromotionalFlyerProductTable {
           )
           .subscribe();
       }
+
+      return;
     } else {
       this.promotionalFlyerService.updateWarningType(this.flyerId(), productId.value).subscribe();
       warningType.setValue(null, { emitEvent: false });
@@ -818,17 +832,6 @@ export class PromotionalFlyerProductTable {
         );
       }
     }
-
-    const actualDiscountPercent = priceDiscountPercent?.value || 0;
-    const discountPercent =
-      lowestCompetitorPrice < suggestedPrice ? marginRule?.discountPercent || 0 : 0;
-    if (discountPercent !== actualDiscountPercent) {
-      this.promotionalFlyerService
-        .updatePriceDiscountPercent(this.flyerId(), productId.value, discountPercent)
-        .subscribe();
-    }
-
-    priceDiscountPercent.setValue(discountPercent);
   }
 
   private setObservables(rowForm: FlyerRowForm) {
