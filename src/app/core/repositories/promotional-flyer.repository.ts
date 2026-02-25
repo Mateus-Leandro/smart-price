@@ -265,9 +265,14 @@ export class PromotionalFlyerRepository {
     );
   }
 
-  applySuggestedPrices(flyerId: number) {
+  applySuggestedPrices(flyerId: number, onlyCompetitorPriceZero: boolean = false) {
     this.loadingService.show();
-    return from(this.supabase.rpc('apply_suggested_prices', { p_flyer_id: flyerId })).pipe(
+    return from(
+      this.supabase.rpc('apply_suggested_prices', {
+        p_flyer_id: flyerId,
+        p_only_zero_comp_price: onlyCompetitorPriceZero,
+      }),
+    ).pipe(
       map(({ error }) => {
         if (error) throw error;
       }),
