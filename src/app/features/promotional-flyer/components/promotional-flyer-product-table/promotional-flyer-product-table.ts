@@ -723,10 +723,9 @@ export class PromotionalFlyerProductTable {
           )
           .subscribe();
       }
+      warningType.setValue(EnumWarningProductType.NoCompetitorPrice, { emitEvent: false });
       return;
     }
-
-    if (!productMarginValue) return;
 
     if (finalCost >= lowestCompetitorPrice) {
       warningPriceText.setValue('Preço do concorrente menor ou igual ao custo.');
@@ -738,6 +737,7 @@ export class PromotionalFlyerProductTable {
             EnumWarningProductType.CompetitorPrice,
           )
           .subscribe();
+        warningType.setValue(EnumWarningProductType.CompetitorPrice, { emitEvent: false });
       }
       return;
     }
@@ -746,7 +746,11 @@ export class PromotionalFlyerProductTable {
       this.promotionalFlyerService
         .updateWarningType(this.flyerId(), productId.value, undefined)
         .subscribe();
+
+      warningType.setValue(null, { emitEvent: false });
     }
+
+    if (!productMarginValue) return;
 
     const competitorMargin = (1 - finalCost / lowestCompetitorPrice) * 100;
     const marginRule = this.suggestedPriceSettingsList.find(
