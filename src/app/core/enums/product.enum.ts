@@ -14,12 +14,13 @@ export enum MarginFilterEnum {
 export enum EnumWarningProductType {
   CompetitorMargin = 'COMPETITOR_MARGIN',
   CompetitorPrice = 'COMPETITOR_PRICE',
+  NoCompetitorPrice = 'NO_COMPETITOR_PRICE',
 }
 
 export enum EnumFilterPromotionalFlyerProducts {
   NoSalePrice = 'NoSalePrice',
   NoLoyaltyPrice = 'NoLoyaltyPrice',
-  NoCompetingPrice = 'NoCompetingPrice',
+  NoCompetitorPrice = EnumWarningProductType.NoCompetitorPrice,
   NoImported = 'NoImported',
   CompetitorMargin = EnumWarningProductType.CompetitorMargin,
   CompetitorPrice = EnumWarningProductType.CompetitorPrice,
@@ -39,7 +40,7 @@ export function getPromotionalFlyerProductsFilterOptions(): IFilterOptions<EnumF
     },
     {
       label: 'Sem Preço dos Concorrentes',
-      value: EnumFilterPromotionalFlyerProducts.NoCompetingPrice,
+      value: EnumWarningProductType.NoCompetitorPrice,
     },
     {
       label: 'Preço do Concorrente <= Custo',
