@@ -71,6 +71,22 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'supplier_flyer',
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./features/supplier-flyer/pages/supplier-flyer/supplier-flyer').then(
+            (m) => m.SupplierFlyer,
+          ),
+      },
+      {
+        path: 'supplier_flyer/:id',
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./features/supplier-flyer/pages/supplier-flyer-products/supplier-flyer-products').then(
+            (m) => m.SupplierFlyerProducts,
+          ),
+      },
+      {
         path: 'products',
         canActivate: [authGuard],
         loadComponent: () =>

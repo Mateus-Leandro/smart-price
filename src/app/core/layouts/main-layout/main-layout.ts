@@ -56,6 +56,11 @@ export class MainLayout {
       icon: 'query_stats',
     },
     {
+      router: '/supplier_flyer',
+      textNav: 'Tabela de Fornecedores',
+      icon: 'assignment',
+    },
+    {
       router: '/products',
       textNav: 'Produtos',
       icon: 'shopping_cart',
