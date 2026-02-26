@@ -25,6 +25,7 @@ export enum EnumFilterPromotionalFlyerProducts {
   CompetitorMargin = EnumWarningProductType.CompetitorMargin,
   CompetitorPrice = EnumWarningProductType.CompetitorPrice,
   SupplierDeliveryPaid = EnumSupplierDeliveryTypeEnum.BH,
+  SupplierDeliveryPaidNoDeliveryValue = 'NoDeliveryValue',
   SupplierDeliveryFree = EnumSupplierDeliveryTypeEnum.PORTA,
 }
 
@@ -55,12 +56,16 @@ export function getPromotionalFlyerProductsFilterOptions(): IFilterOptions<EnumF
       value: EnumFilterPromotionalFlyerProducts.NoImported,
     },
     {
-      label: 'Sem Frete (Fornecedor Porta)',
+      label: 'Fornecedor Porta',
       value: EnumSupplierDeliveryTypeEnum.PORTA,
     },
     {
-      label: 'Com Frete (Fornecedor BH)',
+      label: 'Fornecedor BH - Com Frete',
       value: EnumSupplierDeliveryTypeEnum.BH,
+    },
+    {
+      label: 'Fornecedor BH - Sem Frete',
+      value: EnumFilterPromotionalFlyerProducts.SupplierDeliveryPaidNoDeliveryValue,
     },
   ];
 }

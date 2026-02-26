@@ -171,7 +171,15 @@ export class PromotionalFlyerRepository {
           break;
 
         case EnumFilterPromotionalFlyerProducts.SupplierDeliveryPaid:
-          query = query.eq('supplier.delivery_type', EnumSupplierDeliveryTypeEnum.BH);
+          query = query
+            .eq('supplier.delivery_type', EnumSupplierDeliveryTypeEnum.BH)
+            .or('quote_supplier_shipping_price.gt.0');
+          break;
+
+        case EnumFilterPromotionalFlyerProducts.SupplierDeliveryPaidNoDeliveryValue:
+          query = query
+            .eq('supplier.delivery_type', EnumSupplierDeliveryTypeEnum.BH)
+            .or('quote_supplier_shipping_price.eq.0,quote_supplier_shipping_price.is.null');
           break;
       }
     }
