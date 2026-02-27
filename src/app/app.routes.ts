@@ -9,7 +9,12 @@ export const routes: Routes = [
     path: '',
     component: MainLayout,
     children: [
-      { path: '', redirectTo: 'promotional_flyer', pathMatch: 'full' },
+      {
+        path: '',
+        redirectTo: 'promotional_flyer/quote',
+        pathMatch: 'full',
+        data: { type: 'quote' },
+      },
       {
         path: 'company_branches',
         canActivate: [authGuard],

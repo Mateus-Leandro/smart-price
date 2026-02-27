@@ -68,7 +68,7 @@ export class Login {
       .pipe()
       .subscribe({
         next: () => {
-          this.router.navigate(['/promotional_flyer']);
+          this.router.navigate(['/promotional_flyer/quote']);
         },
         error: (err) => {
           this.notificationService.showError(
