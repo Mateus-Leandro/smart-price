@@ -1,13 +1,18 @@
-import { Component, inject } from '@angular/core';
+import { Component, Inject, inject } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { Checkbox } from 'src/app/shared/components/checkbox/checkbox';
 import { Button } from 'src/app/shared/components/button/button';
 import { MatDivider } from '@angular/material/divider';
 import { OneCheckboxCheckedValidator } from 'src/app/shared/validators/one-checkbox-checked.validator';
-import { ClearPriceResult } from 'src/app/core/models/promotional-flyer.model';
+import { ClearPriceResult, TFlyerType } from 'src/app/core/models/promotional-flyer.model';
 import { MatIconModule } from '@angular/material/icon';
+
+interface DialogData {
+  fleyrId: number;
+  flyerType: TFlyerType;
+}
 
 @Component({
   selector: 'app-promotional-flyer-clear-price-dialog',
@@ -27,7 +32,10 @@ export class PromotionalFlyerClearPriceDialog {
   clearPriceFormGroup: FormGroup;
   dialogRef = inject(MatDialogRef<PromotionalFlyerClearPriceDialog, ClearPriceResult>);
 
-  constructor(private fb: FormBuilder) {
+  constructor(
+    private fb: FormBuilder,
+    @Inject(MAT_DIALOG_DATA) public data: DialogData,
+  ) {
     this.clearPriceFormGroup = this.fb.group(
       {
         clearSalePrice: [false, { nonNullable: true }],

@@ -36,11 +36,13 @@ import { PromotionalFlyerClearPriceDialog } from '../promotional-flyer-clear-pri
 import {
   ClearPriceResult,
   IPromotionalFlyerView,
+  TFlyerType,
 } from 'src/app/core/models/promotional-flyer.model';
 import { PromotionalFlyerService } from 'src/app/features/promotional-flyer/services/promotional-flyer.service';
 import { CompetitorPriceFlyerProductService } from 'src/app/features/competitor-price-flyer-product/competitor-price-flyer-product.service';
 import { forkJoin, of } from 'rxjs';
 import { CompetitorType } from 'src/app/core/models/competitor';
+import { SupplierFlyerService } from 'src/app/features/supplier-flyer/services/supplier-flyer.service';
 
 type FormState = 'view' | 'create' | 'edit';
 
@@ -48,6 +50,7 @@ interface DialogData {
   flyerInfo: IPromotionalFlyerView;
   companyId: number;
   competitorType: CompetitorType;
+  flyerType: TFlyerType;
 }
 
 @Component({
@@ -81,6 +84,7 @@ export class SuggestedPriceSettingsDialog implements OnInit {
     private cdr: ChangeDetectorRef,
     private companySettings: CompanySettingsService,
     private promotionalFlyerService: PromotionalFlyerService,
+    private supplierFlyerService: SupplierFlyerService,
     private competitorPriceFlyerProductsService: CompetitorPriceFlyerProductService,
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
   ) {}
@@ -297,14 +301,20 @@ export class SuggestedPriceSettingsDialog implements OnInit {
     const { companyId, flyerInfo } = this.data || {};
     const flyerId = flyerInfo?.id;
     const integralId = flyerInfo?.idIntegral;
+    const flyerType = this.data.flyerType;
 
     if (!companyId || !flyerId || !integralId) return;
 
     this.dialog
-      .open<PromotionalFlyerClearPriceDialog, { flyerId: number }, ClearPriceResult>(
+      .open<
         PromotionalFlyerClearPriceDialog,
-        { width: '600px', data: { flyerId }, autoFocus: false },
-      )
+        { flyerId: number; flyerType: TFlyerType },
+        ClearPriceResult
+      >(PromotionalFlyerClearPriceDialog, {
+        width: '600px',
+        data: { flyerId, flyerType },
+        autoFocus: false,
+      })
       .afterClosed()
       .subscribe((clearValues) => {
         if (!clearValues) return;
@@ -315,7 +325,7 @@ export class SuggestedPriceSettingsDialog implements OnInit {
         const tasks$ = {
           prices:
             clearSalePrice || clearLoyaltyPrice
-              ? this.promotionalFlyerService.clearPrices(clearValues, flyerId)
+              ? this.getFlyerService().clearPrices(clearValues, flyerId)
               : of(null),
 
           competitors: clearCompetitorPrice
@@ -356,5 +366,11 @@ export class SuggestedPriceSettingsDialog implements OnInit {
 
   get increasePricePercent() {
     return this.increasePricePercentControl as FormControl;
+  }
+
+  getFlyerService() {
+    return this.data.flyerType === 'quote'
+      ? this.promotionalFlyerService
+      : this.supplierFlyerService;
   }
 }

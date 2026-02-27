@@ -1,5 +1,7 @@
 <div mat-dialog-title fxLayout="column" fxLayoutGap.gt-lg="10px">
-  <span>Remover preços informados na cotação</span>
+  <span>{{
+    `Remover preços informados na ${data.flyerType === 'quote' ? 'cotação' : 'tabela de fornecedor'}`
+  }}</span>
   <mat-divider />
 </div>
 
@@ -21,10 +23,10 @@
       @if (clearCompetitorPrice) {
         <div fxLayout="row" fxLayoutGap="5px" style="color: var(--error-color)">
           <mat-icon style="font-size: 18px; width: 30px; height: 30px">warning</mat-icon>
-          <span class="mat-caption" style="font-weight: 500"
-            >Ao marcar para remover o preço dos concorrentes, ele será removido em todas as lojas da
-            cotação selecionada.</span
-          >
+          <span class="mat-caption" style="font-weight: 500">{{
+            `Ao marcar para remover o preço dos concorrentes, ele será removido em todas as lojas da
+            ${data.flyerType === 'quote' ? 'cotação' : 'tabela de fornecedor'} selecionada.`
+          }}</span>
         </div>
       }
     </div>

@@ -40,7 +40,7 @@
           bgColor="var(--error-color)"
           text="Remover Preços Informados"
           [tooltipText]="
-            'Clique aqui e selecione quais preços deseja remover da cotação ' +
+            `Clique aqui e selecione quais preços deseja remover da ${data.flyerType === 'quote' ? 'cotação' : 'tabela de fornecedor'} ` +
             data.flyerInfo.idIntegral +
             '.'
           "

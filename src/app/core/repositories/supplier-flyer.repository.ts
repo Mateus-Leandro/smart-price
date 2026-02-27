@@ -4,7 +4,7 @@ import { SupabaseService } from 'src/app/shared/services/supabase.service';
 import { LoadingService } from '../services/loading.service';
 import { ISupplierFlyerProductsView, ISupplierFlyerView } from '../models/supplier-flyer.model';
 import { IDefaultPaginatorDataSource } from '../models/query.model';
-import { finalize, from, map, Observable } from 'rxjs';
+import { finalize, from, map, Observable, of } from 'rxjs';
 import { EnumFilterPromotionalFlyerProducts, EnumWarningProductType } from '../enums/product.enum';
 
 @Injectable({ providedIn: 'root' })
@@ -287,7 +287,7 @@ export class SupplierFlyerRepository {
     discountPercent: number,
   ): Observable<void> {
     const promise = this.supabase
-      .from('promotional_flyer_products')
+      .from('supplier_flyer_products')
       .update({
         price_discount_percent: discountPercent,
       })
@@ -295,6 +295,46 @@ export class SupplierFlyerRepository {
       .eq('product_id', productId);
 
     return from(promise).pipe(
+      map(({ error }) => {
+        if (error) throw error;
+      }),
+    );
+  }
+
+  applySuggestedPrices(flyerId: number, onlyCompetitorPriceZero: boolean = false) {
+    this.loadingService.show();
+    return from(
+      this.supabase.rpc('apply_supplier_suggested_prices', {
+        p_flyer_id: flyerId,
+        p_only_zero_comp_price: onlyCompetitorPriceZero,
+      }),
+    ).pipe(
+      map(({ error }) => {
+        if (error) throw error;
+      }),
+      finalize(() => this.loadingService.hide()),
+    );
+  }
+
+  clearPrices(clearValues: any, flyerId: number) {
+    let updateData: any = {};
+
+    if (clearValues.clearSalePrice) {
+      updateData.sale_price = 0;
+    }
+
+    if (clearValues.clearLoyaltyPrice) {
+      updateData.loyalty_price = 0;
+    }
+
+    if (Object.keys(updateData).length === 0) return of(null);
+
+    return from(
+      this.supabase
+        .from('supplier_flyer_products')
+        .update(updateData)
+        .eq('supplier_flyer_id', flyerId),
+    ).pipe(
       map(({ error }) => {
         if (error) throw error;
       }),

@@ -101,7 +101,11 @@ export class PromotionalFlyerProducts {
         data: {
           flyerInfo: this.flyerInfo(),
           companyId: this.flyerTable?.companyId,
-          competitorType: 'competitor_price_flyer_products',
+          competitorType:
+            this.flyerType() === 'quote'
+              ? 'competitor_price_flyer_products'
+              : 'competitor_price_supplier_flyer_products',
+          flyerType: this.flyerType(),
         },
       })
       .afterClosed()
@@ -131,7 +135,7 @@ export class PromotionalFlyerProducts {
       .afterClosed()
       .subscribe((confirmation) => {
         if (confirmation) {
-          this.promotionalFlyerService
+          this.getFlyerService()
             .applySuggestedPrices(
               this.id(),
               this?.flyerTable?.selectedFilterType() ===
@@ -142,7 +146,7 @@ export class PromotionalFlyerProducts {
                 this?.flyerTable?.reload();
                 this.notificationService.showSuccess(`Preços atualizados com sucesso!`);
               },
-              error: (err) => {
+              error: (err: any) => {
                 this.notificationService.showError(
                   `Erro ao utilizar preços sugeridos: ${err.message || err}`,
                 );
