@@ -55,7 +55,8 @@ export const routes: Routes = [
           ),
       },
       {
-        path: 'promotional_flyer',
+        path: 'promotional_flyer/quote',
+        data: { type: 'quote' },
         canActivate: [authGuard],
         loadComponent: () =>
           import('./features/promotional-flyer/pages/promotional-flyer/promotional-flyer').then(
@@ -63,7 +64,8 @@ export const routes: Routes = [
           ),
       },
       {
-        path: 'promotional_flyer/:id',
+        path: 'promotional_flyer/quote/:id',
+        data: { type: 'quote' },
         canActivate: [authGuard],
         loadComponent: () =>
           import('./features/promotional-flyer/pages/promotional-flyer-products/promotional-flyer-products').then(
@@ -71,19 +73,21 @@ export const routes: Routes = [
           ),
       },
       {
-        path: 'supplier_flyer',
+        path: 'promotional_flyer/supplier',
+        data: { type: 'supplier' },
         canActivate: [authGuard],
         loadComponent: () =>
-          import('./features/supplier-flyer/pages/supplier-flyer/supplier-flyer').then(
-            (m) => m.SupplierFlyer,
+          import('./features/promotional-flyer/pages/promotional-flyer/promotional-flyer').then(
+            (m) => m.PromotionalFlyer,
           ),
       },
       {
-        path: 'supplier_flyer/:id',
+        path: 'promotional_flyer/supplier/:id',
+        data: { type: 'supplier' },
         canActivate: [authGuard],
         loadComponent: () =>
-          import('./features/supplier-flyer/pages/supplier-flyer-products/supplier-flyer-products').then(
-            (m) => m.SupplierFlyerProducts,
+          import('./features/promotional-flyer/pages/promotional-flyer-products/promotional-flyer-products').then(
+            (m) => m.PromotionalFlyerProducts,
           ),
       },
       {

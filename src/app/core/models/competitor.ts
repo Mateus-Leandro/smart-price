@@ -13,3 +13,7 @@ export interface IUpdateCompetitor {
 export interface ICompetitorView extends ICompetitor {
   competitorBranches: { brancheId: number }[];
 }
+
+export type CompetitorType =
+  | 'competitor_price_flyer_products'
+  | 'competitor_price_supplier_flyer_products';

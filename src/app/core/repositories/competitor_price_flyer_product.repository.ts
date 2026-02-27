@@ -7,6 +7,7 @@ import {
   IDeleteCompetitorPriceFlyerProduct,
   IUpsertCompetitorPriceFlyerProduct,
 } from '../models/competitor_price_flyer_products.model';
+import { CompetitorType } from '../models/competitor';
 
 @Injectable({ providedIn: 'root' })
 export class CompetitorPriceFlyerProductRepository {
@@ -17,10 +18,11 @@ export class CompetitorPriceFlyerProductRepository {
 
   upsertCompetitorPriceFlyerProduct(
     competitorPriceFlyerProduct: IUpsertCompetitorPriceFlyerProduct,
+    competitorTable: CompetitorType,
   ) {
     return from(
       this.supabase
-        .from('competitor_price_flyer_products')
+        .from(competitorTable)
         .upsert(
           {
             integral_flyer_id: competitorPriceFlyerProduct.integralFlyerId,
@@ -45,10 +47,11 @@ export class CompetitorPriceFlyerProductRepository {
 
   deleteCompetitorPriceFlyerProduct(
     deleteCompetitorPriceFlyerProduct: IDeleteCompetitorPriceFlyerProduct,
+    competitorTable: CompetitorType,
   ) {
     return from(
       this.supabase
-        .from('competitor_price_flyer_products')
+        .from(competitorTable)
         .delete()
         .eq('integral_flyer_id', deleteCompetitorPriceFlyerProduct.integralFlyerId)
         .eq('product_id', deleteCompetitorPriceFlyerProduct.productId)
@@ -64,10 +67,11 @@ export class CompetitorPriceFlyerProductRepository {
 
   deleteAllcompetitorPriceByFlyerId(
     deleteAllCompetitorPriceByFlyerId: IDeleteAllCompetitorPriceByFlyerId,
+    competitorTable: CompetitorType,
   ) {
     return from(
       this.supabase
-        .from('competitor_price_flyer_products')
+        .from(competitorTable)
         .delete()
         .eq('integral_flyer_id', deleteAllCompetitorPriceByFlyerId.integralFlyerId)
         .eq('company_id', deleteAllCompetitorPriceByFlyerId.companyId),

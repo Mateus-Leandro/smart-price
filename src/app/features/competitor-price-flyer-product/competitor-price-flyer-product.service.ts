@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { CompetitorType } from 'src/app/core/models/competitor';
 import {
   IDeleteAllCompetitorPriceByFlyerId,
   IDeleteCompetitorPriceFlyerProduct,
@@ -13,19 +14,31 @@ export class CompetitorPriceFlyerProductService {
   constructor(private repository: CompetitorPriceFlyerProductRepository) {}
   upsertCompetitorPriceFlyerProduct(
     competitorPriceFlyerProduct: IUpsertCompetitorPriceFlyerProduct,
+    competitorTable: CompetitorType,
   ) {
-    return this.repository.upsertCompetitorPriceFlyerProduct(competitorPriceFlyerProduct);
+    return this.repository.upsertCompetitorPriceFlyerProduct(
+      competitorPriceFlyerProduct,
+      competitorTable,
+    );
   }
 
   deleteCompetitorPriceFlyerProduct(
     deleteCompetitorPriceFlyerProduct: IDeleteCompetitorPriceFlyerProduct,
+    competitorTable: CompetitorType,
   ) {
-    return this.repository.deleteCompetitorPriceFlyerProduct(deleteCompetitorPriceFlyerProduct);
+    return this.repository.deleteCompetitorPriceFlyerProduct(
+      deleteCompetitorPriceFlyerProduct,
+      competitorTable,
+    );
   }
 
   deleteAllcompetitorPriceByFlyerId(
     deleteAllCompetitorPriceByFlyerId: IDeleteAllCompetitorPriceByFlyerId,
+    competitorTable: CompetitorType,
   ) {
-    return this.repository.deleteAllcompetitorPriceByFlyerId(deleteAllCompetitorPriceByFlyerId);
+    return this.repository.deleteAllcompetitorPriceByFlyerId(
+      deleteAllCompetitorPriceByFlyerId,
+      competitorTable,
+    );
   }
 }

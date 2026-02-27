@@ -10,7 +10,7 @@ import { SuggestedPriceSettingsDialog } from 'src/app/features/settings-suggeste
 import { ConfirmationDialog } from 'src/app/shared/components/confirmation-dialog/confirmation-dialog';
 import { NotificationService } from 'src/app/core/services/notification.service';
 import { PromotionalFlyerService } from '../../services/promotional-flyer.service';
-import { IPromotionalFlyerView } from 'src/app/core/models/promotional-flyer.model';
+import { IPromotionalFlyerView, TFlyerType } from 'src/app/core/models/promotional-flyer.model';
 import { Spinner } from 'src/app/shared/components/spinner/spinner';
 import { LoadingService } from 'src/app/core/services/loading.service';
 import { IUserPermission } from 'src/app/core/models/user-permission.model';
@@ -18,6 +18,8 @@ import { UserPermissionService } from 'src/app/features/user-permission/user-per
 import { AuthService } from 'src/app/features/auth/services/auth.service';
 import { MatIcon } from '@angular/material/icon';
 import { EnumFilterPromotionalFlyerProducts } from 'src/app/core/enums/product.enum';
+import { ISupplierFlyerView } from 'src/app/core/models/supplier-flyer.model';
+import { SupplierFlyerService } from 'src/app/features/supplier-flyer/services/supplier-flyer.service';
 
 @Component({
   selector: 'app-promotional-flyer-products',
@@ -39,9 +41,10 @@ import { EnumFilterPromotionalFlyerProducts } from 'src/app/core/enums/product.e
 export class PromotionalFlyerProducts {
   userPermissions: IUserPermission | null = null;
   loading = inject(LoadingService).loading;
-  flyerInfo = signal<IPromotionalFlyerView | undefined>(undefined);
+  flyerInfo = signal<IPromotionalFlyerView | ISupplierFlyerView | undefined>(undefined);
   readonly FilterPromotionalFlyerProductsEnum = EnumFilterPromotionalFlyerProducts;
   id = signal<number>(0);
+  flyerType = signal<TFlyerType | null>(null);
 
   @ViewChild(PromotionalFlyerProductTable)
   flyerTable: PromotionalFlyerProductTable | null = null;
@@ -54,9 +57,13 @@ export class PromotionalFlyerProducts {
     private promotionalFlyerService: PromotionalFlyerService,
     private userPermissionService: UserPermissionService,
     private authService: AuthService,
+    private supplierFlyerService: SupplierFlyerService,
   ) {}
 
   ngOnInit() {
+    const typeFromRoute = this.route.snapshot.data['type'] as 'quote' | 'supplier';
+    this.flyerType.set(typeFromRoute);
+
     const routeId = Number(this.route.snapshot.paramMap.get('id'));
     this.id.set(routeId);
 
@@ -82,7 +89,7 @@ export class PromotionalFlyerProducts {
   }
 
   goBack() {
-    this.router.navigate(['/promotional_flyer']);
+    this.router.navigate(['/promotional_flyer', this.flyerType()]);
   }
 
   openSettingsSuggestedPriceDialog(): void {
@@ -94,6 +101,7 @@ export class PromotionalFlyerProducts {
         data: {
           flyerInfo: this.flyerInfo(),
           companyId: this.flyerTable?.companyId,
+          competitorType: 'competitor_price_flyer_products',
         },
       })
       .afterClosed()
@@ -154,13 +162,19 @@ export class PromotionalFlyerProducts {
       },
     };
 
-    this.promotionalFlyerService.loadFlyers(paginatorFlyer, '', this.id()).subscribe({
-      next: (flyer) => {
-        this.flyerInfo.set(flyer.data[0]);
-      },
-      error: (err) => {
-        this.notificationService.showError(`Erro ao buscar informações do encarte: ${err}`);
-      },
-    });
+    this.getFlyerService()
+      .loadFlyers(paginatorFlyer, '', this.id())
+      .subscribe({
+        next: (flyer: any) => {
+          this.flyerInfo.set(flyer.data[0]);
+        },
+        error: (err: any) => {
+          this.notificationService.showError(`Erro ao buscar informações: ${err}`);
+        },
+      });
+  }
+
+  getFlyerService(): any {
+    return this.flyerType() === 'quote' ? this.promotionalFlyerService : this.supplierFlyerService;
   }
 }

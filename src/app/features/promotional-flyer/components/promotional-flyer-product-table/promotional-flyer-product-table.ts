@@ -49,6 +49,7 @@ import {
 import {
   IPromotionalFlyerProductsView,
   IPromotionalFlyerView,
+  TFlyerType,
 } from 'src/app/core/models/promotional-flyer.model';
 import { CompetitorService } from 'src/app/features/competitor/services/competitor.service';
 import { ICompetitorView } from 'src/app/core/models/competitor';
@@ -65,6 +66,8 @@ import { IconFilterButton } from 'src/app/shared/components/icon-filter-button/i
 import { IFilterOptions } from 'src/app/shared/components/icon-filter-button/icon-filter-list';
 import { SupplierShippingPriceService } from 'src/app/features/supplier-shipping-price/services/supplier-shipping-price.service';
 import { CompanySettingsService } from 'src/app/features/company-settings/services/company-settings.service';
+import { ISupplierFlyerView } from 'src/app/core/models/supplier-flyer.model';
+import { SupplierFlyerService } from 'src/app/features/supplier-flyer/services/supplier-flyer.service';
 
 type FlyerRowForm = FormGroup<{
   actualSalePrice: FormControl<string | null>;
@@ -74,7 +77,7 @@ type FlyerRowForm = FormGroup<{
   loyaltyPrice: FormControl<string | null>;
   productId: FormControl<number>;
   productMargin: FormControl<number>;
-  quoteCost: FormControl<number>;
+  actualCost: FormControl<number>;
   linkedCompetitorPrices: FormArray<FormControl<string | null>>;
   unlinkedCompetitorPrices: FormArray<FormControl<string | null>>;
   suggestedSalePrice: FormControl<string | null>;
@@ -113,6 +116,10 @@ type FlyerRowForm = FormGroup<{
   styleUrls: ['../../../../global/styles/_tables.scss', './promotional-flyer-product-table.scss'],
 })
 export class PromotionalFlyerProductTable {
+  flyerInfo = input.required<IPromotionalFlyerView | ISupplierFlyerView>();
+  flyerId = input.required<number>();
+  flyerType = input.required<TFlyerType>();
+
   @ViewChild(MatSort) sort!: MatSort;
 
   @ViewChildren('salePriceInput')
@@ -132,9 +139,6 @@ export class PromotionalFlyerProductTable {
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  flyerInfo = input.required<IPromotionalFlyerView>();
-  flyerId = input.required<number>();
-
   readonly ProductPriceType = ProductPriceType;
   readonly SupplierDeliveryTypeEnum = EnumSupplierDeliveryTypeEnum;
   private destroy$ = new Subject<void>();
@@ -151,28 +155,15 @@ export class PromotionalFlyerProductTable {
 
   sortEvent!: Sort;
 
-  dataSource = new MatTableDataSource<IPromotionalFlyerProductsView>([]);
-  expandedElement: IPromotionalFlyerProductsView | null = null;
-  columnsToDisplay = [
-    'expand',
-    'id',
-    'name',
-    'margin',
-    'shipping_price',
-    'quote_cost',
-    'average_cost_quote',
-    'current_sale_price',
-    'sale_price',
-    'current_loyalty_price',
-    'loyalty_price',
-    'fixed_price',
-    'send',
-  ];
+  dataSource = new MatTableDataSource<IPromotionalFlyerProductsView | ISupplierFlyerView>([]);
+  expandedElement: IPromotionalFlyerProductsView | ISupplierFlyerView | null = null;
 
   filterOptions: IFilterOptions<EnumFilterPromotionalFlyerProducts>[] =
     getPromotionalFlyerProductsFilterOptions();
   selectedFilterType = signal<null | EnumFilterPromotionalFlyerProducts>(null);
-  paginatorDataSource: IDefaultPaginatorDataSource<IPromotionalFlyerProductsView> = {
+  paginatorDataSource: IDefaultPaginatorDataSource<
+    IPromotionalFlyerProductsView | ISupplierFlyerView
+  > = {
     pageIndex: 0,
     pageSize: 10,
     records: {
@@ -197,6 +188,7 @@ export class PromotionalFlyerProductTable {
     private userPermissionService: UserPermissionService,
     private supplierShippingPriceService: SupplierShippingPriceService,
     private companySettingsService: CompanySettingsService,
+    private supplierFlyerService: SupplierFlyerService,
   ) {
     effect(() => {
       const info = this.flyerInfo();
@@ -295,26 +287,28 @@ export class PromotionalFlyerProductTable {
     });
   }
 
-  loadProductsFromPromotionalFlyer(
+  loadProductsFromFlyer(
     flyerId: number,
     idIntegral: number,
-    paginatorDataSource: IDefaultPaginatorDataSource<IPromotionalFlyerProductsView>,
+    paginatorDataSource: IDefaultPaginatorDataSource<
+      IPromotionalFlyerProductsView | ISupplierFlyerView
+    >,
     search?: string,
     selectedFilterType?: EnumFilterPromotionalFlyerProducts,
   ): void {
-    this.promotionalFlyerService
-      .loadProducts(flyerId, idIntegral, paginatorDataSource, search, selectedFilterType)
+    this.getFlyerService()
+      .loadProducts(flyerId, idIntegral, paginatorDataSource as any, search, selectedFilterType)
       .subscribe({
-        next: (response) => {
+        next: (response: any) => {
           this.paginatorDataSource.records = response;
           this.dataSource.data = response.data;
 
           this.buildForm(this.dataSource.data);
           this.cdr.detectChanges();
         },
-        error: (err) => {
+        error: (err: any) => {
           this.notificationService.showError(
-            `Erro ao buscar produtos do encarte ${flyerId}: ${err.message || err}`,
+            `Erro ao buscar produtos ${flyerId}: ${err.message || err}`,
           );
           this.cdr.detectChanges();
         },
@@ -335,6 +329,7 @@ export class PromotionalFlyerProductTable {
 
   reload(filterType: EnumFilterPromotionalFlyerProducts | null = this.selectedFilterType()): void {
     const currentBrancheId = this.flyerInfo().branche.id;
+
     this.competitorService
       .loadCompetitors({
         pageIndex: 0,
@@ -351,7 +346,7 @@ export class PromotionalFlyerProductTable {
             (c) => !c.competitorBranches.some((cb) => cb.brancheId === currentBrancheId),
           );
 
-          this.loadProductsFromPromotionalFlyer(
+          this.loadProductsFromFlyer(
             this.flyerId(),
             this.flyerInfo().idIntegral,
             this.paginatorDataSource,
@@ -369,9 +364,9 @@ export class PromotionalFlyerProductTable {
     return this.form.get('rows') as FormArray<FlyerRowForm>;
   }
 
-  private buildForm(data: IPromotionalFlyerProductsView[]): void {
+  private buildForm(data: (IPromotionalFlyerProductsView | ISupplierFlyerView)[]): void {
     const rowsArray = this.fb.array<FlyerRowForm>(
-      data.map((item) => {
+      data.map((item: any) => {
         const linkedCompetitorControls = this.linkedCompetitorsList.map((competitor) => {
           const priceEntry = item.competitorPrices?.find(
             (cp: any) => cp.competitor?.id === competitor.id,
@@ -407,7 +402,7 @@ export class PromotionalFlyerProductTable {
             item.salePrice != null ? item.salePrice.toFixed(2).replace('.', ',') : '0,00',
           ),
           shippingPrice: this.fb.control<string | null>(
-            item.shippingPrice != null ? item.shippingPrice.toFixed(2).replace('.', ',') : '0,00',
+            item?.shippingPrice != null ? item.shippingPrice.toFixed(2).replace('.', ',') : '0,00',
           ),
           loyaltyPrice: this.fb.control<string | null>(
             item.loyaltyPrice != null ? item.loyaltyPrice.toFixed(2).replace('.', ',') : '0,00',
@@ -420,7 +415,7 @@ export class PromotionalFlyerProductTable {
           linkedCompetitorPrices: this.fb.array(linkedCompetitorControls),
           unlinkedCompetitorPrices: this.fb.array(unlinkedCompetitorControls),
           productMargin: this.fb.control<number>(item.product?.margin ?? 0),
-          quoteCost: this.fb.control<number>(item.quoteCost ?? 0),
+          actualCost: this.fb.control<number>((item?.quoteCost || item?.costPrice) ?? 0),
           suggestedSalePrice: this.fb.control<string | null>(null),
           suggestedSalePriceWithMargin: this.fb.control<string | null>(null),
           suggestedLoyaltyPrice: this.fb.control<string | null>('0,00'),
@@ -532,13 +527,18 @@ export class PromotionalFlyerProductTable {
 
         if (numericPrice > 0) {
           this.competitorPriceFlyerProductService
-            .upsertCompetitorPriceFlyerProduct({
-              productId: productId,
-              price: numericPrice,
-              competitorId: competitorId,
-              companyId: this.companyId,
-              integralFlyerId: this.flyerInfo().idIntegral,
-            })
+            .upsertCompetitorPriceFlyerProduct(
+              {
+                productId: productId,
+                price: numericPrice,
+                competitorId: competitorId,
+                companyId: this.companyId,
+                integralFlyerId: this.flyerInfo().idIntegral,
+              },
+              this.flyerType() === 'quote'
+                ? 'competitor_price_flyer_products'
+                : 'competitor_price_supplier_flyer_products',
+            )
             .subscribe({
               error: (err) => {
                 this.notificationService.showError(
@@ -550,12 +550,17 @@ export class PromotionalFlyerProductTable {
             });
         } else {
           this.competitorPriceFlyerProductService
-            .deleteCompetitorPriceFlyerProduct({
-              productId: productId,
-              competitorId: competitorId,
-              companyId: this.companyId,
-              integralFlyerId: this.flyerInfo().idIntegral,
-            })
+            .deleteCompetitorPriceFlyerProduct(
+              {
+                productId: productId,
+                competitorId: competitorId,
+                companyId: this.companyId,
+                integralFlyerId: this.flyerInfo().idIntegral,
+              },
+              this.flyerType() === 'quote'
+                ? 'competitor_price_flyer_products'
+                : 'competitor_price_supplier_flyer_products',
+            )
             .subscribe({
               error: (err) => {
                 this.notificationService.showError(
@@ -606,10 +611,10 @@ export class PromotionalFlyerProductTable {
         return;
       }
 
-      this.promotionalFlyerService
+      this.getFlyerService()
         .updateProductPrice(this.flyerId(), productId, numericPrice, columnName)
         .subscribe({
-          error: (err) => {
+          error: (err: any) => {
             this.notificationService.showError(
               `Erro ao atualizar preço. Item: ${productId} | Erro: ${err.message || err}`,
             );
@@ -627,34 +632,38 @@ export class PromotionalFlyerProductTable {
   sendPrices(productId: number) {
     this.sendingProductId = productId;
 
-    this.promotionalFlyerService.sendPricesToErp(this.flyerId(), productId).subscribe({
-      error: (err) => {
-        this.notificationService.showError(
-          `Erro ao marcar preço para ser enviado ao ERP. Produto: ${productId} | Erro: ${err.message || err}`,
-        );
-      },
-      complete: () => {
-        this.sendingProductId = null;
-        this.cdr.detectChanges();
-      },
-    });
+    this.getFlyerService()
+      .sendPricesToErp(this.flyerId(), productId)
+      .subscribe({
+        error: (err: any) => {
+          this.notificationService.showError(
+            `Erro ao marcar preço para ser enviado ao ERP. Produto: ${productId} | Erro: ${err.message || err}`,
+          );
+        },
+        complete: () => {
+          this.sendingProductId = null;
+          this.cdr.detectChanges();
+        },
+      });
   }
 
   lockOrUnlockPrices(productId: number, lock: boolean, index: number) {
-    this.promotionalFlyerService.lockOrUnlockPrices(this.flyerId(), productId, lock).subscribe({
-      next: () => {
-        const typeOperation = lock ? 'fixado' : 'desafixado';
-        this.notificationService.showSuccess(
-          `Preço ${typeOperation} corretamente para o produto ${productId}`,
-        );
-        this.rows.at(index).controls.lockPrices.setValue(lock);
-      },
-      error: (err) => {
-        this.notificationService.showError(
-          `Erro ao fixar preços no produto ${productId}:  ${err.message || err}.`,
-        );
-      },
-    });
+    this.getFlyerService()
+      .lockOrUnlockPrices(this.flyerId(), productId, lock)
+      .subscribe({
+        next: () => {
+          const typeOperation = lock ? 'fixado' : 'desafixado';
+          this.notificationService.showSuccess(
+            `Preço ${typeOperation} corretamente para o produto ${productId}`,
+          );
+          this.rows.at(index).controls.lockPrices.setValue(lock);
+        },
+        error: (err: any) => {
+          this.notificationService.showError(
+            `Erro ao fixar preços no produto ${productId}:  ${err.message || err}.`,
+          );
+        },
+      });
   }
 
   isPriceInvalid(index: number): boolean {
@@ -679,7 +688,7 @@ export class PromotionalFlyerProductTable {
       shippingPrice,
       productMargin,
       linkedCompetitorPrices,
-      quoteCost,
+      actualCost,
       suggestedSalePrice,
       suggestedLoyaltyPrice,
       actualLoyaltyPrice,
@@ -703,7 +712,7 @@ export class PromotionalFlyerProductTable {
 
     const finalCost =
       transformToNumberValue(shippingPrice.value ?? 0) +
-      transformToNumberValue(quoteCost.value ?? 0);
+      transformToNumberValue(actualCost.value ?? 0);
 
     const productMarginValue = transformToNumberValue(productMargin.value ?? 0);
 
@@ -716,7 +725,7 @@ export class PromotionalFlyerProductTable {
     if (!lowestCompetitorPrice) {
       warningPriceText.setValue('Não informado preço dos concorrentes.');
       if (warningType.value !== EnumWarningProductType.NoCompetitorPrice) {
-        this.promotionalFlyerService
+        this.getFlyerService()
           .updateWarningType(
             this.flyerId(),
             productId.value,
@@ -731,7 +740,7 @@ export class PromotionalFlyerProductTable {
     if (finalCost >= lowestCompetitorPrice) {
       warningPriceText.setValue('Preço do concorrente menor ou igual ao custo.');
       if (warningType.value !== EnumWarningProductType.CompetitorPrice) {
-        this.promotionalFlyerService
+        this.getFlyerService()
           .updateWarningType(
             this.flyerId(),
             productId.value,
@@ -756,7 +765,7 @@ export class PromotionalFlyerProductTable {
       lowestCompetitorPrice < suggestedPrice ? marginRule?.discountPercent || 0 : 0;
 
     if (discountPercent !== actualDiscountPercent) {
-      this.promotionalFlyerService
+      this.getFlyerService()
         .updatePriceDiscountPercent(this.flyerId(), productId.value, discountPercent)
         .subscribe();
     }
@@ -767,7 +776,7 @@ export class PromotionalFlyerProductTable {
       warningPriceText.setValue('Margem do concorrente menor que 7%.');
 
       if (warningType.value !== EnumWarningProductType.CompetitorMargin) {
-        this.promotionalFlyerService
+        this.getFlyerService()
           .updateWarningType(
             this.flyerId(),
             productId.value,
@@ -778,7 +787,7 @@ export class PromotionalFlyerProductTable {
 
       return;
     } else {
-      this.promotionalFlyerService.updateWarningType(this.flyerId(), productId.value).subscribe();
+      this.getFlyerService().updateWarningType(this.flyerId(), productId.value).subscribe();
       warningType.setValue(null, { emitEvent: false });
     }
 
@@ -839,7 +848,7 @@ export class PromotionalFlyerProductTable {
       rowForm.controls.linkedCompetitorPrices.valueChanges,
       rowForm.controls.shippingPrice.valueChanges,
       rowForm.controls.productMargin.valueChanges,
-      rowForm.controls.quoteCost.valueChanges,
+      rowForm.controls.actualCost.valueChanges,
     )
       .pipe(debounceTime(600), distinctUntilChanged(), takeUntil(this.destroy$))
       .subscribe(() => {
@@ -876,7 +885,7 @@ export class PromotionalFlyerProductTable {
     if (!competitorPrice) return '0,00%';
 
     const row = this.rows.at(rowIndex);
-    const quoteCost = row.controls.quoteCost.value || 0;
+    const quoteCost = row.controls.actualCost.value || 0;
     const shippingPrice = transformToNumberValue(row?.controls?.shippingPrice?.value || 0);
 
     const finalCost = quoteCost + shippingPrice;
@@ -895,5 +904,56 @@ export class PromotionalFlyerProductTable {
     const saleMarginRuleText = row.controls.saleMarginRuleText.value;
     const loyaltyMarginRuleText = row.controls.loyaltyMarginRuleText.value;
     return { saleMarginRuleText, loyaltyMarginRuleText };
+  }
+
+  getColumnsToDisplay(): string[] {
+    return this.flyerType() === 'quote'
+      ? [
+          'expand',
+          'id',
+          'name',
+          'margin',
+          'shipping_price',
+          'quote_cost',
+          'average_cost_quote',
+          'current_sale_price',
+          'sale_price',
+          'current_loyalty_price',
+          'loyalty_price',
+          'fixed_price',
+          'send',
+        ]
+      : [
+          'expand',
+          'id',
+          'name',
+          'margin',
+          'cost_price',
+          'previous_cost',
+          'variation',
+          'current_sale_price',
+          'sale_price',
+          'current_loyalty_price',
+          'loyalty_price',
+          'fixed_price',
+          'send',
+        ];
+  }
+
+  getFlyerService(): any {
+    return this.flyerType() === 'quote' ? this.promotionalFlyerService : this.supplierFlyerService;
+  }
+
+  calculatePercentage(current: number, previous: number): string {
+    if (!previous || previous === 0) return '0.00';
+    const variation = ((current - previous) / previous) * 100;
+    return Math.abs(variation).toFixed(2);
+  }
+
+  getVariationClass(current: number, previous: number): string {
+    const diff = (current || 0) - (previous || 0);
+    if (diff > 0) return 'text-danger';
+    if (diff < 0) return 'text-success';
+    return 'text-muted';
   }
 }

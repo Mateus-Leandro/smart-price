@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { SupabaseClient } from '@supabase/supabase-js';
-import { finalize, from, map, Observable } from 'rxjs';
+import { finalize, from, map, Observable, of } from 'rxjs';
 import { SupabaseService } from 'src/app/shared/services/supabase.service';
 import { IDefaultPaginatorDataSource } from '../models/query.model';
 import { LoadingService } from '../services/loading.service';
@@ -345,24 +345,22 @@ export class PromotionalFlyerRepository {
   }
 
   clearPrices(clearValues: any, flyerId: number) {
-    let updateColuns = [];
+    let updateData: any = {};
 
     if (clearValues.clearSalePrice) {
-      updateColuns.push({
-        sale_price: 0,
-      });
+      updateData.sale_price = 0;
     }
 
     if (clearValues.clearLoyaltyPrice) {
-      updateColuns.push({
-        loyalty_price: 0,
-      });
+      updateData.loyalty_price = 0;
     }
+
+    if (Object.keys(updateData).length === 0) return of(null);
 
     return from(
       this.supabase
         .from('promotional_flyer_products')
-        .update(updateColuns)
+        .update(updateData)
         .eq('promotional_flyer_id', flyerId),
     ).pipe(
       map(({ error }) => {
