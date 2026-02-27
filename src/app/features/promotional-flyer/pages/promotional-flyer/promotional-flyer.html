@@ -2,12 +2,18 @@
   <mat-card class="mat-card">
     <mat-card-header>
       <div fxLayout="column">
-        <mat-card-title>Lista de cotações</mat-card-title>
-        <mat-card-subtitle>
-          Selecione a cotação na qual deseja visualizar os produtos.
+        <mat-card-title>{{
+          `Lista de ${flyerType() === 'quote' ? 'cotações' : 'tabelas de fornecedores'}`
+        }}</mat-card-title>
+        <mat-card-subtitle
+          >{{
+            `Selecione a ${flyerType() === 'quote' ? 'cotação' : 'tabela de fornecedor'} na qual deseja visualizar os produtos.`
+          }}
         </mat-card-subtitle>
       </div>
     </mat-card-header>
-    <app-promotional-flyer-table />
+    @if (flyerType()) {
+      <app-promotional-flyer-table [flyerType]="flyerType()!" />
+    }
   </mat-card>
 </div>

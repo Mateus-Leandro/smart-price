@@ -40,12 +40,14 @@ import {
 import { PromotionalFlyerService } from 'src/app/features/promotional-flyer/services/promotional-flyer.service';
 import { CompetitorPriceFlyerProductService } from 'src/app/features/competitor-price-flyer-product/competitor-price-flyer-product.service';
 import { forkJoin, of } from 'rxjs';
+import { CompetitorType } from 'src/app/core/models/competitor';
 
 type FormState = 'view' | 'create' | 'edit';
 
 interface DialogData {
   flyerInfo: IPromotionalFlyerView;
   companyId: number;
+  competitorType: CompetitorType;
 }
 
 @Component({
@@ -317,10 +319,13 @@ export class SuggestedPriceSettingsDialog implements OnInit {
               : of(null),
 
           competitors: clearCompetitorPrice
-            ? this.competitorPriceFlyerProductsService.deleteAllcompetitorPriceByFlyerId({
-                companyId,
-                integralFlyerId: integralId,
-              })
+            ? this.competitorPriceFlyerProductsService.deleteAllcompetitorPriceByFlyerId(
+                {
+                  companyId,
+                  integralFlyerId: integralId,
+                },
+                this.data.competitorType,
+              )
             : of(null),
         };
 

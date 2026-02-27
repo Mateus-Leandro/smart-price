@@ -39,3 +39,15 @@ input.only-line.loyalty-price-cell {
 .mat-column-shipping_price {
   width: 70px;
 }
+
+.text-danger {
+  color: red !important;
+  display: flex;
+  align-items: center;
+}
+
+.text-success {
+  color: green !important;
+  display: flex;
+  align-items: center;
+}

@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, inject, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, input, ViewChild } from '@angular/core';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
@@ -14,11 +14,13 @@ import { CommonModule } from '@angular/common';
 import { IDefaultPaginatorDataSource } from 'src/app/core/models/query.model';
 import { LoadingService } from 'src/app/core/services/loading.service';
 import { NotificationService } from 'src/app/core/services/notification.service';
-import { IPromotionalFlyerView } from 'src/app/core/models/promotional-flyer.model';
+import { IPromotionalFlyerView, TFlyerType } from 'src/app/core/models/promotional-flyer.model';
 import { IUserPermission } from 'src/app/core/models/user-permission.model';
 import { UserPermissionService } from 'src/app/features/user-permission/user-permission.service';
 import { AuthService } from 'src/app/features/auth/services/auth.service';
 import { FlexLayoutModule } from '@angular/flex-layout';
+import { ISupplierFlyerView } from 'src/app/core/models/supplier-flyer.model';
+import { SupplierFlyerService } from 'src/app/features/supplier-flyer/services/supplier-flyer.service';
 
 @Component({
   selector: 'app-promotional-flyer-table',
@@ -39,13 +41,14 @@ import { FlexLayoutModule } from '@angular/flex-layout';
   styleUrl: './promotional-flyer-table.scss',
 })
 export class PromotionalFlyerTable {
+  flyerType = input.required<TFlyerType>();
   @ViewChild(MatSort) sort!: MatSort;
   loading = inject(LoadingService).loading;
   searchTerm = '';
-  dataSource = new MatTableDataSource<IPromotionalFlyerView>([]);
+  dataSource = new MatTableDataSource<IPromotionalFlyerView | ISupplierFlyerView>([]);
   userPermissions: IUserPermission | null = null;
 
-  paginatorDataSource: IDefaultPaginatorDataSource<IPromotionalFlyerView> = {
+  paginatorDataSource: IDefaultPaginatorDataSource<IPromotionalFlyerView | ISupplierFlyerView> = {
     pageIndex: 0,
     pageSize: 10,
     records: {
@@ -57,7 +60,7 @@ export class PromotionalFlyerTable {
   sendingFlyerId?: number | null;
 
   columnsToDisplay = [
-    'id_quote',
+    'id_integral',
     'name',
     'branche_id',
     'created_date',
@@ -73,6 +76,7 @@ export class PromotionalFlyerTable {
     private notificationService: NotificationService,
     private authService: AuthService,
     private userPermissionService: UserPermissionService,
+    private supplierFlyerService: SupplierFlyerService,
   ) {}
 
   ngOnInit(): void {
@@ -120,25 +124,29 @@ export class PromotionalFlyerTable {
     };
   }
 
-  loadPrincingRecords(
-    paginatorDataSource: IDefaultPaginatorDataSource<IPromotionalFlyerView>,
+  loadRecords(
+    paginatorDataSource: IDefaultPaginatorDataSource<IPromotionalFlyerView | ISupplierFlyerView>,
     search?: string,
   ) {
-    this.promotionalFlyerService.loadFlyers(paginatorDataSource, search).subscribe({
-      next: (response) => {
-        this.paginatorDataSource.records = response;
-        this.dataSource.data = response.data;
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        this.notificationService.showError(`Erro ao buscar cotações: ${err.message || err}`);
-        this.cdr.detectChanges();
-      },
-    });
+    this.getFlyerService()
+      .loadFlyers(paginatorDataSource as any, search)
+      .subscribe({
+        next: (response: any) => {
+          this.paginatorDataSource.records = response;
+          this.dataSource.data = response.data;
+          this.cdr.detectChanges();
+        },
+        error: (err: any) => {
+          this.notificationService.showError(
+            `Erro ao buscar ${this.flyerType() === 'quote' ? 'cotações' : 'tabelas de fornecedores'} : ${err.message || err}`,
+          );
+          this.cdr.detectChanges();
+        },
+      });
   }
 
   navigateToPromotionalFlyerProduct(row: any) {
-    this.router.navigate(['/promotional_flyer', row.id]);
+    this.router.navigate([`/promotional_flyer/${this.flyerType()}`, row.id]);
   }
 
   async sendPrices(flyerId: number) {
@@ -163,7 +171,7 @@ export class PromotionalFlyerTable {
   }
 
   private reload(): void {
-    this.loadPrincingRecords(this.paginatorDataSource, this.searchTerm);
+    this.loadRecords(this.paginatorDataSource, this.searchTerm);
   }
 
   formatQuoteId(quoteId: any): string {
@@ -177,5 +185,9 @@ export class PromotionalFlyerTable {
 
   calculeCompletePercent(totalProducts: number, importedProducts: number) {
     return (100 * (importedProducts / totalProducts)).toFixed(2);
+  }
+
+  getFlyerService(): any {
+    return this.flyerType() === 'quote' ? this.promotionalFlyerService : this.supplierFlyerService;
   }
 }

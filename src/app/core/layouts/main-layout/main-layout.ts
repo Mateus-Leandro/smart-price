@@ -51,9 +51,14 @@ export class MainLayout {
       icon: 'groups_3',
     },
     {
-      router: '/promotional_flyer',
+      router: '/promotional_flyer/quote',
       textNav: 'Cotações',
       icon: 'query_stats',
+    },
+    {
+      router: '/promotional_flyer/supplier',
+      textNav: 'Tabela de Fornecedores',
+      icon: 'assignment',
     },
     {
       router: '/products',

@@ -63,3 +63,5 @@ export interface ClearPriceResult {
   clearLoyaltyPrice: boolean;
   clearCompetitorPrice: boolean;
 }
+
+export type TFlyerType = 'quote' | 'supplier';
