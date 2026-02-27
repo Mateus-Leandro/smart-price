@@ -53,4 +53,12 @@ export class SupplierFlyerService {
   sendPricesToErp(flyerId: number, productId?: number) {
     return this.repository.sendPricesToErp(flyerId, productId);
   }
+
+  applySuggestedPrices(flyerId: number, onlyCompetitorPriceZero: boolean = false) {
+    return this.repository.applySuggestedPrices(flyerId, onlyCompetitorPriceZero);
+  }
+
+  clearPrices(clearValues: any, flyerId: number) {
+    return this.repository.clearPrices(clearValues, flyerId);
+  }
 }
