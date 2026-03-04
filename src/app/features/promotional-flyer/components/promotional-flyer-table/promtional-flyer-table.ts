@@ -151,17 +151,19 @@ export class PromotionalFlyerTable {
 
   async sendPrices(flyerId: number) {
     this.sendingFlyerId = flyerId;
-    this.promotionalFlyerService.sendPricesToErp(flyerId).subscribe({
-      error: (err) => {
-        this.notificationService.showError(
-          `Erro ao enviar produtos para o ERP: ${err.message | err}`,
-        );
-      },
-      complete: () => {
-        this.sendingFlyerId = null;
-        this.cdr.detectChanges();
-      },
-    });
+    this.getFlyerService()
+      .sendPricesToErp(flyerId)
+      .subscribe({
+        error: (err: any) => {
+          this.notificationService.showError(
+            `Erro ao enviar produtos para o ERP: ${err.message | err}`,
+          );
+        },
+        complete: () => {
+          this.sendingFlyerId = null;
+          this.cdr.detectChanges();
+        },
+      });
   }
 
   onPageChange(event: PageEvent): void {
