@@ -42,18 +42,15 @@ serve(async (req) => {
 
     for (const item of payload) {
       const {
-        supplier_flyer_id,
         product_id,
         product_name,
-        cost_price,
+        supplier_flyer_id,
         current_sale_price,
         current_loyalty_price,
-        supplier_id,
-        supplier_name,
-        supplier_cnpj,
+        cost_price,
       } = item;
 
-      if (!supplier_flyer_id || (!product_id && !product_name)) {
+      if (!supplier_flyer_id || !product_id || !product_name) {
         return fail('Campos obrigatórios ausentes', 400);
       }
 
@@ -74,29 +71,6 @@ serve(async (req) => {
         if (productError) {
           return fail('Erro ao criar produto', 500);
         }
-      }
-
-      const { data, upsertSupplierError } = await supabase
-        .from('suppliers')
-        .upsert(
-          {
-            id: supplier_id,
-            company_id: company_id,
-            name: supplier_name,
-            cnpj: supplier_cnpj,
-          },
-          {
-            onConflict: 'id, company_id',
-          },
-        )
-        .select()
-        .single();
-
-      if (upsertSupplierError) {
-        return new fail(
-          `Erro ao realizar upsert do fornecedor ${supplier_id}: ${upsertSupplierError}`,
-          500,
-        );
       }
 
       const { data: supplierFlyerProduct, error: flyerError } = await supabase
