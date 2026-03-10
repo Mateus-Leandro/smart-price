@@ -21,6 +21,7 @@ import { AuthService } from 'src/app/features/auth/services/auth.service';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { ISupplierFlyerView } from 'src/app/core/models/supplier-flyer.model';
 import { SupplierFlyerService } from 'src/app/features/supplier-flyer/services/supplier-flyer.service';
+import { CnpjPipe } from '../../../../shared/pipes/cnpj/cnpj-pipe';
 
 @Component({
   selector: 'app-promotional-flyer-table',
@@ -36,6 +37,7 @@ import { SupplierFlyerService } from 'src/app/features/supplier-flyer/services/s
     MatInputModule,
     CommonModule,
     FlexLayoutModule,
+    CnpjPipe,
   ],
   templateUrl: './promotional-flyer-table.html',
   styleUrl: './promotional-flyer-table.scss',
@@ -58,16 +60,6 @@ export class PromotionalFlyerTable {
   };
   private search$ = new Subject<string>();
   sendingFlyerId?: number | null;
-
-  columnsToDisplay = [
-    'id_integral',
-    'name',
-    'branche_id',
-    'created_date',
-    'status',
-    'produtos',
-    'send',
-  ];
 
   constructor(
     private promotionalFlyerService: PromotionalFlyerService,
@@ -191,5 +183,21 @@ export class PromotionalFlyerTable {
 
   getFlyerService(): any {
     return this.flyerType() === 'quote' ? this.promotionalFlyerService : this.supplierFlyerService;
+  }
+
+  getColunsToDisplay() {
+    return this.flyerType() === 'quote'
+      ? ['id_integral', 'name', 'branche_id', 'created_date', 'status', 'produtos', 'send']
+      : [
+          'id_integral',
+          'name',
+          'supplier',
+          'cnpj_supplier',
+          'branche_id',
+          'created_date',
+          'status',
+          'produtos',
+          'send',
+        ];
   }
 }
