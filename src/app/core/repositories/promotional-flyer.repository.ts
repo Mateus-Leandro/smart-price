@@ -95,6 +95,7 @@ export class PromotionalFlyerRepository {
       warning_type,
       quote_supplier_id,
       quote_supplier_shipping_price,
+      lock_competitor_prices,
 
       promotionalFlyer:promotional_flyers!inner (
         branche_id,
@@ -126,7 +127,6 @@ export class PromotionalFlyerRepository {
         name,
         delivery_type
       )
-
       `,
         { count: 'exact' },
       )
@@ -208,6 +208,7 @@ export class PromotionalFlyerRepository {
             lockPrice: item.lock_price,
             priceDiscountPercent: item.price_discount_percent,
             warningType: item.warning_type,
+            lockCompetitorPrices: item.lock_competitor_prices,
             product: {
               id: item?.product?.id,
               name: item?.product?.name,
@@ -361,6 +362,21 @@ export class PromotionalFlyerRepository {
       this.supabase
         .from('promotional_flyer_products')
         .update(updateData)
+        .eq('promotional_flyer_id', flyerId),
+    ).pipe(
+      map(({ error }) => {
+        if (error) throw error;
+      }),
+    );
+  }
+
+  lockOrUnlockCompetitorPrices(flyerId: number, lockCompetitorPrices: boolean) {
+    return from(
+      this.supabase
+        .from('promotional_flyer_products')
+        .update({
+          lock_competitor_prices: lockCompetitorPrices,
+        })
         .eq('promotional_flyer_id', flyerId),
     ).pipe(
       map(({ error }) => {

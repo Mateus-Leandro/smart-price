@@ -100,6 +100,7 @@ export class SupplierFlyerRepository {
           previous_cost,
           cost_price,
           warning_type,
+          lock_competitor_prices,
     
           supplierFlyer:supplier_flyers!inner (
             branche_id,
@@ -191,6 +192,7 @@ export class SupplierFlyerRepository {
             priceDiscountPercent: item.price_discount_percent,
             warningType: item.warning_type,
             competitorPrices: item?.product?.competitorPrices || [],
+            lockCompetitorPrices: item?.lock_competitor_prices || false,
           };
         });
 
@@ -333,6 +335,21 @@ export class SupplierFlyerRepository {
       this.supabase
         .from('supplier_flyer_products')
         .update(updateData)
+        .eq('supplier_flyer_id', flyerId),
+    ).pipe(
+      map(({ error }) => {
+        if (error) throw error;
+      }),
+    );
+  }
+
+  lockOrUnlockCompetitorPrices(flyerId: number, lockCompetitorPrices: boolean) {
+    return from(
+      this.supabase
+        .from('supplier_flyer_products')
+        .update({
+          lock_competitor_prices: lockCompetitorPrices,
+        })
         .eq('supplier_flyer_id', flyerId),
     ).pipe(
       map(({ error }) => {

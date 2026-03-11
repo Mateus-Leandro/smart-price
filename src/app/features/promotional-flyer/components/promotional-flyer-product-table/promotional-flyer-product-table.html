@@ -429,52 +429,60 @@
                               "
                             >
                               <p>{{ competitor.name }}</p>
-                              <input
-                                matInput
-                                #linkedCompetitorPriceInput
-                                class="only-line"
-                                type="text"
-                                [formControlName]="j"
-                                (focusin)="
-                                  linkedCompetitorPriceInput.setAttribute(
-                                    'initial-competitor-price',
-                                    currentRow
-                                      .get('linkedCompetitorPrices')
-                                      ?.get(j.toString())
-                                      ?.value?.toString() || '0,00'
-                                  )
-                                "
-                                (focus)="onFocus(linkedCompetitorPriceInput)"
-                                (blur)="
-                                  onPriceBlur(
-                                    linkedCompetitorPriceInput.getAttribute(
-                                      'initial-competitor-price'
-                                    ) || '0',
-                                    element.product.id,
-                                    rows.at(i).controls.linkedCompetitorPrices.at(j),
-                                    'competitor_price',
-                                    undefined,
-                                    competitor.id
-                                  )
-                                "
-                                mask="separator.2"
-                                maxlength="10"
-                                (keyup.enter)="
-                                  onEnterInRow(
-                                    i,
-                                    j,
-                                    linkedCompetitorPriceInputs.toArray(),
-                                    linkedCompetitorsList
-                                  )
-                                "
-                                thousandSeparator="."
-                                decimalMarker=","
-                                prefix="R$ "
-                                [dropSpecialCharacters]="true"
-                                [showMaskTyped]="false"
-                                [allowNegativeNumbers]="false"
-                                style="width: 80px"
-                              />
+                              <div fxLayout="row" fxLayoutGap="10px">
+                                <input
+                                  [readonly]="element.lockCompetitorPrices"
+                                  matInput
+                                  #linkedCompetitorPriceInput
+                                  class="only-line"
+                                  type="text"
+                                  [formControlName]="j"
+                                  (focusin)="
+                                    linkedCompetitorPriceInput.setAttribute(
+                                      'initial-competitor-price',
+                                      currentRow
+                                        .get('linkedCompetitorPrices')
+                                        ?.get(j.toString())
+                                        ?.value?.toString() || '0,00'
+                                    )
+                                  "
+                                  (focus)="onFocus(linkedCompetitorPriceInput)"
+                                  (blur)="
+                                    onPriceBlur(
+                                      linkedCompetitorPriceInput.getAttribute(
+                                        'initial-competitor-price'
+                                      ) || '0',
+                                      element.product.id,
+                                      rows.at(i).controls.linkedCompetitorPrices.at(j),
+                                      'competitor_price',
+                                      undefined,
+                                      competitor.id
+                                    )
+                                  "
+                                  mask="separator.2"
+                                  maxlength="10"
+                                  (keyup.enter)="
+                                    onEnterInRow(
+                                      i,
+                                      j,
+                                      linkedCompetitorPriceInputs.toArray(),
+                                      linkedCompetitorsList
+                                    )
+                                  "
+                                  thousandSeparator="."
+                                  decimalMarker=","
+                                  prefix="R$ "
+                                  [dropSpecialCharacters]="true"
+                                  [showMaskTyped]="false"
+                                  [allowNegativeNumbers]="false"
+                                  style="width: 80px"
+                                />
+                                @if (element.lockCompetitorPrices) {
+                                  <mat-icon style="font-size: 18px; width: 18px; height: 18px"
+                                    >lock</mat-icon
+                                  >
+                                }
+                              </div>
                               <span
                                 class="details-rows"
                                 matTooltip="Margem do concorrente em relação ao custo (Pr. cotação + Frete)."
@@ -518,52 +526,60 @@
                                 fxLayoutGap="1"
                               >
                                 <p>{{ competitor.name }}</p>
-                                <input
-                                  matInput
-                                  #unlikendCompetitorPriceInput
-                                  class="only-line"
-                                  type="text"
-                                  [formControlName]="j"
-                                  (focusin)="
-                                    unlikendCompetitorPriceInput.setAttribute(
-                                      'initial-competitor-price',
-                                      currentRow
-                                        .get('unlinkedCompetitorPrices')
-                                        ?.get(j.toString())
-                                        ?.value?.toString() || '0,00'
-                                    )
-                                  "
-                                  (focus)="onFocus(unlikendCompetitorPriceInput)"
-                                  (blur)="
-                                    onPriceBlur(
-                                      unlikendCompetitorPriceInput.getAttribute(
-                                        'initial-competitor-price'
-                                      ) || '0',
-                                      element.product.id,
-                                      rows.at(i).controls.unlinkedCompetitorPrices.at(j),
-                                      'competitor_price',
-                                      undefined,
-                                      competitor.id
-                                    )
-                                  "
-                                  mask="separator.2"
-                                  maxlength="10"
-                                  (keyup.enter)="
-                                    onEnterInRow(
-                                      i,
-                                      j,
-                                      unlinkedCompetitorPriceInputs.toArray(),
-                                      unlinkedCompetitorsList
-                                    )
-                                  "
-                                  thousandSeparator="."
-                                  decimalMarker=","
-                                  prefix="R$ "
-                                  [dropSpecialCharacters]="true"
-                                  [showMaskTyped]="false"
-                                  [allowNegativeNumbers]="false"
-                                  style="width: 80px"
-                                />
+                                <div fxLayout="row" fxLayoutGap="10px">
+                                  <input
+                                    [readonly]="element.lockCompetitorPrices"
+                                    matInput
+                                    #unlikendCompetitorPriceInput
+                                    class="only-line"
+                                    type="text"
+                                    [formControlName]="j"
+                                    (focusin)="
+                                      unlikendCompetitorPriceInput.setAttribute(
+                                        'initial-competitor-price',
+                                        currentRow
+                                          .get('unlinkedCompetitorPrices')
+                                          ?.get(j.toString())
+                                          ?.value?.toString() || '0,00'
+                                      )
+                                    "
+                                    (focus)="onFocus(unlikendCompetitorPriceInput)"
+                                    (blur)="
+                                      onPriceBlur(
+                                        unlikendCompetitorPriceInput.getAttribute(
+                                          'initial-competitor-price'
+                                        ) || '0',
+                                        element.product.id,
+                                        rows.at(i).controls.unlinkedCompetitorPrices.at(j),
+                                        'competitor_price',
+                                        undefined,
+                                        competitor.id
+                                      )
+                                    "
+                                    mask="separator.2"
+                                    maxlength="10"
+                                    (keyup.enter)="
+                                      onEnterInRow(
+                                        i,
+                                        j,
+                                        unlinkedCompetitorPriceInputs.toArray(),
+                                        unlinkedCompetitorsList
+                                      )
+                                    "
+                                    thousandSeparator="."
+                                    decimalMarker=","
+                                    prefix="R$ "
+                                    [dropSpecialCharacters]="true"
+                                    [showMaskTyped]="false"
+                                    [allowNegativeNumbers]="false"
+                                    style="width: 80px"
+                                  />
+                                  @if (element.lockCompetitorPrices) {
+                                    <mat-icon style="font-size: 18px; width: 18px; height: 18px"
+                                      >lock</mat-icon
+                                    >
+                                  }
+                                </div>
                                 <span
                                   class="details-rows"
                                   matTooltip="Margem do concorrente em relação ao custo (Pr. cotação + Frete)."
