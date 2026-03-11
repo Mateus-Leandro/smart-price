@@ -61,4 +61,8 @@ export class SupplierFlyerService {
   clearPrices(clearValues: any, flyerId: number) {
     return this.repository.clearPrices(clearValues, flyerId);
   }
+
+  lockOrUnlockCompetitorPrices(flyerId: number, lockCompetitorPrices: boolean) {
+    return this.repository.lockOrUnlockCompetitorPrices(flyerId, lockCompetitorPrices);
+  }
 }

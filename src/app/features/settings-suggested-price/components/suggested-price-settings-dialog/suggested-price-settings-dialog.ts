@@ -351,6 +351,28 @@ export class SuggestedPriceSettingsDialog implements OnInit {
       });
   }
 
+  lockOrUnlockCompetitorPrices(lockCompetitorPrices: boolean) {
+    const { flyerInfo } = this.data || {};
+    this.getFlyerService()
+      .lockOrUnlockCompetitorPrices(flyerInfo?.id, lockCompetitorPrices)
+      .subscribe({
+        next: () => {
+          this.notificationService.showSuccess(
+            lockCompetitorPrices
+              ? 'Preços dos concorrentes foram travados com sucesso'
+              : 'Preços dos concorrentes foram destravados com sucesso',
+          );
+        },
+        error: (err) => {
+          this.notificationService.showError(
+            lockCompetitorPrices
+              ? `Erro ao travar os preços dos concorrentes: ${err?.message || err}`
+              : `Erro ao destravar os preços dos concorrentes: ${err?.message || err}`,
+          );
+        },
+      });
+  }
+
   get isViewing() {
     return this.currentState() === 'view';
   }

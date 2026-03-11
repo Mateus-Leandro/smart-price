@@ -35,17 +35,34 @@
             <mat-error>Acréscimo maior que 100</mat-error>
           }
         </mat-form-field>
-        <app-button
-          icon="money_off"
-          bgColor="var(--error-color)"
-          text="Remover Preços Informados"
-          [tooltipText]="
-            `Clique aqui e selecione quais preços deseja remover da ${data.flyerType === 'quote' ? 'cotação' : 'tabela de fornecedor'} ` +
-            data.flyerInfo.idIntegral +
-            '.'
-          "
-          (click)="openClearPriceDialog()"
-        />
+        <div fxLayout="column" fxLayoutGap="15px">
+          <app-button
+            icon="money_off"
+            bgColor="var(--error-color)"
+            text="Remover Preços Informados"
+            [tooltipText]="
+              `Clique aqui e selecione quais preços deseja remover da ${data.flyerType === 'quote' ? 'cotação' : 'tabela de fornecedor'} ` +
+              data.flyerInfo.idIntegral +
+              '.'
+            "
+            (click)="openClearPriceDialog()"
+          />
+          <div fxLayout="column" fxLayoutGap="10px" fxLayoutAlign="end end">
+            <span style="font-weight: 500; color: black"> Preços dos Concorrentes</span>
+            <div fxLayout="row" fxLayoutGap="10px">
+              <app-icon-button
+                icon="lock"
+                tooltipText="Trava o preço de todos os concorrentes. Quando travado, não será possível alterá-lo."
+                (click)="lockOrUnlockCompetitorPrices(true)"
+              />
+              <app-icon-button
+                icon="lock_open"
+                tooltipText="Destravar o preço de todos os concorrentes"
+                (click)="lockOrUnlockCompetitorPrices(false)"
+              />
+            </div>
+          </div>
+        </div>
       </div>
 
       <div fxLayout="row" fxLayoutGap="5px" style="padding-bottom: 15px">

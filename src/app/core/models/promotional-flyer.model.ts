@@ -46,6 +46,7 @@ export interface IPromotionalFlyerProductsView {
   lockPrice?: boolean;
   priceDiscountPercent?: number;
   warningType?: EnumWarningProductType;
+  lockCompetitorPrices?: boolean;
   product: {
     id: number;
     name: string;
