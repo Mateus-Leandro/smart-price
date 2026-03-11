@@ -22,6 +22,8 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 import { ISupplierFlyerView } from 'src/app/core/models/supplier-flyer.model';
 import { SupplierFlyerService } from 'src/app/features/supplier-flyer/services/supplier-flyer.service';
 import { CnpjPipe } from '../../../../shared/pipes/cnpj/cnpj-pipe';
+import { ConfirmationDialog } from 'src/app/shared/components/confirmation-dialog/confirmation-dialog';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-promotional-flyer-table',
@@ -69,6 +71,7 @@ export class PromotionalFlyerTable {
     private authService: AuthService,
     private userPermissionService: UserPermissionService,
     private supplierFlyerService: SupplierFlyerService,
+    private dialog: MatDialog,
   ) {}
 
   ngOnInit(): void {
@@ -146,9 +149,43 @@ export class PromotionalFlyerTable {
     this.getFlyerService()
       .sendPricesToErp(flyerId)
       .subscribe({
+        next: () => {
+          this.dialog
+            .open(ConfirmationDialog, {
+              width: '400px',
+              disableClose: true,
+              autoFocus: true,
+              data: {
+                titleText: `Travar Preços dos Concorrentes`,
+                messageText: `Deseja travar os preços dos concorrentes? Após o travamento, não será possível modificá-los.`,
+                confirmationText: 'Travar preços',
+                cancelText: 'Não travar',
+                confirmationColor: 'var(--primary)',
+              },
+            })
+            .afterClosed()
+            .subscribe((confirmation) => {
+              if (confirmation) {
+                this.getFlyerService()
+                  .lockOrUnlockCompetitorPrices(flyerId, true)
+                  .subscribe({
+                    next: () => {
+                      this.notificationService.showSuccess(
+                        'Preços dos concorrentes travados corretamente',
+                      );
+                    },
+                    error: (err: any) => {
+                      this.notificationService.showError(
+                        `Erro ao travar preços dos concorrentes: ${err?.message || err}`,
+                      );
+                    },
+                  });
+              }
+            });
+        },
         error: (err: any) => {
           this.notificationService.showError(
-            `Erro ao enviar produtos para o ERP: ${err.message | err}`,
+            `Erro ao enviar produtos para o ERP: ${err?.message || err}`,
           );
         },
         complete: () => {
