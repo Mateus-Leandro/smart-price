@@ -77,6 +77,7 @@ type FlyerRowForm = FormGroup<{
   loyaltyPrice: FormControl<string | null>;
   productId: FormControl<number>;
   productMargin: FormControl<number>;
+  previousCost: FormControl<number>;
   actualCost: FormControl<number>;
   linkedCompetitorPrices: FormArray<FormControl<string | null>>;
   unlinkedCompetitorPrices: FormArray<FormControl<string | null>>;
@@ -415,6 +416,7 @@ export class PromotionalFlyerProductTable {
           linkedCompetitorPrices: this.fb.array(linkedCompetitorControls),
           unlinkedCompetitorPrices: this.fb.array(unlinkedCompetitorControls),
           productMargin: this.fb.control<number>(item.product?.margin ?? 0),
+          previousCost: this.fb.control<number>(item?.previousCost ?? 0),
           actualCost: this.fb.control<number>((item?.quoteCost || item?.costPrice) ?? 0),
           suggestedSalePrice: this.fb.control<string | null>(null),
           suggestedSalePriceWithMargin: this.fb.control<string | null>(null),
@@ -689,6 +691,7 @@ export class PromotionalFlyerProductTable {
       productMargin,
       linkedCompetitorPrices,
       actualCost,
+      previousCost,
       suggestedSalePrice,
       suggestedLoyaltyPrice,
       actualLoyaltyPrice,
@@ -710,9 +713,16 @@ export class PromotionalFlyerProductTable {
     const pricesOnly = competitorPriceValues.filter((price) => price > 0);
     const lowestCompetitorPrice = pricesOnly.length > 0 ? Math.min(...pricesOnly) : 0;
 
+    let baseCost = actualCost.value;
+
+    if (this.flyerType() === 'supplier') {
+      if (previousCost.value > actualCost.value) {
+        baseCost = previousCost.value;
+      }
+    }
+
     const finalCost =
-      transformToNumberValue(shippingPrice.value ?? 0) +
-      transformToNumberValue(actualCost.value ?? 0);
+      transformToNumberValue(shippingPrice.value ?? 0) + transformToNumberValue(baseCost);
 
     const productMarginValue = transformToNumberValue(productMargin.value ?? 0);
 
@@ -928,8 +938,8 @@ export class PromotionalFlyerProductTable {
           'id',
           'name',
           'margin',
-          'cost_price',
           'previous_cost',
+          'cost_price',
           'variation',
           'current_sale_price',
           'sale_price',
