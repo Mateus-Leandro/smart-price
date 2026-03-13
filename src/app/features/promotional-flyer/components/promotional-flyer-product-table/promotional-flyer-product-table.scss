@@ -5,6 +5,12 @@
   font-weight: bolder;
 }
 
+.greater-cost {
+  font-size: 13px;
+  font-weight: bolder;
+  color: blue;
+}
+
 .sale-price-cell,
 input.only-line.sale-price-cell {
   color: $sale-price-color !important;
