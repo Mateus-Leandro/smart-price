@@ -73,14 +73,22 @@
       @if (flyerType() === 'supplier') {
         <ng-container matColumnDef="previous_cost">
           <th mat-header-cell *matHeaderCellDef>Custo Anterior</th>
-          <td mat-cell *matCellDef="let element">
+          <td
+            mat-cell
+            *matCellDef="let element"
+            [class.greater-cost]="element?.previousCost > element?.costPrice"
+          >
             {{ element?.previousCost || 0 | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
           </td>
         </ng-container>
 
         <ng-container matColumnDef="cost_price">
           <th mat-header-cell *matHeaderCellDef>Custo Atual</th>
-          <td mat-cell *matCellDef="let element">
+          <td
+            mat-cell
+            *matCellDef="let element"
+            [class.greater-cost]="element?.costPrice > element?.previousCost"
+          >
             {{ element?.costPrice || 0 | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}
           </td>
         </ng-container>
