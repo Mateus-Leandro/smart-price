@@ -829,7 +829,7 @@ export class PromotionalFlyerProductTable {
         );
       } else {
         loyaltyMarginRuleText.setValue(
-          `${productMarginValue}% em relação ao custo final(Pr.Cotação + Frete).`,
+          `${productMarginValue}% ${this.flyerType() === 'quote' ? 'em relação ao custo final(Pr.Cotação + Frete)' : 'em relação ao maior custo'}.`,
         );
       }
 
@@ -847,7 +847,7 @@ export class PromotionalFlyerProductTable {
         );
       } else {
         saleMarginRuleText.setValue(
-          `${productMarginValue}% em relação ao custo final(Pr.Cotação + Frete).`,
+          `${productMarginValue}% ${this.flyerType() === 'quote' ? 'em relação ao custo final(Pr.Cotação + Frete)' : 'em relação ao maior custo'}.`,
         );
       }
     }
