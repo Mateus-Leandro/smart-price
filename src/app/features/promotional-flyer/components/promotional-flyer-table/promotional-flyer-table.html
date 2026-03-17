@@ -7,7 +7,9 @@
     }
 
     <mat-form-field appearance="outline" class="search-input">
-      <mat-label>Pesquise pelo nome do registro</mat-label>
+      <mat-label>{{
+        flyerType() === 'quote' ? 'Pesquisar cotação' : 'Pesquisar tabela de fornecedor'
+      }}</mat-label>
       <input matInput type="search" (input)="onSearch($event)" />
       <mat-icon matSuffix>search</mat-icon>
     </mat-form-field>
