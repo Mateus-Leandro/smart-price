@@ -248,7 +248,7 @@ export class MaintenanceProductTable implements OnInit {
               brancheId: this.fb.control(branch.id, { nonNullable: true }),
               margin: this.fb.control(existingMargin, {
                 nonNullable: true,
-                validators: [Validators.max(100)],
+                validators: [Validators.max(999.99)],
               }),
             }) as BranchGroup;
           }),
