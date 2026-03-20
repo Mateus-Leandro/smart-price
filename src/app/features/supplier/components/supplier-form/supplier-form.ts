@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Output, signal } from '@angular/core';
 import { Spinner } from 'src/app/shared/components/spinner/spinner';
 import { MatInputModule } from '@angular/material/input';
 import { LoadingService } from 'src/app/core/services/loading.service';
@@ -32,7 +32,7 @@ export class SupplierForm {
   loading = inject(LoadingService).loading;
   supplierFormGroup: FormGroup;
   supplierId: number | null = null;
-  userPermissions: IUserPermission | null = null;
+  userPermissions = signal<IUserPermission | null>(null);
 
   constructor(
     private fb: FormBuilder,
@@ -58,7 +58,7 @@ export class SupplierForm {
         next: (user) => {
           this.userPermissionService.getPermissions(user.id).subscribe({
             next: (permissions) => {
-              this.userPermissions = permissions;
+              this.userPermissions.set(permissions);
             },
             error: (err) => {
               this.notificationService.showError(
