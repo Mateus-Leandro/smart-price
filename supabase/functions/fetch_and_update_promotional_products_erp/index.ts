@@ -44,7 +44,7 @@ serve(async (req) => {
     let query = supabase
       .from('promotional_flyer_products')
       .select(
-        'promotional_flyer_id, product_id, sale_price, loyalty_price, price_discount_percent, warning_type',
+        'promotional_flyer_id, product_id, current_sale_price, sale_price, current_loyalty_price, loyalty_price, price_discount_percent, warning_type',
       )
       .eq('company_id', company_id)
       .eq('send_to_erp', true)
