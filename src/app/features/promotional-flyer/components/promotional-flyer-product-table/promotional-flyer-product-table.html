@@ -220,7 +220,7 @@
         <td mat-cell *matCellDef="let element; let i = dataIndex" class="sale-price-cell">
           <div fxLayout="column" fxLayoutGap="2px">
             <input
-              [readonly]="!userPermissions?.allowEditPrices"
+              [readonly]="!userPermissions?.allowEditPrices || rows.at(i).controls.lockPrices.value"
               #salePriceInput
               matInput
               class="only-line sale-price-cell"
@@ -276,7 +276,9 @@
           @if (element.currentLoyaltyPrice) {
             <div fxLayout="column" fxLayoutGap="2px">
               <input
-                [readonly]="!userPermissions?.allowEditPrices"
+                [readonly]="
+                  !userPermissions?.allowEditPrices || rows.at(i).controls.lockPrices.value
+                "
                 #loyaltyPriceInput
                 matInput
                 class="only-line loyalty-price-cell"
