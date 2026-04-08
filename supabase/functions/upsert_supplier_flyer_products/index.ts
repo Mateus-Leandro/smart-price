@@ -17,6 +17,10 @@ serve(async (req) => {
       return fail('Payload enviado não é um array!', 400);
     }
 
+    if (payload.length === 0) {
+      return success([]);
+    }
+
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,
       Deno.env.get('SUPABASE_ANON_KEY')!,
@@ -29,6 +33,7 @@ serve(async (req) => {
       data: { user },
       error: authError,
     } = await supabase.auth.getUser();
+
     if (authError || !user) {
       return fail('Não autenticado', 401);
     }
@@ -38,20 +43,20 @@ serve(async (req) => {
       return fail('Não encontrado empresa vinculada ao usuário!', 400);
     }
 
+    const currentFlyerId = payload[0].supplier_flyer_id;
+    if (!currentFlyerId) {
+      return fail('ID do encarte (supplier_flyer_id) não encontrado no payload', 400);
+    }
+
     const results: any[] = [];
+    const processedProductIds: string[] = [];
 
     for (const item of payload) {
-      const {
-        product_id,
-        product_name,
-        supplier_flyer_id,
-        current_sale_price,
-        current_loyalty_price,
-        cost_price,
-      } = item;
+      const { product_id, product_name, current_sale_price, current_loyalty_price, cost_price } =
+        item;
 
-      if (!supplier_flyer_id || !product_id || !product_name) {
-        return fail('Campos obrigatórios ausentes', 400);
+      if (!product_id || !product_name) {
+        return fail('Campos de produto obrigatórios ausentes', 400);
       }
 
       const { data: existingProduct } = await supabase
@@ -77,7 +82,7 @@ serve(async (req) => {
         .from('supplier_flyer_products')
         .upsert(
           {
-            supplier_flyer_id,
+            supplier_flyer_id: currentFlyerId,
             product_id,
             company_id,
             current_sale_price,
@@ -95,15 +100,44 @@ serve(async (req) => {
         return fail('Erro ao vincular produto', 500);
       }
 
+      processedProductIds.push(product_id);
+
       results.push({
-        supplier_flyer_id,
+        supplier_flyer_id: currentFlyerId,
         product_id,
         flyer_product_id: supplierFlyerProduct.id,
       });
     }
 
+    const { data: currentProducts, error: fetchError } = await supabase
+      .from('supplier_flyer_products')
+      .select('product_id')
+      .eq('company_id', company_id)
+      .eq('supplier_flyer_id', currentFlyerId);
+
+    if (fetchError) {
+      return fail('Erro ao buscar produtos atuais do encarte', 500);
+    }
+
+    const productsToDelete = currentProducts
+      .map((p) => p.product_id)
+      .filter((id) => !processedProductIds.includes(id));
+
+    if (productsToDelete.length > 0) {
+      const { error: deleteError } = await supabase
+        .from('supplier_flyer_products')
+        .delete()
+        .eq('company_id', company_id)
+        .eq('supplier_flyer_id', currentFlyerId)
+        .in('product_id', productsToDelete);
+
+      if (deleteError) {
+        return fail('Erro ao limpar produtos removidos do encarte', 500);
+      }
+    }
+
     return success(results);
-  } catch (err) {
+  } catch (err: any) {
     return fail(`Erro ao atualizar produtos da tabela de fornecedor: ${err.message}`, 500);
   }
 });
