@@ -46,8 +46,8 @@ export class SupplierFlyerService {
     return this.repository.updatePriceDiscountPercent(flyerId, productId, discountPercent);
   }
 
-  lockOrUnlockPrices(flyerId: number, productId: number, lock: boolean) {
-    return this.repository.lockOrUnlockPrices(flyerId, productId, lock);
+  lockOrUnlockPrices(flyerId: number, lock: boolean, productId?: number) {
+    return this.repository.lockOrUnlockPrices(flyerId, lock, productId);
   }
 
   sendPricesToErp(flyerId: number, productId?: number) {
