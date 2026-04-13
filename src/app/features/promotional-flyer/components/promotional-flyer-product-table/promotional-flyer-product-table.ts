@@ -651,7 +651,7 @@ export class PromotionalFlyerProductTable {
 
   lockOrUnlockPrices(productId: number, lock: boolean, index: number) {
     this.getFlyerService()
-      .lockOrUnlockPrices(this.flyerId(), productId, lock)
+      .lockOrUnlockPrices(this.flyerId(), lock, productId)
       .subscribe({
         next: () => {
           const typeOperation = lock ? 'fixado' : 'desafixado';

@@ -48,7 +48,28 @@
             (click)="openClearPriceDialog()"
           />
           <div fxLayout="column" fxLayoutGap="10px" fxLayoutAlign="end end">
-            <span style="font-weight: 500; color: black"> Preços dos Concorrentes</span>
+            <div fxLayout="row" fxLayoutGap="5px">
+              <mat-icon style="font-size: 20px; width: 20px; height: 20px">attach_money</mat-icon>
+              <span style="font-weight: 500; color: black">Preços de Venda e Fidelidade</span>
+            </div>
+            <div fxLayout="row" fxLayoutGap="10px">
+              <app-icon-button
+                icon="lock"
+                tooltipText="Travar os preços de venda e fidelidade. Quando travados, não será possível alterá-los."
+                (click)="lockOrUnlockFlyerPrices(true)"
+              />
+              <app-icon-button
+                icon="lock_open"
+                tooltipText="Destravar os preços de venda e fidalidade"
+                (click)="lockOrUnlockFlyerPrices(false)"
+              />
+            </div>
+          </div>
+          <div fxLayout="column" fxLayoutGap="10px" fxLayoutAlign="end end">
+            <div fxLayout="row" fxLayoutGap="10px">
+              <mat-icon style="font-size: 20px; width: 20px; height: 20px">groups_3</mat-icon>
+              <span style="font-weight: 500; color: black">Preços dos Concorrentes</span>
+            </div>
             <div fxLayout="row" fxLayoutGap="10px">
               <app-icon-button
                 icon="lock"

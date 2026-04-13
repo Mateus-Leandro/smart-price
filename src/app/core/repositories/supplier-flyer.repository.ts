@@ -267,16 +267,19 @@ export class SupplierFlyerRepository {
     );
   }
 
-  lockOrUnlockPrices(flyerId: number, productId: number, lock: boolean) {
-    return from(
-      this.supabase
-        .from('supplier_flyer_products')
-        .update({
-          lock_price: lock,
-        })
-        .eq('supplier_flyer_id', flyerId)
-        .eq('product_id', productId),
-    ).pipe(
+  lockOrUnlockPrices(flyerId: number, lock: boolean, productId?: number) {
+    let query = this.supabase
+      .from('supplier_flyer_products')
+      .update({
+        lock_price: lock,
+      })
+      .eq('supplier_flyer_id', flyerId);
+
+    if (productId) {
+      query = query.eq('product_id', productId);
+    }
+
+    return from(query).pipe(
       map(({ error }) => {
         if (error) throw error;
       }),

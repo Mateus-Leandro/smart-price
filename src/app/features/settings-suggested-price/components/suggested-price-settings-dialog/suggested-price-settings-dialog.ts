@@ -373,6 +373,30 @@ export class SuggestedPriceSettingsDialog implements OnInit {
       });
   }
 
+  lockOrUnlockFlyerPrices(lockFlyerPrices: boolean) {
+    const { flyerInfo } = this.data || {};
+    const flyerId = flyerInfo?.id;
+
+    this.getFlyerService()
+      .lockOrUnlockPrices(flyerId, lockFlyerPrices)
+      .subscribe({
+        next: () => {
+          this.notificationService.showSuccess(
+            lockFlyerPrices
+              ? 'Preços de venda e fidelidade travados com sucesso'
+              : 'Preços de venda e fidelidade destravados com sucesso',
+          );
+        },
+        error: (err) => {
+          this.notificationService.showError(
+            lockFlyerPrices
+              ? `Erro ao travar os preços de venda e fidelidade: ${err?.message || err}`
+              : `Erro ao destravar os preços de venda e fidelidade: ${err?.message || err}`,
+          );
+        },
+      });
+  }
+
   get isViewing() {
     return this.currentState() === 'view';
   }
