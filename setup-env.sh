@@ -8,6 +8,6 @@ echo "export const environment = { production: false, SUPABASE_URL: 'REPLACE_WIT
 
 # Substitui os placeholders no arquivo de produção pelas variáveis da Vercel
 sed -i "s|REPLACE_WITH_SUPABASE_URL|$NEXT_PUBLIC_SUPABASE_URL|g" src/environments/environment.ts
-sed -i "s|REPLACE_WITH_SUPABASE_KEY|$NEXT_PUBLIC_SUPABASE_ANON_KEY|g" src/environments/environment.ts
+sed -i "s|REPLACE_WITH_SUPABASE_KEY|$NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY|g" src/environments/environment.ts
 
 echo "Ambiente configurado com sucesso!"
