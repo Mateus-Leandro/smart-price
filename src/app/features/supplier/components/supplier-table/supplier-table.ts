@@ -18,6 +18,7 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 import { EnumSupplierDeliveryTypeEnum } from '../../../../core/enums/supplier.enum';
 import { IFilterOptions } from 'src/app/shared/components/icon-filter-button/icon-filter-list';
 import { ISupplierView } from 'src/app/core/models/supplier.model';
+import { SupplierFilterService } from '../../services/supplier-filter-service';
 
 @Component({
   selector: 'app-supplier-table',
@@ -48,7 +49,6 @@ export class SupplierTable {
     value: value,
   }));
 
-  selectedDeliveryFilterType = signal<null | EnumSupplierDeliveryTypeEnum>(null);
   paginatorDataSource: IDefaultPaginatorDataSource<ISupplierView> = {
     pageIndex: 0,
     pageSize: 10,
@@ -56,6 +56,8 @@ export class SupplierTable {
   };
 
   private search$ = new Subject<string>();
+  private supplierFilterService = inject(SupplierFilterService);
+  selectedDeliveryFilterType = this.supplierFilterService.selectedDeliveryFilterType;
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -69,10 +71,6 @@ export class SupplierTable {
 
       this.reload(filterValue);
     });
-  }
-
-  aplicarFiltro(filterValue: any) {
-    console.log(filterValue);
   }
 
   ngOnInit(): void {
