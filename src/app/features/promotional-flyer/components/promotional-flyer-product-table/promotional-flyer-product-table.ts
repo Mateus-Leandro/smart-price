@@ -1,6 +1,7 @@
 import {
   ChangeDetectorRef,
   Component,
+  computed,
   effect,
   ElementRef,
   inject,
@@ -43,7 +44,7 @@ import { MatTooltip } from '@angular/material/tooltip';
 import {
   EnumFilterPromotionalFlyerProducts,
   EnumWarningProductType,
-  getPromotionalFlyerProductsFilterOptions,
+  getFlyerFilterOptions,
   ProductPriceType,
 } from '../../../../core/enums/product.enum';
 import {
@@ -159,8 +160,8 @@ export class PromotionalFlyerProductTable {
   dataSource = new MatTableDataSource<IPromotionalFlyerProductsView | ISupplierFlyerView>([]);
   expandedElement: IPromotionalFlyerProductsView | ISupplierFlyerView | null = null;
 
-  filterOptions: IFilterOptions<EnumFilterPromotionalFlyerProducts>[] =
-    getPromotionalFlyerProductsFilterOptions();
+  filterOptions = computed(() => getFlyerFilterOptions(this.flyerType()));
+
   selectedFilterType = signal<null | EnumFilterPromotionalFlyerProducts>(null);
   paginatorDataSource: IDefaultPaginatorDataSource<
     IPromotionalFlyerProductsView | ISupplierFlyerView

@@ -5,7 +5,12 @@ import { LoadingService } from '../services/loading.service';
 import { ISupplierFlyerProductsView, ISupplierFlyerView } from '../models/supplier-flyer.model';
 import { IDefaultPaginatorDataSource } from '../models/query.model';
 import { finalize, from, map, Observable, of } from 'rxjs';
-import { EnumFilterPromotionalFlyerProducts, EnumWarningProductType } from '../enums/product.enum';
+import {
+  EnumFilterPromotionalFlyerProducts,
+  EnumFilterSupplierFlyerProducts,
+  EnumWarningProductType,
+  FlyerFilterValue,
+} from '../enums/product.enum';
 
 @Injectable({ providedIn: 'root' })
 export class SupplierFlyerRepository {
@@ -80,13 +85,13 @@ export class SupplierFlyerRepository {
     idIntegral: number,
     paginator: IDefaultPaginatorDataSource<ISupplierFlyerProductsView>,
     search?: string,
-    selectedFilterType?: EnumFilterPromotionalFlyerProducts,
+    selectedFilterType?: EnumFilterSupplierFlyerProducts,
   ): Observable<{ data: ISupplierFlyerProductsView[]; count: number }> {
     const fromIdx = paginator.pageIndex * paginator.pageSize;
     const toIdx = fromIdx + paginator.pageSize - 1;
 
     let query = this.supabase
-      .from('supplier_flyer_products')
+      .from('supplier_flyer_products_view')
       .select(
         `
           sale_price,
@@ -158,6 +163,12 @@ export class SupplierFlyerRepository {
           break;
         case EnumFilterPromotionalFlyerProducts.NoCompetitorPrice:
           query = query.eq('warning_type', EnumFilterPromotionalFlyerProducts.NoCompetitorPrice);
+          break;
+        case EnumFilterSupplierFlyerProducts.VariationGreater:
+          query = query.gt('price_variation', 0).gt('cost_price', 0).gt('previous_cost', 0);
+          break;
+        case EnumFilterSupplierFlyerProducts.VariationLess:
+          query = query.lt('price_variation', 0);
           break;
       }
     }
