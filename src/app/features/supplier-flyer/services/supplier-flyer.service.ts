@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {
-  EnumFilterPromotionalFlyerProducts,
+  EnumFilterSupplierFlyerProducts,
   EnumWarningProductType,
 } from 'src/app/core/enums/product.enum';
 import { IDefaultPaginatorDataSource } from 'src/app/core/models/query.model';
@@ -29,7 +29,7 @@ export class SupplierFlyerService {
     idIntegral: number,
     paginator: IDefaultPaginatorDataSource<ISupplierFlyerProductsView>,
     search?: string,
-    selectedFilterType?: EnumFilterPromotionalFlyerProducts,
+    selectedFilterType?: EnumFilterSupplierFlyerProducts,
   ) {
     return this.repository.loadProduts(flyerId, idIntegral, paginator, search, selectedFilterType);
   }
