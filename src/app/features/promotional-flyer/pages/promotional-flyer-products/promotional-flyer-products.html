@@ -17,7 +17,7 @@
             @if (flyerInfo()) {
               <mat-card-title>
                 {{
-                  `${flyerType() === 'quote' ? 'cotação' : 'tabela de fornecedor'}: ${flyerInfo()?.idIntegral}
+                  `${flyerType() === 'quote' ? 'Cotação' : 'Tabela de fornecedor'}: ${flyerInfo()?.idIntegral}
                 | Loja: ${flyerInfo()?.branche?.id?.toString()?.padStart(2, '0')} -
                 ${flyerInfo()?.branche?.name} `
                 }}
