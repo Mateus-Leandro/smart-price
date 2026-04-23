@@ -59,15 +59,16 @@ import { EnumSupplierDeliveryTypeEnum } from 'src/app/core/enums/supplier.enum';
 import { IUserPermission } from 'src/app/core/models/user-permission.model';
 import { UserPermissionService } from 'src/app/features/user-permission/user-permission.service';
 import { IconFilterButton } from 'src/app/shared/components/icon-filter-button/icon-filter-button';
-import { IFilterOptions } from 'src/app/shared/components/icon-filter-button/icon-filter-list';
 import { SupplierShippingPriceService } from 'src/app/features/supplier-shipping-price/services/supplier-shipping-price.service';
 import { CompanySettingsService } from 'src/app/features/company-settings/services/company-settings.service';
 import { ISupplierFlyerView } from 'src/app/core/models/supplier-flyer.model';
 import { SupplierFlyerService } from 'src/app/features/supplier-flyer/services/supplier-flyer.service';
 import {
   EnumFilterPromotionalFlyerProducts,
+  FlyerFilterValue,
   getFlyerFilterOptions,
 } from 'src/app/core/enums/flyer.enum';
+import { PromotionalFlyerFilterService } from '../../services/promotional-flyer-filter-service';
 
 type FlyerRowForm = FormGroup<{
   actualSalePrice: FormControl<string | null>;
@@ -161,7 +162,8 @@ export class PromotionalFlyerProductTable {
 
   filterOptions = computed(() => getFlyerFilterOptions(this.flyerType()));
 
-  selectedFilterType = signal<null | EnumFilterPromotionalFlyerProducts>(null);
+  filterService = inject(PromotionalFlyerFilterService);
+  selectedFilterType = computed(() => this.filterService.getSelectedFilter(this.flyerType()));
   paginatorDataSource: IDefaultPaginatorDataSource<
     IPromotionalFlyerProductsView | ISupplierFlyerView
   > = {
@@ -295,7 +297,7 @@ export class PromotionalFlyerProductTable {
       IPromotionalFlyerProductsView | ISupplierFlyerView
     >,
     search?: string,
-    selectedFilterType?: EnumFilterPromotionalFlyerProducts,
+    selectedFilterType?: FlyerFilterValue,
   ): void {
     this.getFlyerService()
       .loadProducts(flyerId, idIntegral, paginatorDataSource as any, search, selectedFilterType)
@@ -328,7 +330,7 @@ export class PromotionalFlyerProductTable {
     this.search$.next(value);
   }
 
-  reload(filterType: EnumFilterPromotionalFlyerProducts | null = this.selectedFilterType()): void {
+  reload(filterType: FlyerFilterValue | null = this.selectedFilterType()): void {
     const currentBrancheId = this.flyerInfo().branche.id;
 
     this.competitorService
