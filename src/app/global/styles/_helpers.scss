@@ -48,3 +48,16 @@
   min-height: 100vh;
   background-color: $primary;
 }
+
+.filter-type {
+  padding-top: 35px;
+}
+
+.filter-type-label {
+  font-weight: 400;
+  color: red;
+}
+
+.filter-type-bold-label {
+  font-weight: 500;
+}

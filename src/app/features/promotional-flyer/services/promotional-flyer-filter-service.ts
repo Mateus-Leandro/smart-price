@@ -18,4 +18,16 @@ export class PromotionalFlyerFilterService {
     const validOptions = getFlyerFilterOptions(type).map((opt) => opt.value);
     return validOptions.includes(selected) ? selected : null;
   }
+
+  getSelectedFilterLabel(type: TFlyerType): string | null {
+    const selected = this.getSelectedFilter(type);
+
+    if (!selected) {
+      return 'Todos';
+    }
+
+    const option = getFlyerFilterOptions(type).find((opt) => opt.value === selected);
+
+    return option?.label ?? 'Todos';
+  }
 }

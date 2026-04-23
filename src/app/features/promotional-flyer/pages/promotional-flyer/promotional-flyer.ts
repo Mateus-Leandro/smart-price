@@ -1,4 +1,4 @@
-import { Component, input, signal, ViewChild } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 
 import { PromotionalFlyerTable } from '../../components/promotional-flyer-table/promtional-flyer-table';

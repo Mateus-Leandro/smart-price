@@ -20,6 +20,7 @@ import { MatIcon } from '@angular/material/icon';
 import { ISupplierFlyerView } from 'src/app/core/models/supplier-flyer.model';
 import { SupplierFlyerService } from 'src/app/features/supplier-flyer/services/supplier-flyer.service';
 import { EnumFilterPromotionalFlyerProducts } from 'src/app/core/enums/flyer.enum';
+import { PromotionalFlyerFilterService } from '../../services/promotional-flyer-filter-service';
 
 @Component({
   selector: 'app-promotional-flyer-products',
@@ -48,6 +49,8 @@ export class PromotionalFlyerProducts {
 
   @ViewChild(PromotionalFlyerProductTable)
   flyerTable: PromotionalFlyerProductTable | null = null;
+
+  public flyerFilterService = inject(PromotionalFlyerFilterService);
 
   constructor(
     private route: ActivatedRoute,
