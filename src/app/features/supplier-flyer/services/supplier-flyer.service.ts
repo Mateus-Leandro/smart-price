@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core';
-import {
-  EnumFilterSupplierFlyerProducts,
-  EnumWarningProductType,
-} from 'src/app/core/enums/product.enum';
+import { EnumFilterSupplierFlyerProducts } from 'src/app/core/enums/flyer.enum';
+import { EnumWarningProductType } from 'src/app/core/enums/product.enum';
 import { IDefaultPaginatorDataSource } from 'src/app/core/models/query.model';
 import {
   ISupplierFlyerProductsView,

@@ -5,12 +5,11 @@ import { LoadingService } from '../services/loading.service';
 import { ISupplierFlyerProductsView, ISupplierFlyerView } from '../models/supplier-flyer.model';
 import { IDefaultPaginatorDataSource } from '../models/query.model';
 import { finalize, from, map, Observable, of } from 'rxjs';
+import { EnumWarningProductType } from '../enums/product.enum';
 import {
   EnumFilterPromotionalFlyerProducts,
   EnumFilterSupplierFlyerProducts,
-  EnumWarningProductType,
-  FlyerFilterValue,
-} from '../enums/product.enum';
+} from '../enums/flyer.enum';
 
 @Injectable({ providedIn: 'root' })
 export class SupplierFlyerRepository {

@@ -27,6 +27,12 @@
             <mat-card-subtitle>
               Ajuste o preço de venda e o preço fidelidade dos itens desejados.
             </mat-card-subtitle>
+            <div class="filter-type" fxLayout="row" fxLayoutGap="5px">
+              <span class="filter-type-bold-label">Filtro selecionado:</span>
+              <span class="filter-type-label">
+                {{ flyerFilterService.getSelectedFilterLabel(flyerType()!) }}</span
+              >
+            </div>
           </div>
         </div>
         @if (userPermissions?.allowEditPrices) {

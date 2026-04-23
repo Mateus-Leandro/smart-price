@@ -8,8 +8,9 @@ import {
   IPromotionalFlyerProductsView,
   IPromotionalFlyerView,
 } from '../models/promotional-flyer.model';
-import { EnumFilterPromotionalFlyerProducts, EnumWarningProductType } from '../enums/product.enum';
+import { EnumWarningProductType } from '../enums/product.enum';
 import { EnumSupplierDeliveryTypeEnum } from '../enums/supplier.enum';
+import { EnumFilterPromotionalFlyerProducts } from '../enums/flyer.enum';
 
 @Injectable({ providedIn: 'root' })
 export class PromotionalFlyerRepository {

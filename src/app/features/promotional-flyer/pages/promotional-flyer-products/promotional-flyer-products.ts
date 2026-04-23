@@ -17,9 +17,10 @@ import { IUserPermission } from 'src/app/core/models/user-permission.model';
 import { UserPermissionService } from 'src/app/features/user-permission/user-permission.service';
 import { AuthService } from 'src/app/features/auth/services/auth.service';
 import { MatIcon } from '@angular/material/icon';
-import { EnumFilterPromotionalFlyerProducts } from 'src/app/core/enums/product.enum';
 import { ISupplierFlyerView } from 'src/app/core/models/supplier-flyer.model';
 import { SupplierFlyerService } from 'src/app/features/supplier-flyer/services/supplier-flyer.service';
+import { EnumFilterPromotionalFlyerProducts } from 'src/app/core/enums/flyer.enum';
+import { PromotionalFlyerFilterService } from '../../services/promotional-flyer-filter-service';
 
 @Component({
   selector: 'app-promotional-flyer-products',
@@ -48,6 +49,8 @@ export class PromotionalFlyerProducts {
 
   @ViewChild(PromotionalFlyerProductTable)
   flyerTable: PromotionalFlyerProductTable | null = null;
+
+  public flyerFilterService = inject(PromotionalFlyerFilterService);
 
   constructor(
     private route: ActivatedRoute,

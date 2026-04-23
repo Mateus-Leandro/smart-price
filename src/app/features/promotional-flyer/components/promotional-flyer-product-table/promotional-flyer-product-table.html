@@ -16,7 +16,8 @@
       <app-icon-filter-button
         [showOptionAll]="true"
         [itemsOptions]="filterOptions()"
-        [(selectedFilter)]="selectedFilterType"
+        [selectedFilter]="selectedFilterType()"
+        (selectedFilterChange)="filterService.selectedFilterType.set($event)"
         toolTipText="Produtos"
       />
     </div>
