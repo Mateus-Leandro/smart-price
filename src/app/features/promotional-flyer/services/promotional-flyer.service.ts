@@ -5,10 +5,8 @@ import {
   IPromotionalFlyerProductsView,
   IPromotionalFlyerView,
 } from 'src/app/core/models/promotional-flyer.model';
-import {
-  EnumFilterPromotionalFlyerProducts,
-  EnumWarningProductType,
-} from 'src/app/core/enums/product.enum';
+import { EnumWarningProductType } from 'src/app/core/enums/product.enum';
+import { EnumFilterPromotionalFlyerProducts } from 'src/app/core/enums/flyer.enum';
 
 @Injectable({
   providedIn: 'root',

@@ -41,12 +41,7 @@ import { IDefaultPaginatorDataSource } from 'src/app/core/models/query.model';
 import { LoadingService } from 'src/app/core/services/loading.service';
 import { NotificationService } from 'src/app/core/services/notification.service';
 import { MatTooltip } from '@angular/material/tooltip';
-import {
-  EnumFilterPromotionalFlyerProducts,
-  EnumWarningProductType,
-  getFlyerFilterOptions,
-  ProductPriceType,
-} from '../../../../core/enums/product.enum';
+import { EnumWarningProductType, ProductPriceType } from '../../../../core/enums/product.enum';
 import {
   IPromotionalFlyerProductsView,
   IPromotionalFlyerView,
@@ -69,6 +64,10 @@ import { SupplierShippingPriceService } from 'src/app/features/supplier-shipping
 import { CompanySettingsService } from 'src/app/features/company-settings/services/company-settings.service';
 import { ISupplierFlyerView } from 'src/app/core/models/supplier-flyer.model';
 import { SupplierFlyerService } from 'src/app/features/supplier-flyer/services/supplier-flyer.service';
+import {
+  EnumFilterPromotionalFlyerProducts,
+  getFlyerFilterOptions,
+} from 'src/app/core/enums/flyer.enum';
 
 type FlyerRowForm = FormGroup<{
   actualSalePrice: FormControl<string | null>;
