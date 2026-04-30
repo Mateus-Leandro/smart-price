@@ -186,6 +186,44 @@
           </td>
         </ng-container>
 
+        <ng-container matColumnDef="additional_cost">
+          <th mat-header-cell *matHeaderCellDef>Acréscimo</th>
+          <td mat-cell *matCellDef="let element; let i = dataIndex">
+            <input
+              [readonly]="!userPermissions?.allowEditPrices || rows.at(i).controls.lockPrices.value"
+              #additionalCostInput
+              matInput
+              class="only-line additional-price-cell"
+              [formControl]="rows.at(i).controls.additionalCost"
+              (blur)="
+                onPriceBlur(
+                  additionalCostInput.getAttribute('initial-additional-cost') || '0',
+                  element.product.id,
+                  rows.at(i).controls.additionalCost || '0',
+                  'additional_cost'
+                )
+              "
+              (focus)="onFocus(additionalCostInput)"
+              (focusin)="
+                additionalCostInput.setAttribute(
+                  'initial-additional-cost',
+                  rows.at(i).controls.salePrice.value?.toString() || '0'
+                )
+              "
+              mask="separator.2"
+              thousandSeparator="."
+              decimalMarker=","
+              prefix="R$ "
+              (keyup.enter)="onEnterNext(additionalCostInputs, additionalCostInput)"
+              [dropSpecialCharacters]="true"
+              [showMaskTyped]="false"
+              [allowNegativeNumbers]="false"
+              style="width: 75px"
+              (click)="$event.stopPropagation()"
+            />
+          </td>
+        </ng-container>
+
         <ng-container matColumnDef="quote_cost">
           <th mat-header-cell *matHeaderCellDef>Pr.Cotação</th>
           <td mat-cell *matCellDef="let element; let i = dataIndex">
@@ -195,9 +233,18 @@
             >
               <span> {{ element.quoteCost | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR' }}</span>
             </div>
-            @if (getShippingPrice(i)) {
-              <div matTooltip="Pr.Cotação + frete">
-                <span style="font-weight: bold">
+            @if (getShippingPrice(i) || getAdditionalCost(i)) {
+              <div
+                [matTooltip]="
+                  `Pr.Cotação ${getAdditionalCost(i) ? '+ Acréscimo' : ''} ${getShippingPrice(i) ? '+ Frete' : ''}`
+                "
+              >
+                <span
+                  [ngClass]="{
+                    'additional-price-cell': getAdditionalCost(i) > 0,
+                  }"
+                  style="font-weight: bold"
+                >
                   {{
                     getFinalCost(i, element.quoteCost)
                       | currency: 'BRL' : 'symbol' : '1.2-2' : 'pt-BR'
