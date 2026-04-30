@@ -17,6 +17,12 @@ input.only-line.sale-price-cell {
   border-bottom-color: $sale-price-color !important;
 }
 
+.additional-price-cell,
+input.only-line.additional-price-cell {
+  color: $additional-cost-color !important;
+  border-bottom-color: $additional-cost-color !important;
+}
+
 .loyalty-price-cell,
 input.only-line.loyalty-price-cell {
   color: $loyalty-price-color !important;

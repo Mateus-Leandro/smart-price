@@ -80,6 +80,7 @@ type FlyerRowForm = FormGroup<{
   productMargin: FormControl<number>;
   previousCost: FormControl<number>;
   actualCost: FormControl<number>;
+  additionalCost: FormControl<string | null>;
   linkedCompetitorPrices: FormArray<FormControl<string | null>>;
   unlinkedCompetitorPrices: FormArray<FormControl<string | null>>;
   suggestedSalePrice: FormControl<string | null>;
@@ -132,6 +133,9 @@ export class PromotionalFlyerProductTable {
 
   @ViewChildren('shippingPriceInput')
   shippingPriceInputs!: QueryList<ElementRef<HTMLInputElement>>;
+
+  @ViewChildren('additionalCostInput')
+  additionalCostInputs!: QueryList<ElementRef<HTMLInputElement>>;
 
   @ViewChildren('linkedCompetitorPriceInput')
   linkedCompetitorPriceInputs!: QueryList<ElementRef<HTMLInputElement>>;
@@ -420,6 +424,11 @@ export class PromotionalFlyerProductTable {
           productMargin: this.fb.control<number>(item.product?.margin ?? 0),
           previousCost: this.fb.control<number>(item?.previousCost ?? 0),
           actualCost: this.fb.control<number>((item?.quoteCost || item?.costPrice) ?? 0),
+          additionalCost: this.fb.control<string | null>(
+            item?.additionalCost != null
+              ? item.additionalCost.toFixed(2).replace('.', ',')
+              : '0,00',
+          ),
           suggestedSalePrice: this.fb.control<string | null>(null),
           suggestedSalePriceWithMargin: this.fb.control<string | null>(null),
           suggestedLoyaltyPrice: this.fb.control<string | null>('0,00'),
@@ -615,6 +624,20 @@ export class PromotionalFlyerProductTable {
         return;
       }
 
+      if (columnName.toLocaleLowerCase() === 'additional_cost' && this.flyerType() === 'quote') {
+        this.promotionalFlyerService
+          .updateAdditionalCost(this.flyerId(), productId, numericPrice)
+          .subscribe({
+            error: (err: any) => {
+              this.notificationService.showError(
+                `Erro ao atualizar custo adicional. Item: ${productId} | Erro: ${err.message || err}`,
+              );
+            },
+          });
+
+        return;
+      }
+
       this.getFlyerService()
         .updateProductPrice(this.flyerId(), productId, numericPrice, columnName)
         .subscribe({
@@ -693,6 +716,7 @@ export class PromotionalFlyerProductTable {
       productMargin,
       linkedCompetitorPrices,
       actualCost,
+      additionalCost,
       previousCost,
       suggestedSalePrice,
       suggestedLoyaltyPrice,
@@ -715,7 +739,7 @@ export class PromotionalFlyerProductTable {
     const pricesOnly = competitorPriceValues.filter((price) => price > 0);
     const lowestCompetitorPrice = pricesOnly.length > 0 ? Math.min(...pricesOnly) : 0;
 
-    let baseCost = actualCost.value;
+    let baseCost = actualCost.value + transformToNumberValue(additionalCost.value || 0);
 
     if (this.flyerType() === 'supplier') {
       if (previousCost.value > actualCost.value) {
@@ -831,7 +855,7 @@ export class PromotionalFlyerProductTable {
         );
       } else {
         loyaltyMarginRuleText.setValue(
-          `${productMarginValue}% ${this.flyerType() === 'quote' ? 'em relação ao custo final(Pr.Cotação + Frete)' : 'em relação ao maior custo'}.`,
+          `${productMarginValue}% ${this.flyerType() === 'quote' ? `em relação ao custo final(Pr.Cotação + Frete + Acréscimo)` : 'em relação ao maior custo'}.`,
         );
       }
 
@@ -849,7 +873,7 @@ export class PromotionalFlyerProductTable {
         );
       } else {
         saleMarginRuleText.setValue(
-          `${productMarginValue}% ${this.flyerType() === 'quote' ? 'em relação ao custo final(Pr.Cotação + Frete)' : 'em relação ao maior custo'}.`,
+          `${productMarginValue}% ${this.flyerType() === 'quote' ? 'em relação ao custo final(Pr.Cotação + Frete + Acréscimo)' : 'em relação ao maior custo'}.`,
         );
       }
     }
@@ -861,6 +885,7 @@ export class PromotionalFlyerProductTable {
       rowForm.controls.shippingPrice.valueChanges,
       rowForm.controls.productMargin.valueChanges,
       rowForm.controls.actualCost.valueChanges,
+      rowForm.controls.additionalCost.valueChanges,
     )
       .pipe(debounceTime(600), distinctUntilChanged(), takeUntil(this.destroy$))
       .subscribe(() => {
@@ -870,7 +895,18 @@ export class PromotionalFlyerProductTable {
 
   getFinalCost(index: number, quoteCost: number): number {
     const shipping = transformToNumberValue(this.rows.at(index).get('shippingPrice')?.value || 0);
-    return quoteCost + shipping;
+    const additionalCost = transformToNumberValue(
+      this.rows.at(index).get('additionalCost')?.value || 0,
+    );
+    return quoteCost + shipping + additionalCost;
+  }
+
+  getAdditionalCost(index: number) {
+    const additionalCost = transformToNumberValue(
+      this.rows.at(index).get('additionalCost')?.value || 0,
+    );
+
+    return additionalCost;
   }
 
   getShippingPrice(index: number) {
@@ -926,6 +962,7 @@ export class PromotionalFlyerProductTable {
           'name',
           'margin',
           'shipping_price',
+          'additional_cost',
           'quote_cost',
           'average_cost_quote',
           'current_sale_price',

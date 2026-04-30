@@ -37,6 +37,7 @@ export interface IPromotionalFlyerProductsView {
   salePrice?: number;
   loyaltyPrice?: number;
   shippingPrice?: number;
+  additionalCost?: number;
   quoteCost?: number;
   averageCostQuote?: number;
   quantity_suppliers?: number;
