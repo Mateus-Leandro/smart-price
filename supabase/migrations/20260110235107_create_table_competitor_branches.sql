@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS public.competitor_branches (
     
     competitor_id INT NOT NULL REFERENCES public.competitors(id) ON DELETE CASCADE,
     
-    branch_id INT NOT NULL,
+    branche_id INT NOT NULL,
 
     CONSTRAINT fk_cb_company 
         FOREIGN KEY (company_id) 
@@ -14,11 +14,11 @@ CREATE TABLE IF NOT EXISTS public.competitor_branches (
         ON DELETE CASCADE,
 
     CONSTRAINT fk_cb_branch 
-        FOREIGN KEY (branch_id, company_id) 
+        FOREIGN KEY (branche_id, company_id) 
         REFERENCES public.company_branches(id, company_id) 
         ON DELETE CASCADE,
 
-    CONSTRAINT unique_competitor_branch UNIQUE(competitor_id, branch_id)
+    CONSTRAINT unique_competitor_branch UNIQUE(competitor_id, branche_id)
 );
 
 ALTER TABLE public.competitor_branches ENABLE ROW LEVEL SECURITY;
@@ -35,4 +35,4 @@ WITH CHECK (
 
 CREATE INDEX idx_cb_company ON public.competitor_branches(company_id);
 CREATE INDEX idx_cb_competitor ON public.competitor_branches(competitor_id);
-CREATE INDEX idx_cb_branch_composite ON public.competitor_branches(branch_id, company_id);
+CREATE INDEX idx_cb_branch_composite ON public.competitor_branches(branche_id, company_id);
