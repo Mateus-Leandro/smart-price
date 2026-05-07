@@ -1,0 +1,13 @@
+:host {
+  display: inline-flex;
+}
+
+.report-button {
+  background-color: var(--primary);
+  color: var(--font-primary);
+  box-shadow: none;
+}
+
+.report-button:hover {
+  box-shadow: none;
+}

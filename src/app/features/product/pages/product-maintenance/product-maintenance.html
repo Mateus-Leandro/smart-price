@@ -1,13 +1,19 @@
 <div>
   <mat-card>
     <mat-card-header>
-      <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+      <div
+        fxLayout="row"
+        fxLayoutAlign="space-between center"
+        fxLayoutGap="16px"
+        class="header-content"
+      >
         <div fxLayout="column">
           <mat-card-title>Informações dos Produtos</mat-card-title>
           <mat-card-subtitle
             >Caso desejar, ajuste a margem dos produtos para cada loja.</mat-card-subtitle
           >
         </div>
+        <app-btn-report tooltipText="Gerar relatório" (reportClick)="openReportFilterDialog()" />
       </div>
     </mat-card-header>
     <app-product-maintenance-product-table />
