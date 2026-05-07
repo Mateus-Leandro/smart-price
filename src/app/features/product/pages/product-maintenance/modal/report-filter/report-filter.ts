@@ -5,11 +5,7 @@ import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatDividerModule } from '@angular/material/divider';
 import { Button } from 'src/app/shared/components/button/button';
-
-export interface ProductReportFilterFormValue {
-  marginOption: 'with-margin' | 'without-margin';
-  format: 'xlsx' | 'pdf';
-}
+import { IProductReportFilter } from 'src/app/features/product/models/product-report.model';
 
 @Component({
   selector: 'app-report-filter',
@@ -26,14 +22,14 @@ export interface ProductReportFilterFormValue {
 })
 export class ReportFilter {
   private fb = inject(FormBuilder);
-  dialogRef = inject(MatDialogRef<ReportFilter, ProductReportFilterFormValue>);
+  dialogRef = inject(MatDialogRef<ReportFilter, IProductReportFilter>);
 
   reportFilterForm = this.fb.group({
-    marginOption: this.fb.control<'with-margin' | 'without-margin'>('with-margin', {
+    marginOption: this.fb.control<IProductReportFilter['marginOption']>('with-margin', {
       nonNullable: true,
       validators: [Validators.required],
     }),
-    format: this.fb.control<'xlsx' | 'pdf'>('pdf', {
+    format: this.fb.control<IProductReportFilter['format']>('pdf', {
       nonNullable: true,
       validators: [Validators.required],
     }),
