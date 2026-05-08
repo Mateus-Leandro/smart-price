@@ -26,6 +26,7 @@ export interface IProductReportByCompanyItem {
 }
 
 export interface IProductReportByCompany {
+  brancheId: number;
   companyName: string;
   products: IProductReportByCompanyItem[];
 }
