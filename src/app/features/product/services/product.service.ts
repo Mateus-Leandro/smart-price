@@ -195,43 +195,46 @@ export class ProductService {
     const rows: Array<Record<string, string>> = [];
 
     groupedProducts.forEach((group) => {
-      rows.push({ Empresa: `Empresa: ${group.companyName}`, Produto: '', Margem: '' });
-      rows.push({ Empresa: '', Produto: 'Produto', Margem: 'Margem' });
-
       group.products.forEach((product) => {
         rows.push({
-          Empresa: '',
+          Empresa: group.companyName,
           Produto: product.productName,
           Margem: this.formatPercent(product.margin),
         });
       });
-
-      rows.push({ Empresa: '', Produto: '', Margem: '' });
     });
 
     return rows;
   }
 
   private groupProductsByCompany(products: IProductReportView[]): IProductReportByCompany[] {
-    const groupedMap = new Map<string, IProductReportByCompany['products']>();
+    const groupedMap = new Map<
+      number,
+      { brancheName: string; products: IProductReportByCompany['products'] }
+    >();
 
     products.forEach((product) => {
       product.marginBranches.forEach((marginBranch) => {
-        const companyProducts = groupedMap.get(marginBranch.brancheName) ?? [];
+        const existing = groupedMap.get(marginBranch.brancheId);
+        const companyProducts = existing?.products ?? [];
         companyProducts.push({
           productName: product.name,
           margin: marginBranch.margin,
         });
-        groupedMap.set(marginBranch.brancheName, companyProducts);
+        groupedMap.set(marginBranch.brancheId, {
+          brancheName: marginBranch.brancheName,
+          products: companyProducts,
+        });
       });
     });
 
     return Array.from(groupedMap.entries())
-      .map(([companyName, companyProducts]) => ({
-        companyName,
-        products: companyProducts.sort((a, b) => a.productName.localeCompare(b.productName)),
+      .map(([brancheId, { brancheName, products }]) => ({
+        brancheId,
+        companyName: brancheName,
+        products: products.sort((a, b) => a.productName.localeCompare(b.productName)),
       }))
-      .sort((a, b) => a.companyName.localeCompare(b.companyName));
+      .sort((a, b) => a.brancheId - b.brancheId);
   }
 
   private formatPercent(value: number): string {
