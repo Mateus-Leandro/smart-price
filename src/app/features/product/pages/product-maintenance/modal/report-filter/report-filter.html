@@ -1,0 +1,37 @@
+<div mat-dialog-title fxLayout="column" fxLayoutGap="10px">
+  <span>Filtros do relatório de produtos</span>
+  <mat-divider />
+</div>
+
+<mat-dialog-content>
+  <form [formGroup]="reportFilterForm" fxLayout="column" fxLayoutGap="24px">
+    <section fxLayout="column" fxLayoutGap="12px">
+      <h3 class="section-title">Opção de margem</h3>
+      <mat-radio-group formControlName="marginOption" fxLayout="column" fxLayoutGap="10px">
+        <mat-radio-button value="with-margin">Com margem</mat-radio-button>
+        <mat-radio-button value="without-margin">Sem margem</mat-radio-button>
+      </mat-radio-group>
+    </section>
+
+    <section fxLayout="column" fxLayoutGap="12px">
+      <h3 class="section-title">Formato</h3>
+      <mat-radio-group formControlName="format" fxLayout="column" fxLayoutGap="10px">
+        <mat-radio-button value="xlsx">XLSX</mat-radio-button>
+        <mat-radio-button value="pdf">PDF</mat-radio-button>
+      </mat-radio-group>
+    </section>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <div fxLayout="row" fxLayoutGap="10px">
+    <app-button
+      text="Cancelar"
+      type="button"
+      bgColor="var(--ripple-color)"
+      textColor="var(--primary)"
+      (click)="cancel()"
+    />
+    <app-button text="Confirmar" type="button" (click)="confirm()" />
+  </div>
+</mat-dialog-actions>

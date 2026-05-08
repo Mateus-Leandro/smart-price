@@ -3,6 +3,27 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "supabase: functions serve",
+      "type": "shell",
+      "command": "supabase functions serve --inspect-mode wait",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "supabase",
+        "pattern": {
+          "regexp": "."
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": {
+            "regexp": "."
+          },
+          "endsPattern": {
+            "regexp": "Serving functions on"
+          }
+        }
+      }
+    },
+    {
       "type": "npm",
       "script": "start",
       "isBackground": true,
