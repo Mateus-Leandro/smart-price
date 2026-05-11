@@ -4,21 +4,24 @@ import { MatCardModule } from '@angular/material/card';
 import { SupplierForm } from '../../components/supplier-form/supplier-form';
 import { Button } from 'src/app/shared/components/button/button';
 import { LoadingService } from 'src/app/core/services/loading.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormGroup } from '@angular/forms';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { SupplierService } from '../../services/supplier.service';
 import { NotificationService } from 'src/app/core/services/notification.service';
 import { IUpdateSupplier } from 'src/app/core/models/supplier.model';
+import { SupplierProductsTable } from '../../components/supplier-products-table/supplier-products-table';
 
 @Component({
   selector: 'app-supplier-maintenance',
-  imports: [Spinner, MatCardModule, SupplierForm, Button, FlexLayoutModule],
+  imports: [Spinner, MatCardModule, SupplierForm, Button, FlexLayoutModule, SupplierProductsTable],
   templateUrl: './supplier-maintenance.html',
   styleUrl: './supplier-maintenance.scss',
 })
 export class SupplierMaintenance {
   loading = inject(LoadingService).loading;
+  supplierId = Number(inject(ActivatedRoute).snapshot.paramMap.get('id'));
+
   constructor(
     private router: Router,
     private supplierService: SupplierService,

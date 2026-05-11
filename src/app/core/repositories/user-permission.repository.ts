@@ -29,6 +29,9 @@ export class UserPermissionRepository {
           allow_send_to_erp: userPermissions.allowSendToErp,
           allow_edit_shipping_type: userPermissions.allowEditShippingType,
           allow_edit_product_margin: userPermissions.allowEditProductMargin,
+          view_margin: userPermissions.viewMargin,
+          view_cost: userPermissions.viewCost,
+          view_suggested_price_on_margin: userPermissions.viewSuggestedPriceOnMargin,
         },
         {
           onConflict: 'user_id',
@@ -60,6 +63,9 @@ export class UserPermissionRepository {
           allowSendToErp: data.allow_send_to_erp,
           allowEditShippingType: data.allow_edit_shipping_type,
           allowEditProductMargin: data.allow_edit_product_margin,
+          viewMargin: data.view_margin,
+          viewCost: data.view_cost,
+          viewSuggestedPriceOnMargin: data.view_suggested_price_on_margin,
         };
 
         return mappedData;

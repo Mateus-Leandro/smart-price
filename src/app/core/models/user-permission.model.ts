@@ -7,4 +7,7 @@ export interface IUserPermission {
   allowSendToErp: boolean;
   allowEditShippingType: boolean;
   allowEditProductMargin: boolean;
+  viewMargin?: boolean;
+  viewCost?: boolean;
+  viewSuggestedPriceOnMargin?: boolean;
 }

@@ -3,9 +3,9 @@ import { SupabaseClient } from '@supabase/supabase-js';
 import { SupabaseService } from 'src/app/shared/services/supabase.service';
 import { LoadingService } from '../services/loading.service';
 import { IDefaultPaginatorDataSource } from '../models/query.model';
-import { finalize, from, map, Observable } from 'rxjs';
+import { finalize, from, map, Observable, of, switchMap } from 'rxjs';
 import { EnumSupplierDeliveryTypeEnum } from 'src/app/core/enums/supplier.enum';
-import { ISupplierView, IUpdateSupplier } from '../models/supplier.model';
+import { ISupplierProductView, ISupplierView, IUpdateSupplier } from '../models/supplier.model';
 
 @Injectable({ providedIn: 'root' })
 export class SupplierRepository {
@@ -96,6 +96,86 @@ export class SupplierRepository {
         if (error) throw error;
 
         return data;
+      }),
+      finalize(() => this.loadingService.hide()),
+    );
+  }
+
+  getProductsBySupplier(
+    supplierId: number,
+    paginator: IDefaultPaginatorDataSource<ISupplierProductView>,
+    search?: string,
+  ): Observable<{ data: ISupplierProductView[]; count: number }> {
+    this.loadingService.show();
+
+    return from(
+      this.supabase
+        .from('supplier_flyers')
+        .select('id, branche_id, branche:company_branches!inner(name)')
+        .eq('supplier_id', supplierId),
+    ).pipe(
+      switchMap(({ data: flyers, error: flyersError }) => {
+        if (flyersError) throw flyersError;
+        if (!flyers || flyers.length === 0) return of({ data: [], count: 0 });
+
+        const flyerIds = flyers.map((f: any) => f.id);
+        const flyerMap = new Map<number, { brancheId: number; brancheName: string }>(
+          flyers.map((f: any) => [
+            f.id,
+            { brancheId: f.branche_id, brancheName: f.branche?.name || '' },
+          ]),
+        );
+
+        const fromIdx = paginator.pageIndex * paginator.pageSize;
+        const toIdx = fromIdx + paginator.pageSize - 1;
+
+        let query = this.supabase
+          .from('supplier_flyer_products')
+          .select(
+            `
+            supplier_flyer_id,
+            product:products!inner (
+              id,
+              name,
+              marginBranches:product_margin_branches (
+                margin,
+                branche_id
+              )
+            )
+            `,
+            { count: 'exact' },
+          )
+          .in('supplier_flyer_id', flyerIds)
+          .order('product(name)', { ascending: true });
+
+        if (search) {
+          query = query.or(`name.ilike.%${search}%`, { foreignTable: 'product' });
+        }
+
+        return from(query.range(fromIdx, toIdx)).pipe(
+          map(({ data, count, error }) => {
+            if (error) throw error;
+
+            const mappedData: ISupplierProductView[] = (data || []).map((item: any) => {
+              const flyerInfo = flyerMap.get(item.supplier_flyer_id);
+              const brancheId = flyerInfo?.brancheId ?? 0;
+              const brancheName = flyerInfo?.brancheName ?? '';
+              const margin =
+                item.product?.marginBranches?.find((m: any) => m.branche_id === brancheId)
+                  ?.margin ?? null;
+
+              return {
+                productId: item.product.id,
+                productName: item.product.name,
+                brancheId,
+                brancheName,
+                margin,
+              };
+            });
+
+            return { data: mappedData, count: count ?? 0 };
+          }),
+        );
       }),
       finalize(() => this.loadingService.hide()),
     );
