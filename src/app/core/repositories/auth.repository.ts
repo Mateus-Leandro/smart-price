@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { SupabaseClient } from '@supabase/supabase-js';
-import { finalize, from, map } from 'rxjs';
+import { finalize, from, map, of, switchMap } from 'rxjs';
 import { SupabaseService } from 'src/app/shared/services/supabase.service';
 import { ICreateUser, IRegisterCompanyAndUser, IUpdateUser } from '../models/auth.model';
 import { jwtDecode } from 'jwt-decode';
@@ -17,15 +17,26 @@ export class AuthRepository {
   }
 
   login(email: string, password: string) {
-    return from(
-      this.supabase.auth.signInWithPassword({
-        email,
-        password,
-      }),
-    ).pipe(
-      map(({ error }) => {
+    return from(this.supabase.auth.signInWithPassword({ email, password })).pipe(
+      map(({ data, error }) => {
         if (error) throw error;
+        return data.user!.id;
       }),
+      switchMap((userId) =>
+        from(this.supabase.from('users').select('status').eq('id', userId).single()).pipe(
+          switchMap(({ data, error }) => {
+            if (error) throw error;
+            if (data?.status === 'inactive') {
+              return from(this.supabase.auth.signOut()).pipe(
+                map(() => {
+                  throw new Error('Usuário inativo. Entre em contato com o administrador.');
+                }),
+              );
+            }
+            return of(void 0);
+          }),
+        ),
+      ),
     );
   }
 
