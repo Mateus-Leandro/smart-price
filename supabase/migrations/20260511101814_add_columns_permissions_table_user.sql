@@ -1,10 +1,10 @@
 DO $$ BEGIN
-  CREATE TYPE status AS ENUM ('inactive', 'active');
+  CREATE TYPE user_status AS ENUM ('inactive', 'active');
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
 
 ALTER TABLE public.users
-ADD COLUMN IF NOT EXISTS status status NOT NULL DEFAULT 'active';
+ADD COLUMN IF NOT EXISTS status user_status NOT NULL DEFAULT 'active';
 
 ALTER TABLE public.user_permissions
 ADD COLUMN IF NOT EXISTS view_margin BOOLEAN NOT NULL DEFAULT false,
