@@ -73,9 +73,17 @@ export class RegisterUser {
     const userId = userForm?.getRawValue()?.id;
 
     if (userId) {
+      const status: 'active' | 'inactive' = userForm.getRawValue().isActive ? 'active' : 'inactive';
+
       this.userService.updateUserName(user.name, userId).subscribe({
         error: (err) => {
           this.notificationService.showError(`Erro ao atualizar usuário: ${err.message || err}`);
+        },
+      });
+
+      this.userService.updateUserStatus(userId, status).subscribe({
+        error: (err) => {
+          this.notificationService.showError(`Erro ao atualizar status do usuário: ${err.message || err}`);
         },
       });
 
@@ -129,15 +137,19 @@ export class RegisterUser {
   }
 
   upsertUserPermissions(userForm: FormGroup) {
+    const raw = userForm.getRawValue();
     const userPermissions: IUserPermission = {
-      userId: userForm?.getRawValue()?.id,
-      isAdmin: userForm?.value?.isAdmin,
-      allowEditPrices: userForm?.getRawValue()?.allowEditPrices,
-      allowEditCompetitorPrices: userForm?.getRawValue()?.allowEditCompetitorPrices,
-      allowEditShippingValue: userForm?.getRawValue()?.allowEditShippingValue,
-      allowEditProductMargin: userForm?.getRawValue()?.allowEditProductMargin,
-      allowEditShippingType: userForm?.getRawValue()?.allowEditShippingType,
-      allowSendToErp: userForm?.getRawValue()?.allowSendToErp,
+      userId: raw.id,
+      isAdmin: raw.isAdmin,
+      allowEditPrices: raw.allowEditPrices,
+      allowEditCompetitorPrices: raw.allowEditCompetitorPrices,
+      allowEditShippingValue: raw.allowEditShippingValue,
+      allowEditProductMargin: raw.allowEditProductMargin,
+      allowEditShippingType: raw.allowEditShippingType,
+      allowSendToErp: raw.allowSendToErp,
+      viewMargin: raw.viewMargin ?? false,
+      viewCost: raw.viewCost ?? false,
+      viewSuggestedPriceOnMargin: raw.viewSuggestedPriceOnMargin ?? false,
     };
 
     this.userPermissionService.upsertPermissions(userPermissions).subscribe({
