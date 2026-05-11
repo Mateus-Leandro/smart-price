@@ -21,3 +21,11 @@ export interface IUpdateSupplier {
   supplierId: number;
   deliveryType: EnumSupplierDeliveryTypeEnum;
 }
+
+export interface ISupplierProductView {
+  productId: number;
+  productName: string;
+  brancheId: number;
+  brancheName: string;
+  margin: number | null;
+}
