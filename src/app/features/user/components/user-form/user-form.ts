@@ -14,6 +14,7 @@ import { Spinner } from 'src/app/shared/components/spinner/spinner';
 import { LoadingService } from 'src/app/core/services/loading.service';
 import { MatDivider } from '@angular/material/divider';
 import { Checkbox } from 'src/app/shared/components/checkbox/checkbox';
+import { SlideToggle } from 'src/app/shared/components/slide-toggle/slide-toggle';
 import { UserPermissionService } from 'src/app/features/user-permission/user-permission.service';
 import { MatDialog } from '@angular/material/dialog';
 import { UserPasswordChangeDialog } from '../user-password-change-dialog/user-password-change-dialog';
@@ -38,6 +39,7 @@ import { IUserPermission } from 'src/app/core/models/user-permission.model';
     MatDivider,
     Checkbox,
     IconButton,
+    SlideToggle,
   ],
   templateUrl: './user-form.html',
 })
@@ -69,6 +71,7 @@ export class UserForm {
         pass: ['', [Validators.required, Validators.minLength(6)]],
         confirmationPass: ['', [Validators.required, Validators.minLength(6)]],
 
+        isActive: this.fb.control<boolean>(true),
         isAdmin: this.fb.control<boolean>(false),
         allowEditPrices: this.fb.control<boolean>(false),
         allowEditCompetitorPrices: this.fb.control<boolean>(false),
@@ -76,6 +79,9 @@ export class UserForm {
         allowSendToErp: this.fb.control<boolean>(false),
         allowEditShippingType: this.fb.control<boolean>(false),
         allowEditProductMargin: this.fb.control<boolean>(false),
+        viewMargin: this.fb.control<boolean>(false),
+        viewCost: this.fb.control<boolean>(false),
+        viewSuggestedPriceOnMargin: this.fb.control<boolean>(false),
       },
       { validators: [PasswordMatchValidator.match('pass', 'confirmationPass')] },
     );
@@ -108,6 +114,7 @@ export class UserForm {
                         id: this.userId,
                         email: user.email,
                         name: user.name,
+                        isActive: (user as any).status === 'active',
 
                         isAdmin: permissions?.isAdmin,
                         allowEditPrices: permissions?.allowEditPrices,
@@ -116,6 +123,9 @@ export class UserForm {
                         allowSendToErp: permissions?.allowSendToErp,
                         allowEditShippingType: permissions?.allowEditShippingType,
                         allowEditProductMargin: permissions?.allowEditProductMargin,
+                        viewMargin: permissions?.viewMargin,
+                        viewCost: permissions?.viewCost,
+                        viewSuggestedPriceOnMargin: permissions?.viewSuggestedPriceOnMargin,
                       });
 
                       this.userFormGroup.get('pass')?.disable();
@@ -187,6 +197,9 @@ export class UserForm {
       'allowSendToErp',
       'allowEditShippingType',
       'allowEditProductMargin',
+      'viewMargin',
+      'viewCost',
+      'viewSuggestedPriceOnMargin',
     ];
 
     permissions.forEach((controlName) => {

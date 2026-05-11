@@ -66,13 +66,7 @@ export class UserRepository {
     return from(
       this.supabase
         .from('users')
-        .select(
-          `
-      id,
-      name,
-      email
-      `,
-        )
+        .select('id, name, email, status')
         .eq('id', userId)
         .single(),
     ).pipe(
@@ -80,6 +74,16 @@ export class UserRepository {
         if (error) throw new Error();
 
         return data;
+      }),
+    );
+  }
+
+  updateUserStatus(userId: string, status: 'active' | 'inactive') {
+    return from(
+      this.supabase.from('users').update({ status }).eq('id', userId),
+    ).pipe(
+      map(({ error }) => {
+        if (error) throw error;
       }),
     );
   }

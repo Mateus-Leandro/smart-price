@@ -25,4 +25,8 @@ export class UserService {
   updateUserCredentials(data: IUpdateCredentials) {
     return this.repository.updateUserCredentials(data);
   }
+
+  updateUserStatus(userId: string, status: 'active' | 'inactive') {
+    return this.repository.updateUserStatus(userId, status);
+  }
 }
