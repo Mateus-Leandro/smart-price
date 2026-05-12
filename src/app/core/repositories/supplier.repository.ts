@@ -149,7 +149,9 @@ export class SupplierRepository {
           .order('product(name)', { ascending: true });
 
         if (search) {
-          query = query.or(`name.ilike.%${search}%`, { foreignTable: 'product' });
+          query = query.or(`name.ilike.%${search}%,id_text.ilike.%${search}%`, {
+            foreignTable: 'product',
+          });
         }
 
         return from(query.range(fromIdx, toIdx)).pipe(
