@@ -191,20 +191,25 @@ export class ProductService {
   }
 
   private buildGroupedXlsxRows(products: IProductReportView[]): Array<Record<string, string>> {
-    const groupedProducts = this.groupProductsByCompany(products);
-    const rows: Array<Record<string, string>> = [];
-
-    groupedProducts.forEach((group) => {
-      group.products.forEach((product) => {
-        rows.push({
-          Empresa: group.companyName,
-          Produto: product.productName,
-          Margem: this.formatPercent(product.margin),
-        });
+    const companiesMap = new Map<number, string>();
+    products.forEach((product) => {
+      product.marginBranches.forEach((branch) => {
+        if (!companiesMap.has(branch.brancheId)) {
+          companiesMap.set(branch.brancheId, branch.brancheName);
+        }
       });
     });
 
-    return rows;
+    const sortedCompanies = Array.from(companiesMap.entries()).sort((a, b) => a[0] - b[0]);
+
+    return products.map((product) => {
+      const row: Record<string, string> = { ID: String(product.id), Produto: product.name };
+      sortedCompanies.forEach(([brancheId, companyName]) => {
+        const branch = product.marginBranches.find((b) => b.brancheId === brancheId);
+        row[companyName] = branch ? this.formatPercent(branch.margin) : '-';
+      });
+      return row;
+    });
   }
 
   private groupProductsByCompany(products: IProductReportView[]): IProductReportByCompany[] {
