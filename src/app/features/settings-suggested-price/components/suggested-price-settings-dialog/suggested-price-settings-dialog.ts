@@ -43,6 +43,8 @@ import { CompetitorPriceFlyerProductService } from 'src/app/features/competitor-
 import { forkJoin, of } from 'rxjs';
 import { CompetitorType } from 'src/app/core/models/competitor';
 import { SupplierFlyerService } from 'src/app/features/supplier-flyer/services/supplier-flyer.service';
+import { UserPermissionService } from 'src/app/features/user-permission/user-permission.service';
+import { IUserPermission } from 'src/app/core/models/user-permission.model';
 
 type FormState = 'view' | 'create' | 'edit';
 
@@ -86,6 +88,7 @@ export class SuggestedPriceSettingsDialog implements OnInit {
     private promotionalFlyerService: PromotionalFlyerService,
     private supplierFlyerService: SupplierFlyerService,
     private competitorPriceFlyerProductsService: CompetitorPriceFlyerProductService,
+    private userPermissionService: UserPermissionService,
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
   ) {}
 
@@ -97,11 +100,13 @@ export class SuggestedPriceSettingsDialog implements OnInit {
 
   currentState = signal<FormState>('view');
   editingSettingId = signal<string | null>(null);
+  userPermissions: IUserPermission | null = null;
 
   increasePricePercentControl = new FormControl('', [Validators.maxLength(3), Validators.max(100)]);
   ruleFormGroup!: FormGroup;
 
   ngOnInit(): void {
+    this.getUserPermissions();
     this.buildRuleForm();
     this.loadUserData();
   }
@@ -132,6 +137,22 @@ export class SuggestedPriceSettingsDialog implements OnInit {
       },
       error: (err) =>
         this.notificationService.showError(`Erro ao obter empresa: ${err.message || err}`),
+    });
+  }
+
+  private getUserPermissions() {
+    this.authService.getUser().subscribe({
+      next: (user) => {
+        this.userPermissionService.getPermissions(user.id).subscribe({
+          next: (permissions) => {
+            this.userPermissions = permissions;
+            this.cdr.detectChanges();
+          },
+        });
+      },
+      error: (err) => {
+        this.notificationService.showError(`Erro ao buscar usuário logado: ${err.message || err}`);
+      },
     });
   }
 
