@@ -12,7 +12,7 @@ import {
   MatTableModule,
 } from '@angular/material/table';
 import { LoadingService } from 'src/app/core/services/loading.service';
-import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
 import { IconButton } from 'src/app/shared/components/icon-button/icon-button';
 import { CommonModule } from '@angular/common';
 import { CompetitorService } from '../../services/competitor.service';
@@ -65,6 +65,7 @@ export class CompetitorTable {
   };
 
   private search$ = new Subject<string>();
+  private cancelLoad$ = new Subject<void>();
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -103,7 +104,8 @@ export class CompetitorTable {
   }
 
   loadCompetitors(paginator: IDefaultPaginatorDataSource<ICompetitor>, search?: string) {
-    this.competitorService.loadCompetitors(paginator, search).subscribe({
+    this.cancelLoad$.next();
+    this.competitorService.loadCompetitors(paginator, search).pipe(takeUntil(this.cancelLoad$)).subscribe({
       next: (response) => {
         this.paginatorDataSource.records = response;
         this.dataSource.data = response.data;
@@ -114,6 +116,11 @@ export class CompetitorTable {
         this.cdr.detectChanges();
       },
     });
+  }
+
+  ngOnDestroy(): void {
+    this.cancelLoad$.next();
+    this.cancelLoad$.complete();
   }
 
   onSearch(event: Event): void {

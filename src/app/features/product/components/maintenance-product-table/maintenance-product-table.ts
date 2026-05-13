@@ -17,7 +17,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { PageEvent, MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
-import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
 import { IDefaultPaginatorDataSource } from 'src/app/core/models/query.model';
 import { ProductService } from '../../services/product.service';
 import { FlexLayoutModule } from '@angular/flex-layout';
@@ -119,6 +119,7 @@ export class MaintenanceProductTable implements OnInit {
   };
 
   private search$ = new Subject<string>();
+  private cancelLoad$ = new Subject<void>();
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -198,7 +199,8 @@ export class MaintenanceProductTable implements OnInit {
     marginFilter: MarginFilterEnum,
     search?: string,
   ) {
-    this.productService.loadProducts(paginator, marginFilter, search).subscribe({
+    this.cancelLoad$.next();
+    this.productService.loadProducts(paginator, marginFilter, search).pipe(takeUntil(this.cancelLoad$)).subscribe({
       next: (response) => {
         this.paginatorDataSource.records = response;
         this.dataSource.data = response.data;
@@ -210,6 +212,11 @@ export class MaintenanceProductTable implements OnInit {
         this.cdr.detectChanges();
       },
     });
+  }
+
+  ngOnDestroy(): void {
+    this.cancelLoad$.next();
+    this.cancelLoad$.complete();
   }
 
   onPageChange(event: PageEvent): void {

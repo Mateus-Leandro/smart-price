@@ -6,7 +6,7 @@ import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { CommonModule } from '@angular/common';
 import { LoadingService } from 'src/app/core/services/loading.service';
-import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
 import { IDefaultPaginatorDataSource } from 'src/app/core/models/query.model';
 import { CompanyBrancheService } from '../../services/company-branche.service';
 import { FlexLayoutModule } from '@angular/flex-layout';
@@ -39,6 +39,7 @@ export class CompanyBrancheTable {
   columnsToDisplay = ['store', 'name', 'cnpj', 'created_at', 'updated_at'];
   dataSource = new MatTableDataSource<ICompanyBrancheView>([]);
   private search$ = new Subject<string>();
+  private cancelLoad$ = new Subject<void>();
 
   constructor(
     private companyBrancheService: CompanyBrancheService,
@@ -65,7 +66,8 @@ export class CompanyBrancheTable {
     paginator: IDefaultPaginatorDataSource<ICompanyBrancheView>,
     search?: string,
   ) {
-    this.companyBrancheService.loadCompanyBranches(paginator, search).subscribe({
+    this.cancelLoad$.next();
+    this.companyBrancheService.loadCompanyBranches(paginator, search).pipe(takeUntil(this.cancelLoad$)).subscribe({
       next: (response) => {
         this.paginatorDataSource.records = response;
         this.dataSource.data = response.data;
@@ -74,6 +76,11 @@ export class CompanyBrancheTable {
         this.notificationService.showError(`Erro ao carregar filiais: ${err.message || err}`);
       },
     });
+  }
+
+  ngOnDestroy(): void {
+    this.cancelLoad$.next();
+    this.cancelLoad$.complete();
   }
 
   onSearch(event: Event): void {

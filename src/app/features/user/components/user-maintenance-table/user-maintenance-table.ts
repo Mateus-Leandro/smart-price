@@ -12,7 +12,7 @@ import {
   MatTableModule,
 } from '@angular/material/table';
 import { IDefaultPaginatorDataSource } from 'src/app/core/models/query.model';
-import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
 import { IUserView } from 'src/app/core/models/user.model';
 import { UserService } from '../../services/user.service';
 import { FlexLayoutModule } from '@angular/flex-layout';
@@ -63,6 +63,7 @@ export class UserMaintenanceTable {
   };
 
   private search$ = new Subject<string>();
+  private cancelLoad$ = new Subject<void>();
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -101,7 +102,8 @@ export class UserMaintenanceTable {
   }
 
   loadUsers(paginator: IDefaultPaginatorDataSource<IUserView>, search?: string) {
-    this.userService.loadUsers(paginator, search).subscribe({
+    this.cancelLoad$.next();
+    this.userService.loadUsers(paginator, search).pipe(takeUntil(this.cancelLoad$)).subscribe({
       next: (response) => {
         this.paginatorDataSource.records = response;
         this.dataSource.data = response.data;
@@ -112,6 +114,11 @@ export class UserMaintenanceTable {
         this.cdr.detectChanges();
       },
     });
+  }
+
+  ngOnDestroy(): void {
+    this.cancelLoad$.next();
+    this.cancelLoad$.complete();
   }
 
   onSearch(event: Event): void {
