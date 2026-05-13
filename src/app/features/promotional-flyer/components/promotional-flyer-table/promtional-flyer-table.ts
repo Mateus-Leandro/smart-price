@@ -8,7 +8,7 @@ import { PromotionalFlyerService } from '../../services/promotional-flyer.servic
 import { Router } from '@angular/router';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatFormField, MatLabel } from '@angular/material/select';
-import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
 import { MatInputModule } from '@angular/material/input';
 import { CommonModule } from '@angular/common';
 import { IDefaultPaginatorDataSource } from 'src/app/core/models/query.model';
@@ -61,6 +61,7 @@ export class PromotionalFlyerTable {
     },
   };
   private search$ = new Subject<string>();
+  private cancelLoad$ = new Subject<void>();
   sendingFlyerId?: number | null;
 
   constructor(
@@ -123,8 +124,10 @@ export class PromotionalFlyerTable {
     paginatorDataSource: IDefaultPaginatorDataSource<IPromotionalFlyerView | ISupplierFlyerView>,
     search?: string,
   ) {
+    this.cancelLoad$.next();
     this.getFlyerService()
       .loadFlyers(paginatorDataSource as any, search)
+      .pipe(takeUntil(this.cancelLoad$))
       .subscribe({
         next: (response: any) => {
           this.paginatorDataSource.records = response;
@@ -207,6 +210,11 @@ export class PromotionalFlyerTable {
 
   formatQuoteId(quoteId: any): string {
     return String(quoteId).padStart(2, '0');
+  }
+
+  ngOnDestroy(): void {
+    this.cancelLoad$.next();
+    this.cancelLoad$.complete();
   }
 
   onSearch(event: Event): void {

@@ -7,7 +7,7 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { NgxMaskDirective } from 'ngx-mask';
-import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { LoadingService } from 'src/app/core/services/loading.service';
 import { NotificationService } from 'src/app/core/services/notification.service';
@@ -50,6 +50,7 @@ export class SupplierProductsTable implements OnInit {
   };
 
   private search$ = new Subject<string>();
+  private cancelLoad$ = new Subject<void>();
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -98,7 +99,8 @@ export class SupplierProductsTable implements OnInit {
   }
 
   loadProducts(paginator: IDefaultPaginatorDataSource<ISupplierProductView>, search?: string) {
-    this.supplierService.getProductsBySupplier(this.supplierId, paginator, search).subscribe({
+    this.cancelLoad$.next();
+    this.supplierService.getProductsBySupplier(this.supplierId, paginator, search).pipe(takeUntil(this.cancelLoad$)).subscribe({
       next: (response) => {
         this.paginatorDataSource.records = response;
         this.dataSource.data = response.data;
@@ -110,6 +112,11 @@ export class SupplierProductsTable implements OnInit {
         this.cdr.detectChanges();
       },
     });
+  }
+
+  ngOnDestroy(): void {
+    this.cancelLoad$.next();
+    this.cancelLoad$.complete();
   }
 
   onSearch(event: Event) {

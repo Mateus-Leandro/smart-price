@@ -5,7 +5,7 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { LoadingService } from 'src/app/core/services/loading.service';
 import { IDefaultPaginatorDataSource } from 'src/app/core/models/query.model';
-import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
 import { Router } from '@angular/router';
 import { NotificationService } from 'src/app/core/services/notification.service';
 import { SupplierService } from '../../services/supplier.service';
@@ -56,6 +56,7 @@ export class SupplierTable {
   };
 
   private search$ = new Subject<string>();
+  private cancelLoad$ = new Subject<void>();
   private supplierFilterService = inject(SupplierFilterService);
   selectedDeliveryFilterType = this.supplierFilterService.selectedDeliveryFilterType;
 
@@ -86,7 +87,8 @@ export class SupplierTable {
     deliveryType: null | EnumSupplierDeliveryTypeEnum | 'EMPTY',
     search?: string,
   ) {
-    this.supplierService.getSuppliers(paginator, deliveryType, search).subscribe({
+    this.cancelLoad$.next();
+    this.supplierService.getSuppliers(paginator, deliveryType, search).pipe(takeUntil(this.cancelLoad$)).subscribe({
       next: (response) => {
         this.paginatorDataSource.records = response;
         this.dataSource.data = response.data;
@@ -97,6 +99,11 @@ export class SupplierTable {
         this.cdr.detectChanges();
       },
     });
+  }
+
+  ngOnDestroy(): void {
+    this.cancelLoad$.next();
+    this.cancelLoad$.complete();
   }
 
   onSearch(event: Event): void {
