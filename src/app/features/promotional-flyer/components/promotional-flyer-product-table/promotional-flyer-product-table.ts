@@ -148,6 +148,7 @@ export class PromotionalFlyerProductTable {
   readonly ProductPriceType = ProductPriceType;
   readonly SupplierDeliveryTypeEnum = EnumSupplierDeliveryTypeEnum;
   private destroy$ = new Subject<void>();
+  private cancelReload$ = new Subject<void>();
 
   searchTerm = '';
   loading = inject(LoadingService).loading;
@@ -279,6 +280,8 @@ export class PromotionalFlyerProductTable {
   }
 
   ngOnDestroy(): void {
+    this.cancelReload$.next();
+    this.cancelReload$.complete();
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -305,6 +308,7 @@ export class PromotionalFlyerProductTable {
   ): void {
     this.getFlyerService()
       .loadProducts(flyerId, idIntegral, paginatorDataSource as any, search, selectedFilterType)
+      .pipe(takeUntil(this.cancelReload$))
       .subscribe({
         next: (response: any) => {
           this.paginatorDataSource.records = response;
@@ -335,6 +339,7 @@ export class PromotionalFlyerProductTable {
   }
 
   reload(filterType: FlyerFilterValue | null = this.selectedFilterType()): void {
+    this.cancelReload$.next();
     const currentBrancheId = this.flyerInfo().branche.id;
 
     this.competitorService
@@ -343,6 +348,7 @@ export class PromotionalFlyerProductTable {
         pageSize: 999,
         records: { data: [], count: 0 },
       })
+      .pipe(takeUntil(this.cancelReload$))
       .subscribe({
         next: (competitors) => {
           this.linkedCompetitorsList = competitors.data.filter((c) =>
