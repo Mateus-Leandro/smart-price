@@ -12,7 +12,10 @@ import { ActivatedRoute } from '@angular/router';
 import { LoadingService } from 'src/app/core/services/loading.service';
 import { NotificationService } from 'src/app/core/services/notification.service';
 import { IDefaultPaginatorDataSource } from 'src/app/core/models/query.model';
-import { ISupplierProductView } from 'src/app/core/models/supplier.model';
+import {
+  ISupplierProductBranchView,
+  ISupplierProductPivotView,
+} from 'src/app/core/models/supplier.model';
 import { SupplierService } from '../../services/supplier.service';
 import { ProductMarginBrancheService } from 'src/app/features/product-margin-branche/services/product-margin-branche.service';
 import { AuthService } from 'src/app/features/auth/services/auth.service';
@@ -39,11 +42,12 @@ export class SupplierProductsTable implements OnInit {
   supplierId = 0;
   companyId = 0;
   searchTerm = '';
-  dataSource = new MatTableDataSource<ISupplierProductView>([]);
-  columnsToDisplay = ['id', 'name', 'branche', 'margin'];
+  dataSource = new MatTableDataSource<ISupplierProductPivotView>([]);
+  branchColumns: { brancheId: number; brancheName: string }[] = [];
+  columnsToDisplay: string[] = ['id', 'name'];
   marginControls = new Map<string, FormControl>();
 
-  paginatorDataSource: IDefaultPaginatorDataSource<ISupplierProductView> = {
+  paginatorDataSource: IDefaultPaginatorDataSource<ISupplierProductPivotView> = {
     pageIndex: 0,
     pageSize: 10,
     records: { data: [], count: 0 },
@@ -83,35 +87,56 @@ export class SupplierProductsTable implements OnInit {
     });
   }
 
-  getMarginControl(row: ISupplierProductView): FormControl {
-    return this.marginControls.get(`${row.productId}-${row.brancheId}`)!;
+  getMarginControl(productId: number, brancheId: number): FormControl {
+    return this.marginControls.get(`${productId}-${brancheId}`)!;
   }
 
-  private buildMarginControls(data: ISupplierProductView[]) {
-    data.forEach((row) => {
-      const key = `${row.productId}-${row.brancheId}`;
-      if (this.marginControls.has(key)) {
-        this.marginControls.get(key)!.setValue(row.margin ?? '');
-      } else {
-        this.marginControls.set(key, new FormControl(row.margin ?? ''));
-      }
+  brancheColumnId(brancheId: number): string {
+    return `branche-${brancheId}`;
+  }
+
+  getBranch(product: ISupplierProductPivotView, brancheId: number): ISupplierProductBranchView {
+    return product.branches.find((b) => b.brancheId === brancheId)!;
+  }
+
+  private buildMarginControls(data: ISupplierProductPivotView[]) {
+    data.forEach((product) => {
+      product.branches.forEach((branch) => {
+        const key = `${product.productId}-${branch.brancheId}`;
+        if (this.marginControls.has(key)) {
+          this.marginControls.get(key)!.setValue(branch.margin ?? '');
+        } else {
+          this.marginControls.set(key, new FormControl(branch.margin ?? ''));
+        }
+      });
     });
   }
 
-  loadProducts(paginator: IDefaultPaginatorDataSource<ISupplierProductView>, search?: string) {
+  loadProducts(paginator: IDefaultPaginatorDataSource<ISupplierProductPivotView>, search?: string) {
     this.cancelLoad$.next();
-    this.supplierService.getProductsBySupplier(this.supplierId, paginator, search).pipe(takeUntil(this.cancelLoad$)).subscribe({
-      next: (response) => {
-        this.paginatorDataSource.records = response;
-        this.dataSource.data = response.data;
-        this.buildMarginControls(response.data);
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        this.notificationService.showError(`Erro ao carregar produtos: ${err.message || err}`);
-        this.cdr.detectChanges();
-      },
-    });
+    this.supplierService
+      .getProductsBySupplier(this.supplierId, paginator, search)
+      .pipe(takeUntil(this.cancelLoad$))
+      .subscribe({
+        next: (response) => {
+          this.paginatorDataSource.records = { data: response.data, count: response.count };
+          this.dataSource.data = response.data;
+          this.buildMarginControls(response.data);
+          this.branchColumns = response.branches;
+          this.cdr.detectChanges();
+
+          this.columnsToDisplay = [
+            'id',
+            'name',
+            ...response.branches.map((b) => this.brancheColumnId(b.brancheId)),
+          ];
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          this.notificationService.showError(`Erro ao carregar produtos: ${err.message || err}`);
+          this.cdr.detectChanges();
+        },
+      });
   }
 
   ngOnDestroy(): void {
@@ -130,17 +155,17 @@ export class SupplierProductsTable implements OnInit {
     this.reload();
   }
 
-  onMarginBlur(event: FocusEvent, row: ISupplierProductView) {
-    const ctrl = this.getMarginControl(row);
+  onMarginBlur(_event: FocusEvent, branch: ISupplierProductBranchView, productId: number) {
+    const ctrl = this.getMarginControl(productId, branch.brancheId);
     const controlValue = ctrl?.value;
     const newValue =
       controlValue === '' || controlValue === null || controlValue === undefined
         ? null
         : parseFloat(String(controlValue).replace(',', '.'));
 
-    if (newValue === row.margin) return;
+    if (newValue === branch.margin) return;
     if (newValue !== null && isNaN(newValue)) {
-      ctrl?.setValue(row.margin ?? '');
+      ctrl?.setValue(branch.margin ?? '');
       return;
     }
 
@@ -153,16 +178,16 @@ export class SupplierProductsTable implements OnInit {
       this.productMarginBrancheService
         .upsertProductMarginBranche({
           companyId: this.companyId,
-          brancheId: row.brancheId,
-          productId: row.productId,
+          brancheId: branch.brancheId,
+          productId,
           margin: newValue,
         })
         .subscribe({
           next: () => {
-            row.margin = newValue;
+            branch.margin = newValue;
           },
           error: (err) => {
-            ctrl?.setValue(row.margin ?? '');
+            ctrl?.setValue(branch.margin ?? '');
             this.notificationService.showError(`Erro ao atualizar margem: ${err.message || err}`);
           },
         });
@@ -170,16 +195,16 @@ export class SupplierProductsTable implements OnInit {
       this.productMarginBrancheService
         .deleteProductMarginBranche({
           companyId: this.companyId,
-          brancheId: row.brancheId,
-          productId: row.productId,
+          brancheId: branch.brancheId,
+          productId,
         })
         .subscribe({
           next: () => {
-            row.margin = null;
+            branch.margin = null;
             ctrl?.setValue('');
           },
           error: (err) => {
-            ctrl?.setValue(row.margin ?? '');
+            ctrl?.setValue(branch.margin ?? '');
             this.notificationService.showError(`Erro ao atualizar margem: ${err.message || err}`);
           },
         });
