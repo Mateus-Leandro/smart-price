@@ -4,7 +4,6 @@ import { ProductRepository } from 'src/app/core/repositories/product.repository'
 import { IProductView } from 'src/app/core/models/product.model';
 import { MarginFilterEnum } from 'src/app/core/enums/product.enum';
 import {
-  IProductReportByCompany,
   IProductReportFilter,
   IProductReportGenerationResult,
   IProductReportView,
@@ -97,7 +96,7 @@ export class ProductService {
     );
 
     if (includeMargin) {
-      this.exportPdfGroupedByCompany(doc, products);
+      this.exportPdfWithStoreColumns(doc, products);
       doc.save(`${fileName}.pdf`);
       return;
     }
@@ -129,6 +128,57 @@ export class ProductService {
     doc.save(`${fileName}.pdf`);
   }
 
+  private exportPdfWithStoreColumns(doc: jsPDF, products: IProductReportView[]): void {
+    const companiesMap = new Map<number, string>();
+    products.forEach((product) => {
+      product.marginBranches.forEach((branch) => {
+        if (!companiesMap.has(branch.brancheId)) {
+          companiesMap.set(branch.brancheId, branch.brancheName);
+        }
+      });
+    });
+
+    const sortedCompanies = Array.from(companiesMap.entries()).sort((a, b) => a[0] - b[0]);
+
+    const availableWidth = 269; // A4 landscape (297mm) - 2 * 14mm margins
+    const idWidth = 15;
+    const minProductWidth = 60;
+    const storeCount = sortedCompanies.length;
+    const storeWidth =
+      storeCount > 0
+        ? Math.min(28, Math.floor((availableWidth - idWidth - minProductWidth) / storeCount))
+        : 28;
+    const productWidth = availableWidth - idWidth - storeCount * storeWidth;
+
+    const head = [['ID', 'Produto', ...sortedCompanies.map(([, name]) => name)]];
+
+    const body = products.map((product) => {
+      const row: (string | number)[] = [product.id, product.name];
+      sortedCompanies.forEach(([brancheId]) => {
+        const branch = product.marginBranches.find((b) => b.brancheId === brancheId);
+        row.push(branch ? this.formatPercent(branch.margin) : '-');
+      });
+      return row;
+    });
+
+    const columnStyles: Record<number, object> = {
+      0: { cellWidth: idWidth },
+      1: { cellWidth: productWidth, overflow: 'ellipsize' },
+    };
+    sortedCompanies.forEach((_, index) => {
+      columnStyles[index + 2] = { cellWidth: storeWidth, halign: 'center' };
+    });
+
+    autoTable(doc, {
+      startY: 28,
+      head,
+      body,
+      styles: { fontSize: 8, cellPadding: 2 },
+      headStyles: { fillColor: [0, 121, 107], halign: 'center', fontSize: 7 },
+      columnStyles,
+    });
+  }
+
   private exportXlsx(
     products: IProductReportView[],
     filters: IProductReportFilter,
@@ -151,45 +201,6 @@ export class ProductService {
     XLSX.writeFile(workbook, `${fileName}.xlsx`);
   }
 
-  private exportPdfGroupedByCompany(doc: jsPDF, products: IProductReportView[]): void {
-    const groupedProducts = this.groupProductsByCompany(products);
-    let currentY = 30;
-
-    groupedProducts.forEach((group, index) => {
-      if (currentY > 180) {
-        doc.addPage();
-        currentY = 20;
-      }
-
-      doc.setFontSize(12);
-      doc.text(`Empresa: ${group.companyName}`, 14, currentY);
-
-      autoTable(doc, {
-        startY: currentY + 4,
-        head: [['Produto', 'Margem']],
-        body: group.products.map((product) => [
-          product.productName,
-          this.formatPercent(product.margin),
-        ]),
-        styles: {
-          fontSize: 9,
-          cellPadding: 2,
-        },
-        headStyles: {
-          fillColor: [0, 121, 107],
-        },
-        columnStyles: {
-          0: { cellWidth: 210 },
-          1: { cellWidth: 40 },
-        },
-      });
-
-      currentY =
-        (doc as jsPDF & { lastAutoTable?: { finalY: number } }).lastAutoTable?.finalY ?? currentY;
-      currentY += index < groupedProducts.length - 1 ? 12 : 0;
-    });
-  }
-
   private buildGroupedXlsxRows(products: IProductReportView[]): Array<Record<string, string>> {
     const companiesMap = new Map<number, string>();
     products.forEach((product) => {
@@ -210,36 +221,6 @@ export class ProductService {
       });
       return row;
     });
-  }
-
-  private groupProductsByCompany(products: IProductReportView[]): IProductReportByCompany[] {
-    const groupedMap = new Map<
-      number,
-      { brancheName: string; products: IProductReportByCompany['products'] }
-    >();
-
-    products.forEach((product) => {
-      product.marginBranches.forEach((marginBranch) => {
-        const existing = groupedMap.get(marginBranch.brancheId);
-        const companyProducts = existing?.products ?? [];
-        companyProducts.push({
-          productName: product.name,
-          margin: marginBranch.margin,
-        });
-        groupedMap.set(marginBranch.brancheId, {
-          brancheName: marginBranch.brancheName,
-          products: companyProducts,
-        });
-      });
-    });
-
-    return Array.from(groupedMap.entries())
-      .map(([brancheId, { brancheName, products }]) => ({
-        brancheId,
-        companyName: brancheName,
-        products: products.sort((a, b) => a.productName.localeCompare(b.productName)),
-      }))
-      .sort((a, b) => a.brancheId - b.brancheId);
   }
 
   private formatPercent(value: number): string {
