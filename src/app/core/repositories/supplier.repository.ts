@@ -3,9 +3,14 @@ import { SupabaseClient } from '@supabase/supabase-js';
 import { SupabaseService } from 'src/app/shared/services/supabase.service';
 import { LoadingService } from '../services/loading.service';
 import { IDefaultPaginatorDataSource } from '../models/query.model';
-import { finalize, from, map, Observable, of, switchMap } from 'rxjs';
+import { finalize, forkJoin, from, map, Observable, of, switchMap } from 'rxjs';
 import { EnumSupplierDeliveryTypeEnum } from 'src/app/core/enums/supplier.enum';
-import { ISupplierProductView, ISupplierView, IUpdateSupplier } from '../models/supplier.model';
+import {
+  ISupplierProductBranchView,
+  ISupplierProductPivotView,
+  ISupplierView,
+  IUpdateSupplier,
+} from '../models/supplier.model';
 
 @Injectable({ providedIn: 'root' })
 export class SupplierRepository {
@@ -103,79 +108,80 @@ export class SupplierRepository {
 
   getProductsBySupplier(
     supplierId: number,
-    paginator: IDefaultPaginatorDataSource<ISupplierProductView>,
+    paginator: IDefaultPaginatorDataSource<ISupplierProductPivotView>,
     search?: string,
-  ): Observable<{ data: ISupplierProductView[]; count: number }> {
+  ): Observable<{
+    data: ISupplierProductPivotView[];
+    count: number;
+    branches: { brancheId: number; brancheName: string }[];
+  }> {
     this.loadingService.show();
 
-    return from(
-      this.supabase
-        .from('supplier_flyers')
-        .select('id, branche_id, branche:company_branches!inner(name)')
-        .eq('supplier_id', supplierId),
-    ).pipe(
-      switchMap(({ data: flyers, error: flyersError }) => {
-        if (flyersError) throw flyersError;
-        if (!flyers || flyers.length === 0) return of({ data: [], count: 0 });
+    // Queries 1 e 2 são independentes — rodam em paralelo
+    return forkJoin({
+      branches: from(this.supabase.from('company_branches').select('id, name').order('id')),
+      flyers: from(this.supabase.from('supplier_flyers').select('id').eq('supplier_id', supplierId)),
+    }).pipe(
+      switchMap(({ branches, flyers }) => {
+        if (branches.error) throw branches.error;
+        if (flyers.error) throw flyers.error;
 
-        const flyerIds = flyers.map((f: any) => f.id);
-        const flyerMap = new Map<number, { brancheId: number; brancheName: string }>(
-          flyers.map((f: any) => [
-            f.id,
-            { brancheId: f.branche_id, brancheName: f.branche?.name || '' },
-          ]),
-        );
+        const sortedBranches = (branches.data ?? []).map((b: any) => ({
+          brancheId: b.id as number,
+          brancheName: b.name as string,
+        }));
+        const flyerIds = (flyers.data ?? []).map((f: any) => f.id as number);
 
-        const fromIdx = paginator.pageIndex * paginator.pageSize;
-        const toIdx = fromIdx + paginator.pageSize - 1;
+        if (!sortedBranches.length || !flyerIds.length)
+          return of({ data: [], count: 0, branches: sortedBranches });
 
-        let query = this.supabase
-          .from('supplier_flyer_products')
-          .select(
-            `
-            supplier_flyer_id,
-            product:products!inner (
-              id,
-              name,
-              marginBranches:product_margin_branches (
-                margin,
-                branche_id
-              )
-            )
-            `,
-            { count: 'exact' },
-          )
-          .in('supplier_flyer_id', flyerIds)
-          .order('product(name)', { ascending: true });
+        // Query 3: IDs únicos de produtos nos encartes deste fornecedor
+        return from(
+          this.supabase
+            .from('supplier_flyer_products')
+            .select('product_id')
+            .in('supplier_flyer_id', flyerIds),
+        ).pipe(
+          switchMap(({ data: flyerProducts, error: fpError }) => {
+            if (fpError) throw fpError;
+            if (!flyerProducts?.length) return of({ data: [], count: 0, branches: sortedBranches });
 
-        if (search) {
-          query = query.or(`name.ilike.%${search}%,id_text.ilike.%${search}%`, {
-            foreignTable: 'product',
-          });
-        }
+            const uniqueProductIds = [
+              ...new Set(flyerProducts.map((fp: any) => fp.product_id as number)),
+            ];
+            const fromIdx = paginator.pageIndex * paginator.pageSize;
+            const toIdx = fromIdx + paginator.pageSize - 1;
 
-        return from(query.range(fromIdx, toIdx)).pipe(
-          map(({ data, count, error }) => {
-            if (error) throw error;
+            let query = this.supabase
+              .from('products')
+              .select('id, name, marginBranches:product_margin_branches(margin, branche_id)', {
+                count: 'exact',
+              })
+              .in('id', uniqueProductIds)
+              .order('name', { ascending: true });
 
-            const mappedData: ISupplierProductView[] = (data || []).map((item: any) => {
-              const flyerInfo = flyerMap.get(item.supplier_flyer_id);
-              const brancheId = flyerInfo?.brancheId ?? 0;
-              const brancheName = flyerInfo?.brancheName ?? '';
-              const margin =
-                item.product?.marginBranches?.find((m: any) => m.branche_id === brancheId)
-                  ?.margin ?? null;
+            if (search) query = query.ilike('name', `%${search}%`);
 
-              return {
-                productId: item.product.id,
-                productName: item.product.name,
-                brancheId,
-                brancheName,
-                margin,
-              };
-            });
+            // Query 4: produtos paginados com suas margens
+            return from(query.range(fromIdx, toIdx)).pipe(
+              map(({ data, count, error }) => {
+                if (error) throw error;
 
-            return { data: mappedData, count: count ?? 0 };
+                const mappedData: ISupplierProductPivotView[] = (data ?? []).map((item: any) => ({
+                  productId: item.id,
+                  productName: item.name,
+                  branches: sortedBranches.map((branch): ISupplierProductBranchView => ({
+                    brancheId: branch.brancheId,
+                    brancheName: branch.brancheName,
+                    margin:
+                      item.marginBranches?.find((m: any) => m.branche_id === branch.brancheId)
+                        ?.margin ?? null,
+                  })),
+                }));
+
+                return { data: mappedData, count: count ?? 0, branches: sortedBranches };
+              }),
+            );
           }),
         );
       }),

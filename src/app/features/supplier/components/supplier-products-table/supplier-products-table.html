@@ -25,30 +25,27 @@
         <td mat-cell *matCellDef="let element">{{ element.productName }}</td>
       </ng-container>
 
-      <ng-container matColumnDef="branche">
-        <th mat-header-cell *matHeaderCellDef>Loja</th>
-        <td mat-cell *matCellDef="let element">{{ element.brancheName }}</td>
-      </ng-container>
-
-      <ng-container matColumnDef="margin">
-        <th mat-header-cell *matHeaderCellDef>Margem</th>
-        <td mat-cell *matCellDef="let element">
-          <input
-            class="only-line"
-            type="text"
-            style="width: 80px"
-            [formControl]="getMarginControl(element)"
-            mask="separator.2"
-            suffix="%"
-            decimalMarker=","
-            [dropSpecialCharacters]="true"
-            [showMaskTyped]="false"
-            [allowNegativeNumbers]="false"
-            (blur)="onMarginBlur($event, element)"
-            (click)="$event.stopPropagation()"
-          />
-        </td>
-      </ng-container>
+      @for (branch of branchColumns; track branch.brancheId) {
+        <ng-container [matColumnDef]="brancheColumnId(branch.brancheId)">
+          <th mat-header-cell *matHeaderCellDef>{{ branch.brancheName }}</th>
+          <td mat-cell *matCellDef="let element">
+            <input
+              class="only-line"
+              type="text"
+              style="width: 80px"
+              [formControl]="getMarginControl(element.productId, branch.brancheId)"
+              mask="separator.2"
+              suffix="%"
+              decimalMarker=","
+              [dropSpecialCharacters]="true"
+              [showMaskTyped]="false"
+              [allowNegativeNumbers]="false"
+              (blur)="onMarginBlur($event, getBranch(element, branch.brancheId), element.productId)"
+              (click)="$event.stopPropagation()"
+            />
+          </td>
+        </ng-container>
+      }
 
       <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
       <tr mat-row *matRowDef="let row; columns: columnsToDisplay" style="cursor: default"></tr>

@@ -29,3 +29,15 @@ export interface ISupplierProductView {
   brancheName: string;
   margin: number | null;
 }
+
+export interface ISupplierProductBranchView {
+  brancheId: number;
+  brancheName: string;
+  margin: number | null;
+}
+
+export interface ISupplierProductPivotView {
+  productId: number;
+  productName: string;
+  branches: ISupplierProductBranchView[];
+}
