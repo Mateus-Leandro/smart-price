@@ -164,10 +164,6 @@ export class PromotionalFlyerRepository {
           query = query.eq('warning_type', EnumFilterPromotionalFlyerProducts.CompetitorPrice);
           break;
 
-        case EnumFilterPromotionalFlyerProducts.NoCompetitorPrice:
-          query = query.eq('warning_type', EnumFilterPromotionalFlyerProducts.NoCompetitorPrice);
-          break;
-
         case EnumFilterPromotionalFlyerProducts.SupplierDeliveryFree:
           query = query.eq('supplier.delivery_type', EnumSupplierDeliveryTypeEnum.PORTA);
           break;
@@ -186,48 +182,69 @@ export class PromotionalFlyerRepository {
       }
     }
 
+    const mapResponse = ({ data, count, error }: any) => {
+      if (error) throw error;
+
+      const mappedData: IPromotionalFlyerProductsView[] = (data || []).map((item: any) => {
+        const targetBranchId = item.promotionalFlyer?.branche_id;
+        const correctMargin = item.product?.productMarginBranches?.find(
+          (m: any) => m.branche_id === targetBranchId,
+        );
+
+        return {
+          salePrice: item.sale_price,
+          loyaltyPrice: item.loyalty_price,
+          shippingPrice: item.quote_supplier_shipping_price || 0,
+          additionalCost: item.additional_cost || 0,
+          quoteCost: item.quote_cost,
+          averageCostQuote: item.average_cost_quote,
+          quantitySuppliers: item.quantity_suppliers || 0,
+          currentSalePrice: item.current_sale_price,
+          currentLoyaltyPrice: item.current_loyalty_price,
+          erpImportDate: item.erp_import_date,
+          lockPrice: item.lock_price,
+          priceDiscountPercent: item.price_discount_percent,
+          warningType: item.warning_type,
+          lockCompetitorPrices: item.lock_competitor_prices,
+          product: {
+            id: item?.product?.id,
+            name: item?.product?.name,
+            margin: correctMargin?.margin,
+          },
+          supplier: {
+            id: item?.supplier?.id,
+            name: item?.supplier?.name,
+            deliveryType: item?.supplier?.delivery_type,
+          },
+          competitorPrices: item?.product?.competitorPrices || [],
+        };
+      }) as IPromotionalFlyerProductsView[];
+
+      return { data: mappedData, count: count ?? 0 };
+    };
+
     this.loadingService.show();
-    return from(query.range(fromIdx, toIdx)).pipe(
-      map(({ data, count, error }) => {
-        if (error) throw error;
 
-        const mappedData: IPromotionalFlyerProductsView[] = (data || []).map((item: any) => {
-          const targetBranchId = item.promotionalFlyer?.branche_id;
-          const correctMargin = item.product?.productMarginBranches?.find(
-            (m: any) => m.branche_id === targetBranchId,
+    if (selectedFilterType === EnumFilterPromotionalFlyerProducts.NoCompetitorPrice) {
+      return from(query).pipe(
+        map(({ data, error }) => {
+          if (error) throw error;
+          const withoutPrices = (data || []).filter(
+            (item: any) => !item.product?.competitorPrices?.length,
           );
-
           return {
-            salePrice: item.sale_price,
-            loyaltyPrice: item.loyalty_price,
-            shippingPrice: item.quote_supplier_shipping_price || 0,
-            additionalCost: item.additional_cost || 0,
-            quoteCost: item.quote_cost,
-            averageCostQuote: item.average_cost_quote,
-            quantitySuppliers: item.quantity_suppliers || 0,
-            currentSalePrice: item.current_sale_price,
-            currentLoyaltyPrice: item.current_loyalty_price,
-            erpImportDate: item.erp_import_date,
-            lockPrice: item.lock_price,
-            priceDiscountPercent: item.price_discount_percent,
-            warningType: item.warning_type,
-            lockCompetitorPrices: item.lock_competitor_prices,
-            product: {
-              id: item?.product?.id,
-              name: item?.product?.name,
-              margin: correctMargin?.margin,
-            },
-            supplier: {
-              id: item?.supplier?.id,
-              name: item?.supplier?.name,
-              deliveryType: item?.supplier?.delivery_type,
-            },
-            competitorPrices: item?.product?.competitorPrices || [],
+            data: withoutPrices.slice(fromIdx, toIdx + 1),
+            count: withoutPrices.length,
+            error: null,
           };
-        }) as IPromotionalFlyerProductsView[];
+        }),
+        map(mapResponse),
+        finalize(() => this.loadingService.hide()),
+      );
+    }
 
-        return { data: mappedData, count: count ?? 0 };
-      }),
+    return from(query.range(fromIdx, toIdx)).pipe(
+      map(mapResponse),
       finalize(() => this.loadingService.hide()),
     );
   }

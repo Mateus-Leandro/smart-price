@@ -160,9 +160,6 @@ export class SupplierFlyerRepository {
         case EnumFilterPromotionalFlyerProducts.CompetitorPrice:
           query = query.eq('warning_type', EnumFilterPromotionalFlyerProducts.CompetitorPrice);
           break;
-        case EnumFilterPromotionalFlyerProducts.NoCompetitorPrice:
-          query = query.eq('warning_type', EnumFilterPromotionalFlyerProducts.NoCompetitorPrice);
-          break;
         case EnumFilterSupplierFlyerProducts.VariationGreater:
           query = query.gt('price_variation', 0).gt('cost_price', 0).gt('previous_cost', 0);
           break;
@@ -172,42 +169,63 @@ export class SupplierFlyerRepository {
       }
     }
 
+    const mapResponse = ({ data, count, error }: any) => {
+      if (error) throw error;
+
+      const mappedData: ISupplierFlyerProductsView[] = (data || []).map((item: any) => {
+        const targetBranchId = item.supplierFlyer?.branche_id;
+
+        const correctMargin = item.product?.productMarginBranches?.find(
+          (m: any) => m.branche_id === targetBranchId,
+        );
+
+        return {
+          product: {
+            id: item?.product?.id,
+            name: item?.product?.name,
+            margin: correctMargin?.margin,
+          },
+          sendToErp: item.send_to_erp,
+          costPrice: item.cost_price,
+          salePrice: item.sale_price,
+          previousCost: item.previous_cost,
+          loyaltyPrice: item.loyalty_price,
+          currentSalePrice: item.current_sale_price,
+          currentLoyaltyPrice: item.current_loyalty_price,
+          erpImportDate: item.erp_import_date,
+          lockPrice: item.lock_price,
+          priceDiscountPercent: item.price_discount_percent,
+          warningType: item.warning_type,
+          competitorPrices: item?.product?.competitorPrices || [],
+          lockCompetitorPrices: item?.lock_competitor_prices || false,
+        };
+      });
+
+      return { data: mappedData, count: count ?? 0 };
+    };
+
     this.loadingService.show();
-    return from(query.range(fromIdx, toIdx)).pipe(
-      map(({ data, count, error }) => {
-        if (error) throw error;
 
-        const mappedData: ISupplierFlyerProductsView[] = (data || []).map((item: any) => {
-          const targetBranchId = item.supplierFlyer?.branche_id;
-
-          const correctMargin = item.product?.productMarginBranches?.find(
-            (m: any) => m.branche_id === targetBranchId,
+    if (selectedFilterType === EnumFilterPromotionalFlyerProducts.NoCompetitorPrice) {
+      return from(query).pipe(
+        map(({ data, error }) => {
+          if (error) throw error;
+          const withoutPrices = (data || []).filter(
+            (item: any) => !item.product?.competitorPrices?.length,
           );
-
           return {
-            product: {
-              id: item?.product?.id,
-              name: item?.product?.name,
-              margin: correctMargin?.margin,
-            },
-            sendToErp: item.send_to_erp,
-            costPrice: item.cost_price,
-            salePrice: item.sale_price,
-            previousCost: item.previous_cost,
-            loyaltyPrice: item.loyalty_price,
-            currentSalePrice: item.current_sale_price,
-            currentLoyaltyPrice: item.current_loyalty_price,
-            erpImportDate: item.erp_import_date,
-            lockPrice: item.lock_price,
-            priceDiscountPercent: item.price_discount_percent,
-            warningType: item.warning_type,
-            competitorPrices: item?.product?.competitorPrices || [],
-            lockCompetitorPrices: item?.lock_competitor_prices || false,
+            data: withoutPrices.slice(fromIdx, toIdx + 1),
+            count: withoutPrices.length,
+            error: null,
           };
-        });
+        }),
+        map(mapResponse),
+        finalize(() => this.loadingService.hide()),
+      );
+    }
 
-        return { data: mappedData, count: count ?? 0 };
-      }),
+    return from(query.range(fromIdx, toIdx)).pipe(
+      map(mapResponse),
       finalize(() => this.loadingService.hide()),
     );
   }
