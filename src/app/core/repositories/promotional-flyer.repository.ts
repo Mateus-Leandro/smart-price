@@ -36,7 +36,7 @@ export class PromotionalFlyerRepository {
       .order('created_at', { ascending: false });
 
     if (search) {
-      query = query.ilike('name', `%${search}%`);
+      query = query.ilike('search_text', `%${search}%`);
     }
 
     if (flyerId) {
