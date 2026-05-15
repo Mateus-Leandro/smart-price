@@ -46,7 +46,7 @@ export class SupplierRepository {
       .order('name', { ascending: true });
 
     if (search) {
-      query = query.ilike('name', `%${search}%`);
+      query = query.ilike('search_text', `%${search}%`);
     }
 
     if (deliveryType) {
@@ -120,7 +120,9 @@ export class SupplierRepository {
     // Queries 1 e 2 são independentes — rodam em paralelo
     return forkJoin({
       branches: from(this.supabase.from('company_branches').select('id, name').order('id')),
-      flyers: from(this.supabase.from('supplier_flyers').select('id').eq('supplier_id', supplierId)),
+      flyers: from(
+        this.supabase.from('supplier_flyers').select('id').eq('supplier_id', supplierId),
+      ),
     }).pipe(
       switchMap(({ branches, flyers }) => {
         if (branches.error) throw branches.error;
@@ -170,13 +172,15 @@ export class SupplierRepository {
                 const mappedData: ISupplierProductPivotView[] = (data ?? []).map((item: any) => ({
                   productId: item.id,
                   productName: item.name,
-                  branches: sortedBranches.map((branch): ISupplierProductBranchView => ({
-                    brancheId: branch.brancheId,
-                    brancheName: branch.brancheName,
-                    margin:
-                      item.marginBranches?.find((m: any) => m.branche_id === branch.brancheId)
-                        ?.margin ?? null,
-                  })),
+                  branches: sortedBranches.map(
+                    (branch): ISupplierProductBranchView => ({
+                      brancheId: branch.brancheId,
+                      brancheName: branch.brancheName,
+                      margin:
+                        item.marginBranches?.find((m: any) => m.branche_id === branch.brancheId)
+                          ?.margin ?? null,
+                    }),
+                  ),
                 }));
 
                 return { data: mappedData, count: count ?? 0, branches: sortedBranches };
