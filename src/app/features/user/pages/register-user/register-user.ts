@@ -150,6 +150,7 @@ export class RegisterUser {
       viewMargin: raw.viewMargin ?? false,
       viewCost: raw.viewCost ?? false,
       viewSuggestedPriceOnMargin: raw.viewSuggestedPriceOnMargin ?? false,
+      viewProductMargin: raw.viewProductMargin ?? false,
     };
 
     this.userPermissionService.upsertPermissions(userPermissions).subscribe({
