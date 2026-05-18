@@ -32,6 +32,7 @@ export class UserPermissionRepository {
           view_margin: userPermissions.viewMargin,
           view_cost: userPermissions.viewCost,
           view_suggested_price_on_margin: userPermissions.viewSuggestedPriceOnMargin,
+          view_product_margin: userPermissions.viewProductMargin,
         },
         {
           onConflict: 'user_id',
@@ -66,6 +67,7 @@ export class UserPermissionRepository {
           viewMargin: data.view_margin,
           viewCost: data.view_cost,
           viewSuggestedPriceOnMargin: data.view_suggested_price_on_margin,
+          viewProductMargin: data.view_product_margin,
         };
 
         return mappedData;
