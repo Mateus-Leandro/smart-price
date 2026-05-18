@@ -10,4 +10,5 @@ export interface IUserPermission {
   viewMargin?: boolean;
   viewCost?: boolean;
   viewSuggestedPriceOnMargin?: boolean;
+  viewProductMargin?: boolean;
 }

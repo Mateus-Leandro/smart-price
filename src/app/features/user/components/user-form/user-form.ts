@@ -82,12 +82,23 @@ export class UserForm {
         viewMargin: this.fb.control<boolean>(false),
         viewCost: this.fb.control<boolean>(false),
         viewSuggestedPriceOnMargin: this.fb.control<boolean>(false),
+        viewProductMargin: this.fb.control<boolean>(false),
       },
       { validators: [PasswordMatchValidator.match('pass', 'confirmationPass')] },
     );
 
     this.userFormGroup.get('isAdmin')!.valueChanges.subscribe((isAdmin: boolean) => {
       this.checkAllPermissions(isAdmin);
+    });
+
+    this.userFormGroup.get('allowEditProductMargin')!.valueChanges.subscribe((allow: boolean) => {
+      const viewProductMargin = this.userFormGroup.get('viewProductMargin')!;
+      if (allow) {
+        viewProductMargin.setValue(true, { emitEvent: false });
+        viewProductMargin.disable({ emitEvent: false });
+      } else {
+        viewProductMargin.enable({ emitEvent: false });
+      }
     });
 
     this.pass.valueChanges.subscribe(() => {
@@ -126,6 +137,7 @@ export class UserForm {
                         viewMargin: permissions?.viewMargin,
                         viewCost: permissions?.viewCost,
                         viewSuggestedPriceOnMargin: permissions?.viewSuggestedPriceOnMargin,
+                        viewProductMargin: permissions?.viewProductMargin,
                       });
 
                       this.userFormGroup.get('pass')?.disable();
@@ -200,6 +212,7 @@ export class UserForm {
       'viewMargin',
       'viewCost',
       'viewSuggestedPriceOnMargin',
+      'viewProductMargin',
     ];
 
     permissions.forEach((controlName) => {

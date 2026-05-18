@@ -74,7 +74,11 @@
             <div class="element-detail-content">
               <div class="expanded-detail-content" fxLayout="column">
                 <div fxLayout="column" fxLayoutGap="5px" fxLayoutAlign="start start">
-                  @if (userPermissions?.allowEditProductMargin) {
+                  @if (
+                    userPermissions?.viewProductMargin ||
+                    userPermissions?.isAdmin ||
+                    userPermissions?.allowEditProductMargin
+                  ) {
                     <b class="label">Margem por loja %</b>
 
                     <div fxLayout="row" fxLayoutAlign="space-between" class="full-width">
@@ -84,6 +88,10 @@
 
                           @if (marginCtrl) {
                             <input
+                              [readonly]="
+                                !userPermissions?.isAdmin &&
+                                !userPermissions?.allowEditProductMargin
+                              "
                               #marginInput
                               style="width: 55px"
                               class="only-line margin-field"
