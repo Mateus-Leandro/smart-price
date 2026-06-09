@@ -5,7 +5,7 @@ import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatDividerModule } from '@angular/material/divider';
 import { Button } from 'src/app/shared/components/button/button';
-import { IProductReportFilter } from 'src/app/features/product/models/product-report.model';
+import { IProductReportFilter } from 'src/app/core/models/product-report.model';
 
 @Component({
   selector: 'app-report-filter',

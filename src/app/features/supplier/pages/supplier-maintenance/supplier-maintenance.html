@@ -31,8 +31,18 @@
 @if (supplierId) {
   <mat-card style="margin-top: 20px">
     <mat-card-header style="padding-bottom: 15px">
-      <mat-card-title>Produtos Vinculados</mat-card-title>
-      <mat-card-subtitle>Produtos vinculados a este fornecedor</mat-card-subtitle>
+      <div
+        fxLayout="row"
+        fxLayoutAlign="space-between center"
+        fxLayoutGap="16px"
+        class="full-width"
+      >
+        <div fxLayout="column">
+          <mat-card-title>Produtos Vinculados</mat-card-title>
+          <mat-card-subtitle>Produtos vinculados a este fornecedor</mat-card-subtitle>
+        </div>
+        <app-btn-report tooltipText="Gerar relatório" (reportClick)="openReportFilterDialog()" />
+      </div>
     </mat-card-header>
     <mat-card-content>
       <app-supplier-products-table />
