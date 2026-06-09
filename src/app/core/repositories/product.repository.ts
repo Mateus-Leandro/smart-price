@@ -2,11 +2,11 @@ import { Injectable } from '@angular/core';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { SupabaseService } from 'src/app/shared/services/supabase.service';
 import { IDefaultPaginatorDataSource } from '../models/query.model';
-import { map, from, Observable, finalize } from 'rxjs';
+import { map, from, Observable, finalize, of, switchMap } from 'rxjs';
 import { LoadingService } from '../services/loading.service';
 import { IProductView } from '../models/product.model';
 import { MarginFilterEnum } from '../enums/product.enum';
-import { IProductReportView } from 'src/app/features/product/models/product-report.model';
+import { IProductReportView } from 'src/app/core/models/product-report.model';
 
 @Injectable({ providedIn: 'root' })
 export class ProductRepository {
@@ -48,10 +48,22 @@ export class ProductRepository {
   getProductsReport(
     marginFilter: MarginFilterEnum,
     search?: string,
+    supplierId?: number,
   ): Observable<IProductReportView[]> {
     this.loadingService.show();
 
-    return from(this.fetchAllProductsForReport(marginFilter, search)).pipe(
+    const productIds$: Observable<number[] | undefined> = supplierId
+      ? from(this.fetchSupplierProductIds(supplierId))
+      : of(undefined);
+
+    return productIds$.pipe(
+      switchMap((productIds) => {
+        if (supplierId && !productIds?.length) {
+          return of([] as any[]);
+        }
+
+        return from(this.fetchAllProductsForReport(marginFilter, search, productIds));
+      }),
       map((data) =>
         data.map((item: any) => ({
           id: item.id,
@@ -69,7 +81,11 @@ export class ProductRepository {
     );
   }
 
-  private buildProductsQuery(marginFilter: MarginFilterEnum, search?: string) {
+  private buildProductsQuery(
+    marginFilter: MarginFilterEnum,
+    search?: string,
+    productIds?: number[],
+  ) {
     const relationJoin = marginFilter === MarginFilterEnum.WITH_MARGIN ? '!inner' : '';
 
     let query = this.supabase.from('products').select(
@@ -92,6 +108,10 @@ export class ProductRepository {
       query = query.or(`name.ilike.%${search}%,id_text.ilike.%${search}%`);
     }
 
+    if (productIds) {
+      query = query.in('id', productIds);
+    }
+
     if (marginFilter === MarginFilterEnum.WITHOUT_MARGIN) {
       query = query.filter('marginBranches', 'is', 'null');
     }
@@ -102,6 +122,7 @@ export class ProductRepository {
   private async fetchAllProductsForReport(
     marginFilter: MarginFilterEnum,
     search?: string,
+    productIds?: number[],
   ): Promise<any[]> {
     const pageSize = 1000;
     let fromIdx = 0;
@@ -110,10 +131,11 @@ export class ProductRepository {
 
     while (hasMore) {
       const toIdx = fromIdx + pageSize - 1;
-      const { data, error } = await this.buildProductsQuery(marginFilter, search).range(
-        fromIdx,
-        toIdx,
-      );
+      const { data, error } = await this.buildProductsQuery(
+        marginFilter,
+        search,
+        productIds,
+      ).range(fromIdx, toIdx);
 
       if (error) {
         throw error;
@@ -126,5 +148,32 @@ export class ProductRepository {
     }
 
     return products;
+  }
+
+  private async fetchSupplierProductIds(supplierId: number): Promise<number[]> {
+    const { data: flyers, error: flyersError } = await this.supabase
+      .from('supplier_flyers')
+      .select('id')
+      .eq('supplier_id', supplierId);
+
+    if (flyersError) {
+      throw flyersError;
+    }
+
+    const flyerIds = (flyers ?? []).map((flyer: any) => flyer.id as number);
+    if (!flyerIds.length) {
+      return [];
+    }
+
+    const { data: flyerProducts, error: flyerProductsError } = await this.supabase
+      .from('supplier_flyer_products')
+      .select('product_id')
+      .in('supplier_flyer_id', flyerIds);
+
+    if (flyerProductsError) {
+      throw flyerProductsError;
+    }
+
+    return [...new Set((flyerProducts ?? []).map((fp: any) => fp.product_id as number))];
   }
 }
