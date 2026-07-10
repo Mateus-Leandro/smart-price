@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { SupabaseClient } from '@supabase/supabase-js';
-import { finalize, from, map, Observable, of } from 'rxjs';
+import { finalize, forkJoin, from, map, Observable, of } from 'rxjs';
 import { SupabaseService } from 'src/app/shared/services/supabase.service';
 import { IDefaultPaginatorDataSource } from '../models/query.model';
 import { LoadingService } from '../services/loading.service';
@@ -248,6 +248,31 @@ export class PromotionalFlyerRepository {
     return from(query.range(fromIdx, toIdx)).pipe(
       map(mapResponse),
       finalize(() => this.loadingService.hide()),
+    );
+  }
+
+  getSendToErpCounts(flyerId: number): Observable<{ sent: number; total: number }> {
+    const totalQuery = this.supabase
+      .from('promotional_flyer_products')
+      .select('*', { count: 'exact', head: true })
+      .eq('promotional_flyer_id', flyerId);
+
+    const sentQuery = this.supabase
+      .from('promotional_flyer_products')
+      .select('*', { count: 'exact', head: true })
+      .eq('promotional_flyer_id', flyerId)
+      .eq('send_to_erp', true);
+
+    return forkJoin({
+      total: from(totalQuery),
+      sent: from(sentQuery),
+    }).pipe(
+      map(({ total, sent }) => {
+        if (total.error) throw total.error;
+        if (sent.error) throw sent.error;
+
+        return { sent: sent.count ?? 0, total: total.count ?? 0 };
+      }),
     );
   }
 

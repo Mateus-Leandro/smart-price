@@ -168,6 +168,8 @@ export class PromotionalFlyerProductTable {
   dataSource = new MatTableDataSource<IPromotionalFlyerProductsView | ISupplierFlyerView>([]);
   expandedElement: IPromotionalFlyerProductsView | ISupplierFlyerView | null = null;
 
+  sendToErpCounts: { sent: number; total: number } = { sent: 0, total: 0 };
+
   filterOptions = computed(() => getFlyerFilterOptions(this.flyerType()));
 
   filterService = inject(PromotionalFlyerFilterService);
@@ -272,6 +274,7 @@ export class PromotionalFlyerProductTable {
           this.companyIncreasePricePercent = responses.companySettings.data.increasePricePercent;
 
           this.reload();
+          this.loadSendToErpCounts();
         },
         error: (err) => {
           console.error(err);
@@ -325,6 +328,21 @@ export class PromotionalFlyerProductTable {
             `Erro ao buscar produtos ${flyerId}: ${err.message || err}`,
           );
           this.cdr.detectChanges();
+        },
+      });
+  }
+
+  loadSendToErpCounts(): void {
+    this.getFlyerService()
+      .getSendToErpCounts(this.flyerId())
+      .subscribe({
+        next: (counts: { sent: number; total: number }) => {
+          this.sendToErpCounts = counts;
+        },
+        error: (err: any) => {
+          this.notificationService.showError(
+            `Erro ao buscar contagem de envio de preços para o ERP: ${err.message || err}`,
+          );
         },
       });
   }
@@ -673,7 +691,15 @@ export class PromotionalFlyerProductTable {
       .sendPricesToErp(this.flyerId(), productId, sendToErp)
       .subscribe({
         next: () => {
+          const wasSent = this.rows.at(index).controls.sendToErp.value === true;
           this.rows.at(index).controls.sendToErp.setValue(sendToErp);
+
+          if (sendToErp !== wasSent) {
+            this.sendToErpCounts = {
+              ...this.sendToErpCounts,
+              sent: this.sendToErpCounts.sent + (sendToErp ? 1 : -1),
+            };
+          }
         },
         error: (err: any) => {
           this.notificationService.showError(
