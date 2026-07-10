@@ -198,6 +198,28 @@ export class PromotionalFlyerTable {
       });
   }
 
+  unmarkAllPrices(flyerId: number) {
+    this.sendingFlyerId = flyerId;
+    this.getFlyerService()
+      .sendPricesToErp(flyerId, undefined, false)
+      .subscribe({
+        next: () => {
+          this.notificationService.showSuccess(
+            'Desmarcado o envio de preços para o ERP corretamente',
+          );
+        },
+        error: (err: any) => {
+          this.notificationService.showError(
+            `Erro ao desmarcar envio de preços para o ERP: ${err?.message || err}`,
+          );
+        },
+        complete: () => {
+          this.sendingFlyerId = null;
+          this.cdr.detectChanges();
+        },
+      });
+  }
+
   onPageChange(event: PageEvent): void {
     this.paginatorDataSource.pageSize = event.pageSize;
     this.paginatorDataSource.pageIndex = event.pageIndex;

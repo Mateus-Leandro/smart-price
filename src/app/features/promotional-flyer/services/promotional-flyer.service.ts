@@ -36,8 +36,8 @@ export class PromotionalFlyerService {
     return this.repository.updateProductPrice(flyerId, productId, price, columnName);
   }
 
-  sendPricesToErp(flyerId: number, productId?: number) {
-    return this.repository.sendPricesToErp(flyerId, productId);
+  sendPricesToErp(flyerId: number, productId?: number, sendToErp: boolean = true) {
+    return this.repository.sendPricesToErp(flyerId, productId, sendToErp);
   }
 
   applySuggestedPrices(flyerId: number, onlyCompetitorPriceZero: boolean = false) {

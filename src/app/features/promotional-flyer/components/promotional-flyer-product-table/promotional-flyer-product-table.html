@@ -394,7 +394,7 @@
       </ng-container>
 
       <ng-container matColumnDef="send">
-        <th mat-header-cell *matHeaderCellDef></th>
+        <th mat-header-cell *matHeaderCellDef>Envio de preços p/ ERP</th>
         <td
           mat-cell
           *matCellDef="let element; let i = dataIndex"
@@ -403,13 +403,12 @@
           @if (userPermissions?.allowSendToErp) {
             @if (sendingProductId !== element.product.id) {
               <div fxLayout="column" fxLayoutAlign="center">
-                <app-icon-button
-                  icon="send"
-                  [class]="isPriceInvalid(i) ? 'icon-button-table-disabled' : 'icon-button-table'"
-                  [tooltipText]="isPriceInvalid(i) ? '' : `Enviar preços para o ERP`"
-                  (click)="sendPrices(element.product.id)"
+                <mat-checkbox
+                  [checked]="rows.at(i).controls.sendToErp.value"
                   [disabled]="isPriceInvalid(i)"
-                />
+                  [matTooltip]="isPriceInvalid(i) ? '' : 'Enviar preços para o ERP'"
+                  (change)="toggleSendToErp(element.product.id, $event.checked, i)"
+                ></mat-checkbox>
                 @if (element.erpImportDate) {
                   <div fxLayout="column" matTooltip="Data e hora de importação no ERP">
                     <span class="details-rows">

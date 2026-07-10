@@ -48,8 +48,8 @@ export class SupplierFlyerService {
     return this.repository.lockOrUnlockPrices(flyerId, lock, productId);
   }
 
-  sendPricesToErp(flyerId: number, productId?: number) {
-    return this.repository.sendPricesToErp(flyerId, productId);
+  sendPricesToErp(flyerId: number, productId?: number, sendToErp: boolean = true) {
+    return this.repository.sendPricesToErp(flyerId, productId, sendToErp);
   }
 
   applySuggestedPrices(flyerId: number, onlyCompetitorPriceZero: boolean = false) {

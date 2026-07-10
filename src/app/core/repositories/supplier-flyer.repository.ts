@@ -274,15 +274,22 @@ export class SupplierFlyerRepository {
     );
   }
 
-  sendPricesToErp(flyerId: number, productId?: number): Observable<void> {
+  sendPricesToErp(
+    flyerId: number,
+    productId?: number,
+    sendToErp: boolean = true,
+  ): Observable<void> {
     let query = this.supabase
       .from('supplier_flyer_products')
       .update({
-        send_to_erp: true,
+        send_to_erp: sendToErp,
         updated_at: new Date(),
       })
-      .eq('supplier_flyer_id', flyerId)
-      .or('sale_price.gt.0,loyalty_price.gt.0');
+      .eq('supplier_flyer_id', flyerId);
+
+    if (sendToErp) {
+      query = query.or('sale_price.gt.0,loyalty_price.gt.0');
+    }
 
     if (productId) {
       query = query.eq('product_id', productId);
