@@ -4,7 +4,7 @@ import { SupabaseService } from 'src/app/shared/services/supabase.service';
 import { LoadingService } from '../services/loading.service';
 import { ISupplierFlyerProductsView, ISupplierFlyerView } from '../models/supplier-flyer.model';
 import { IDefaultPaginatorDataSource } from '../models/query.model';
-import { finalize, from, map, Observable, of } from 'rxjs';
+import { finalize, forkJoin, from, map, Observable, of } from 'rxjs';
 import { EnumWarningProductType } from '../enums/product.enum';
 import {
   EnumFilterPromotionalFlyerProducts,
@@ -227,6 +227,31 @@ export class SupplierFlyerRepository {
     return from(query.range(fromIdx, toIdx)).pipe(
       map(mapResponse),
       finalize(() => this.loadingService.hide()),
+    );
+  }
+
+  getSendToErpCounts(flyerId: number): Observable<{ sent: number; total: number }> {
+    const totalQuery = this.supabase
+      .from('supplier_flyer_products')
+      .select('*', { count: 'exact', head: true })
+      .eq('supplier_flyer_id', flyerId);
+
+    const sentQuery = this.supabase
+      .from('supplier_flyer_products')
+      .select('*', { count: 'exact', head: true })
+      .eq('supplier_flyer_id', flyerId)
+      .eq('send_to_erp', true);
+
+    return forkJoin({
+      total: from(totalQuery),
+      sent: from(sentQuery),
+    }).pipe(
+      map(({ total, sent }) => {
+        if (total.error) throw total.error;
+        if (sent.error) throw sent.error;
+
+        return { sent: sent.count ?? 0, total: total.count ?? 0 };
+      }),
     );
   }
 
