@@ -44,6 +44,7 @@ export interface IPromotionalFlyerProductsView {
   currentSalePrice?: number;
   currentLoyaltyPrice?: number;
   erpImportDate?: string;
+  sendToErp?: boolean;
   lockPrice?: boolean;
   priceDiscountPercent?: number;
   warningType?: EnumWarningProductType;

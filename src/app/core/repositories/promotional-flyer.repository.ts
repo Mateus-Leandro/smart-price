@@ -91,6 +91,7 @@ export class PromotionalFlyerRepository {
       current_sale_price,
       current_loyalty_price,
       erp_import_date,
+      send_to_erp,
       lock_price,
       price_discount_percent,
       warning_type,
@@ -202,6 +203,7 @@ export class PromotionalFlyerRepository {
           currentSalePrice: item.current_sale_price,
           currentLoyaltyPrice: item.current_loyalty_price,
           erpImportDate: item.erp_import_date,
+          sendToErp: item.send_to_erp,
           lockPrice: item.lock_price,
           priceDiscountPercent: item.price_discount_percent,
           warningType: item.warning_type,
@@ -273,15 +275,22 @@ export class PromotionalFlyerRepository {
     );
   }
 
-  sendPricesToErp(flyerId: number, productId?: number): Observable<void> {
+  sendPricesToErp(
+    flyerId: number,
+    productId?: number,
+    sendToErp: boolean = true,
+  ): Observable<void> {
     let query = this.supabase
       .from('promotional_flyer_products')
       .update({
-        send_to_erp: true,
+        send_to_erp: sendToErp,
         updated_at: new Date(),
       })
-      .eq('promotional_flyer_id', flyerId)
-      .or('sale_price.gt.0,loyalty_price.gt.0');
+      .eq('promotional_flyer_id', flyerId);
+
+    if (sendToErp) {
+      query = query.or('sale_price.gt.0,loyalty_price.gt.0');
+    }
 
     if (productId) {
       query = query.eq('product_id', productId);

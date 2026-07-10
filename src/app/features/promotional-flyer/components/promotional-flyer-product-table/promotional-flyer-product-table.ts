@@ -55,6 +55,7 @@ import { roundToTwo, transformToNumberValue } from 'src/app/shared/functions/uti
 import { SuggestedPriceSettingService } from 'src/app/features/settings-suggested-price/services/suggested-price-setting.service';
 import { ISuggestedPriceSettingView } from 'src/app/core/models/suggested-price-setting.model';
 import { MatDivider } from '@angular/material/divider';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { EnumSupplierDeliveryTypeEnum } from 'src/app/core/enums/supplier.enum';
 import { IUserPermission } from 'src/app/core/models/user-permission.model';
 import { UserPermissionService } from 'src/app/features/user-permission/user-permission.service';
@@ -90,6 +91,7 @@ type FlyerRowForm = FormGroup<{
   saleMarginRuleText: FormControl<string | null>;
   loyaltyMarginRuleText: FormControl<string | null>;
   lockPrices: FormControl<boolean | null>;
+  sendToErp: FormControl<boolean | null>;
   priceDiscountPercent: FormControl<number>;
   warningType: FormControl<EnumWarningProductType | null>;
 }>;
@@ -113,6 +115,7 @@ type FlyerRowForm = FormGroup<{
     MatTooltip,
     MatDivider,
     IconFilterButton,
+    MatCheckboxModule,
   ],
   templateUrl: './promotional-flyer-product-table.html',
 
@@ -442,6 +445,7 @@ export class PromotionalFlyerProductTable {
           saleMarginRuleText: this.fb.control<string | null>(null),
           loyaltyMarginRuleText: this.fb.control<string | null>(null),
           lockPrices: this.fb.control<boolean | null>(item.lockPrice === true),
+          sendToErp: this.fb.control<boolean | null>(item.sendToErp === true),
           priceDiscountPercent: this.fb.control<number>(item.priceDiscountPercent ?? 0),
           warningType: this.fb.control<EnumWarningProductType | null>(item?.warningType || null),
         }) as FlyerRowForm;
@@ -662,15 +666,18 @@ export class PromotionalFlyerProductTable {
     }
   }
 
-  sendPrices(productId: number) {
+  toggleSendToErp(productId: number, sendToErp: boolean, index: number) {
     this.sendingProductId = productId;
 
     this.getFlyerService()
-      .sendPricesToErp(this.flyerId(), productId)
+      .sendPricesToErp(this.flyerId(), productId, sendToErp)
       .subscribe({
+        next: () => {
+          this.rows.at(index).controls.sendToErp.setValue(sendToErp);
+        },
         error: (err: any) => {
           this.notificationService.showError(
-            `Erro ao marcar preço para ser enviado ao ERP. Produto: ${productId} | Erro: ${err.message || err}`,
+            `Erro ao ${sendToErp ? 'marcar' : 'desmarcar'} envio de preços para o ERP. Produto: ${productId} | Erro: ${err.message || err}`,
           );
         },
         complete: () => {
