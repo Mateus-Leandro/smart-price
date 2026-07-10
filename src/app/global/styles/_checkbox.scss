@@ -1,0 +1,10 @@
+@use '../colors' as *;
+
+.mat-mdc-checkbox {
+  --mat-checkbox-selected-icon-color: #{$success-color};
+  --mat-checkbox-selected-focus-icon-color: #{$success-color};
+  --mat-checkbox-selected-hover-icon-color: #{$success-color};
+  --mat-checkbox-selected-focus-state-layer-color: #{$success-color};
+  --mat-checkbox-selected-hover-state-layer-color: #{$success-color};
+  --mat-checkbox-selected-pressed-state-layer-color: #{$success-color};
+}
