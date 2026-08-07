@@ -254,8 +254,9 @@ export class PromotionalFlyerTable {
 
   getColunsToDisplay() {
     return this.flyerType() === 'quote'
-      ? ['id_integral', 'name', 'branche_id', 'created_date', 'status', 'produtos', 'send']
+      ? ['id', 'id_integral', 'name', 'branche_id', 'created_date', 'status', 'produtos', 'send']
       : [
+          'id',
           'id_integral',
           'name',
           'supplier',
